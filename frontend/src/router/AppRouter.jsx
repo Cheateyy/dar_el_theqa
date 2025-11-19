@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import BuyerHome from '../pages/buyer/components/BuyerHome';
+import LandingPage from '../pages/landingPage/components/page';
 
 {/*Put all your routers here */ }
 function AppRouter() {
@@ -7,7 +7,7 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<BuyerHome />}></Route>
+        <Route path="/" element={<LandingPage />}></Route>
       </Routes>
     </Router>
   );
