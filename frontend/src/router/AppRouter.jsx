@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from '../pages/buyer/components/Home';
+import BuyerHome from '../pages/buyer/components/BuyerHome';
+
 {/*Put all your routers here */ }
 function AppRouter() {
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />}></Route>
+        <Route path="/" element={<BuyerHome />}></Route>
       </Routes>
     </Router>
   );
