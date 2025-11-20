@@ -3,6 +3,7 @@ import heroImg from "../assets/landing_hero.png";
 
 import { Button } from "@/components/ui/button";
 import { GlobeIcon } from "lucide-react";
+import MainFilters from "./MainFilters";
 
 export default function LandingPage() {
     return (
@@ -47,6 +48,8 @@ export default function LandingPage() {
                         </div>
 
                     </div>
+                    <MainFilters />
+
                 </section>
 
                 <div>
@@ -56,3 +59,4 @@ export default function LandingPage() {
         </>
     );
 }
+
