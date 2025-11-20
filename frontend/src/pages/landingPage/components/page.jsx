@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, GlobeIcon } from "lucide-react";
 import MainFilters from "./MainFilters";
 import { ListingCard } from "@/components/common/ListingCard";
+import { PartnerCard } from "./PartnerCard";
 
 export default function LandingPage() {
     return (
@@ -25,9 +26,10 @@ export default function LandingPage() {
             </header>
 
             <main className="px-20">
-                <section>
+                <section role="hero">
                     <div className="relative">
                         <div
+                            role="hero image and MainFilters"
                             style={{ backgroundImage: `url(${heroImg})` }}
                             className="bg-cover bg-center h-172 w-full rounded-4xl"
                         >
@@ -51,21 +53,40 @@ export default function LandingPage() {
                         <MainFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
                     </div>
                 </section>
-                <div role="Search-Page" className="flex justify-center items-center mt-10">
-                    <Button>
-                        <span>Search Listings</span>
-                        <ArrowRight />
-                    </Button>
-                </div>
-                <div className="mt-21 flex justify-center items-center">
-                    <h2 className="h2">You might find interesting</h2>
-                </div>
-                <div className="mt-20 flex gap-4">
-                    {[1, 2, 3, 4].map(() => <ListingCard />)}
-                </div>
-                <div>
-                    Lorem ipsum...
-                </div>
+
+                <section role="Search Listings" className="mt-10">
+                    <div className="flex justify-center items-center">
+                        <Button>
+                            <span>Search Listings</span>
+                            <ArrowRight />
+                        </Button>
+                    </div>
+                </section>
+                <section role="suggested listings" className="mt-21">
+                    <div className="flex justify-center items-center">
+                        <h2 className="h2">You might find interesting</h2>
+                    </div>
+                    <div className="mt-20 flex justify-around">
+                        {[1, 2, 3, 4].map(() => <ListingCard />)}
+                    </div>
+                </section>
+                <section className="partners mt-36">
+                    <div className="flex justify-center items-center">
+                        <h1 className="h1">Our Partners</h1>
+                    </div>
+                    <div role="partners grid" className="grid grid-cols-4 gap-10">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
+                            .map(() => <PartnerCard />
+                            )}
+
+                    </div>
+                    <div className="my-20 flex justify-center items-center">
+                        <Button className="w-78 h-13">
+                            <p >Become a partner</p>
+                            <ArrowRight className="ml-3" />
+                        </Button>
+                    </div>
+                </section>
             </main>
         </>
     );
