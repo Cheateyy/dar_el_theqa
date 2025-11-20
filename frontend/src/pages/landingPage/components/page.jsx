@@ -2,8 +2,9 @@ import logo from "@/assets/images/logo.png";
 import heroImg from "../assets/landing_hero.png";
 
 import { Button } from "@/components/ui/button";
-import { GlobeIcon } from "lucide-react";
+import { ArrowRight, GlobeIcon } from "lucide-react";
 import MainFilters from "./MainFilters";
+import { ListingCard } from "@/components/common/ListingCard";
 
 export default function LandingPage() {
     return (
@@ -23,8 +24,8 @@ export default function LandingPage() {
                 </div>
             </header>
 
-            <main>
-                <section className="px-20">
+            <main className="px-20">
+                <section>
                     <div className="relative">
                         <div
                             style={{ backgroundImage: `url(${heroImg})` }}
@@ -49,9 +50,19 @@ export default function LandingPage() {
                         </div>
                         <MainFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
                     </div>
-
                 </section>
-
+                <div role="Search-Page" className="flex justify-center items-center mt-10">
+                    <Button>
+                        <span>Search Listings</span>
+                        <ArrowRight />
+                    </Button>
+                </div>
+                <div className="mt-21 flex justify-center items-center">
+                    <h2 className="h2">You might find interesting</h2>
+                </div>
+                <div className="mt-20 flex gap-4">
+                    {[1, 2, 3, 4].map(() => <ListingCard />)}
+                </div>
                 <div>
                     Lorem ipsum...
                 </div>
