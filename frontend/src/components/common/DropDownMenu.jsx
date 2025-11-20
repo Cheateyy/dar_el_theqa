@@ -26,7 +26,7 @@ export function CustomDropdownMenu({ className, options, variant, children }) {
     return (
         <div className={className}>
             <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                     <Button variant={variant}>{children}</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="start">

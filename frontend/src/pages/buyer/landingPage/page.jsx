@@ -1,27 +1,16 @@
-import logo from "@/assets/images/logo.png";
-import heroImg from "../assets/landing_hero.png";
+import heroImg from "./assets/landing_hero.png";
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import MainFilters from "./MainFilters";
+import MainFilters from "./components/MainFilters";
 import { ListingCard } from "@/components/common/ListingCard";
-import { PartnerCard } from "./PartnerCard";
-import { LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "./Actions";
+import { PartnerCard } from "./components/PartnerCard";
+import { BuyerHeader } from "../components/Header";
 
 export default function LandingPage() {
     return (
         <>
-            <header>
-                <div className="flex flex-row px-16 justify-between">
-                    <div className="relative -left-10 top-4 max-w-52 max-h-52">
-                        <img src={logo} alt="logo" />
-                    </div>
-                    {/* <LoggedInSellerActions /> */}
-                    {/* <NotLoggedInActions /> */}
-                    <LoggedInBuyerActions />
-                </div>
-            </header>
-
+            <BuyerHeader />
             <main className="px-20">
                 <section role="hero">
                     <div className="relative">
@@ -73,7 +62,7 @@ export default function LandingPage() {
                     </div>
                     <div role="partners grid" className="grid grid-cols-4 gap-10">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
-                            .map(() => <PartnerCard />
+                            .map((value, index) => <PartnerCard key={index} />
                             )}
 
                     </div>
