@@ -2,10 +2,11 @@ import logo from "@/assets/images/logo.png";
 import heroImg from "../assets/landing_hero.png";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, GlobeIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import MainFilters from "./MainFilters";
 import { ListingCard } from "@/components/common/ListingCard";
 import { PartnerCard } from "./PartnerCard";
+import { LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "./Actions";
 
 export default function LandingPage() {
     return (
@@ -15,13 +16,9 @@ export default function LandingPage() {
                     <div className="relative -left-10 top-4 max-w-52 max-h-52">
                         <img src={logo} alt="logo" />
                     </div>
-                    <div className="flex flex-row items-center">
-                        <Button className="w-28 h-12 mr-3 text-gray-600" variant="ghost">
-                            <GlobeIcon />
-                            Language
-                        </Button>
-                        <Button className="w-38 h-12 p-3">Log In</Button>
-                    </div>
+                    {/* <LoggedInSellerActions /> */}
+                    {/* <NotLoggedInActions /> */}
+                    <LoggedInBuyerActions />
                 </div>
             </header>
 
