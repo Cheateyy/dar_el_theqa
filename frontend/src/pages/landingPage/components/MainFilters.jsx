@@ -1,4 +1,4 @@
-import { Combobox } from "@/components/common/Combobox"
+import { FilterCombobox } from "./FilterCombobox"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { useState } from "react"
@@ -10,8 +10,8 @@ export default function MainFilters({ className }) {
   return (
     <div className={cn("relative w-full h-49 p-10 shadow-xl rounded-xl outline z-0 bg-white", className)}>
       <div className="grid grid-cols-2 overflow-hidden relative gap-5">
-        <Combobox className={'w-full h-32'} options={[]} />
-        <Combobox className={'w-full h-32'} options={[]} />
+        <FilterCombobox className={'w-full h-32'} options={[]} filtername="Wilaya" />
+        <FilterCombobox className={'w-full h-32'} options={[]} filtername="Type" />
       </div>
       <ButtonGroup className={'absolute right-0 -top-5 w-104 -z-10'}>
         <Button variant={selectedIndex == 0 ? 'secondary' : 'default'} size={'lg'} className={'flex-1'}>Rent</Button>
