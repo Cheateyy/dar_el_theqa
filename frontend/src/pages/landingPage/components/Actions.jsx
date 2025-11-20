@@ -5,11 +5,34 @@ import ProfileSvg from '../assets/profile.svg'
 import HamburgerSvg from '../assets/hamburger.svg'
 import dashboardSvg from '../assets/dashboard.svg'
 import { CustomDropdownMenu } from "@/components/common/DropDownMenu"
+import homeSvg from '../assets/home.svg'
+import searchSvg from '../assets/search.svg'
+import menuHeartSvg from '../assets/menuHeart.svg'
+import messageSvg from '../assets/message.svg'
+import logoutSvg from '../assets/logout.svg'
 
-export function LanguageSelector({ className }) {
-    return <CustomDropdownMenu className={className} options={["arabic", "english", "language"]}>
+function LanguageSelector({ className }) {
+    const langs = ["arabic", "english", "language"];
+    return <CustomDropdownMenu className={className} options={langs.map(lang => ({ label: lang }))}>
         <GlobeIcon />
         <span>Language</span>
+    </CustomDropdownMenu>
+}
+
+function MenuButton() {
+    const options = [
+        { label: "Home", icon: homeSvg, },
+        { label: "Find a Property", icon: searchSvg, },
+        { label: "Favorites", icon: menuHeartSvg, },
+        { label: "Contacted Properties", icon: messageSvg, },
+        { label: "Log out", icon: logoutSvg, },
+    ]
+
+    return <CustomDropdownMenu
+        variant="ghost"
+        options={options}
+    >
+        <img src={HamburgerSvg} alt="" />
     </CustomDropdownMenu>
 }
 
@@ -30,12 +53,12 @@ export function LoggedInBuyerActions() {
             <Button variant='ghost' size='icon' className='w-15 h-15'>
                 <img src={ProfileSvg} alt="" />
             </Button>
-            <Button variant='ghost' size='icon' className='w-15 h-15'>
-                <img src={HamburgerSvg} alt="" />
-            </Button>
+            <MenuButton />
         </div>
     </div>
 }
+
+
 
 export function LoggedInSellerActions() {
     return <div className="flex flex-row items-center">
@@ -51,9 +74,8 @@ export function LoggedInSellerActions() {
             <Button variant='ghost' size='icon' className='w-15 h-15'>
                 <img src={ProfileSvg} alt="" />
             </Button>
-            <Button variant='ghost' size='icon' className='w-15 h-15'>
-                <img src={HamburgerSvg} alt="" />
-            </Button>
+            <MenuButton />
         </div>
     </div>
 }
+
