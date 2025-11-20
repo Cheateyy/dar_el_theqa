@@ -25,30 +25,30 @@ export default function LandingPage() {
 
             <main>
                 <section className="px-20">
-                    <div
-                        style={{ backgroundImage: `url(${heroImg})` }}
-                        className="bg-cover bg-center h-172 w-full rounded-4xl"
-                    >
-                        <div className="grid grid-cols-2 grid-rows-1 h-full justify-center items-center ml-20">
-                            <div>
-                                <h1 className="h1 text-primary mb-4">
-                                    Real Estate
-                                </h1>
-                                <h1 className="h1 text-primary mb-4">
-                                    You Can
-                                </h1>
-                                <h1 className="h1 text-primary mb-2">
-                                    Trust
-                                </h1>
-                                <p className="p3">
-                                    Connecting you with trusted sellers and agents
-                                </p>
+                    <div className="relative">
+                        <div
+                            style={{ backgroundImage: `url(${heroImg})` }}
+                            className="bg-cover bg-center h-172 w-full rounded-4xl"
+                        >
+                            <div className="grid grid-cols-2 grid-rows-1 h-full justify-center items-center ml-20">
+                                <div role="hero-text-wrapper">
+                                    <h1 className="h1 text-primary mb-4">
+                                        Real Estate
+                                    </h1>
+                                    <h1 className="h1 text-primary mb-4">
+                                        You Can
+                                    </h1>
+                                    <h1 className="h1 text-primary mb-2">
+                                        Trust
+                                    </h1>
+                                    <p className="p3">
+                                        Connecting you with trusted sellers and agents
+                                    </p>
+                                </div>
                             </div>
-
                         </div>
-
+                        <MainFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
                     </div>
-                    <MainFilters />
 
                 </section>
 

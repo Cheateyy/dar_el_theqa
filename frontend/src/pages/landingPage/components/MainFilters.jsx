@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { useState } from "react"
 
-export default function MainFilters() {
+import { cn } from "@/lib/utils"
+
+export default function MainFilters({ className }) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   return (
-    <div className="relative max-w-274 h-49 p-10 shadow-xl rounded-xl isolate outline z-0">
+    <div className={cn("relative w-full h-49 p-10 shadow-xl rounded-xl outline z-0 bg-white", className)}>
       <div className="grid grid-cols-2 overflow-hidden relative gap-5">
         <Combobox className={'w-full h-32'} options={[]} />
         <Combobox className={'w-full h-32'} options={[]} />
