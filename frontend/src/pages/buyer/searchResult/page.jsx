@@ -3,8 +3,7 @@ import { BuyerHeader } from "../../buyer/components/Header"
 import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
 import { ArrowRight } from "lucide-react";
-import { ListingCard } from "@/components/common/ListingCard";
-import { CustomPagination } from "@/components/common/Pagination";
+import { ListingGrid } from "../../../components/common/ListingGrid";
 
 export default function SearchResults() {
     const results = []
@@ -39,10 +38,7 @@ export default function SearchResults() {
                     </div>
                 </section>
                 <section role="search results">
-                    <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-9">
-                        {results.map(() => <ListingCard />)}
-                    </div>
-                    <CustomPagination className="mt-14 mb-20" />
+                    <ListingGrid listings={results} />
                 </section>
             </main>
         </div>
