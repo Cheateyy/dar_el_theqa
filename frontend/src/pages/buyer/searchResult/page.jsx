@@ -1,8 +1,17 @@
+import { Button } from "@/components/ui/button";
 import { BuyerHeader } from "../../buyer/components/Header"
 import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
+import { ArrowRight } from "lucide-react";
+import { ListingCard } from "@/components/common/ListingCard";
+import { CustomPagination } from "@/components/common/Pagination";
 
 export default function SearchResults() {
+    const results = []
+    for (let i = 0; i < 16; i++) {
+        results.push(i)
+    }
+
     return (
         <div>
             <BuyerHeader />
@@ -22,6 +31,18 @@ export default function SearchResults() {
                         </div>
                         <SearchFilters className="w-281 absolute top-3/4 left-1/2 -translate-x-1/2" />
                     </div>
+                    <div className="flex justify-center items-center">
+                        <Button className="mt-30 w-54 py-4 px-8">
+                            Apply filters
+                            <ArrowRight className="ml-3" />
+                        </Button>
+                    </div>
+                </section>
+                <section role="search results">
+                    <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-9">
+                        {results.map(() => <ListingCard />)}
+                    </div>
+                    <CustomPagination className="mt-14 mb-20" />
                 </section>
             </main>
         </div>

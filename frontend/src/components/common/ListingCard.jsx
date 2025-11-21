@@ -9,7 +9,7 @@ export function ListingCard() {
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
-            className="relative bg-cover bg-center rounded-4xl h-100 w-74 py-0 flex justify-end">
+            className="relative bg-cover bg-center rounded-4xl w-74 h-100 py-0 flex justify-end">
             <div className="absolute right-4 top-4">
                 <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
                     <img src={heartSvg} alt="heart icon" />
