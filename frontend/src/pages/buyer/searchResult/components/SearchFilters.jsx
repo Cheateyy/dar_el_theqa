@@ -4,10 +4,10 @@ import { ButtonGroup } from "@/components/ui/button-group"
 import { useState } from "react"
 
 import { cn } from "@/lib/utils"
-import filterIcon from '../assets/filter.svg'
 import { OfferType as OFFER_TYPE } from "../../types"
-import arrowDownIcon from '../../../buyer/assets/arrowDown.svg'
 import { Combobox } from "@/components/common/Combobox"
+import { MoreFilters } from "@/pages/buyer/searchResult/components/MoreFilters"
+import { RangeInput } from "../../components/RangeInput"
 
 export function SearchFilters({ className }) {
     const [selectedOfferType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
@@ -20,10 +20,7 @@ export function SearchFilters({ className }) {
                 <PriceInput offerType={selectedOfferType} />
             </div>
             <div className="mt-4 flex">
-                <Button className="ml-auto" variant={'secondary'}>
-                    <img src={filterIcon} alt="" />
-                    More filters
-                </Button>
+                <MoreFilters className={"ml-auto"} variant={'secondary'} />
             </div>
             {/* absolute positioned*/}
             <ButtonGroup className={'absolute right-0 -top-5 w-104 -z-10'}>
@@ -50,29 +47,8 @@ function PriceInput({ offerType }) {
         { label: "per year", value: "per year" },
     ]
     return (
-        <div className="w-104 min-h-32 border shadow-xs p-6 rounded-2xl flex flex-col gap-3">
-            <p className="font-medium">Price</p>
-
-            <div className="flex items-center gap-2">
-                <input
-                    type="text"
-                    pattern="[0-9]*"
-                    className="min-w-10 px-2 py-1 text-sm"
-                    placeholder="0"
-                />
-
-                <span>-</span>
-
-                <input
-                    type="text"
-                    pattern="[0-9]*"
-                    className="min-w-10 px-2 py-1 text-sm"
-                    placeholder="1000"
-                />
-
-                <span className="text-sm font-bold">DZD</span>
-            </div>
-
+        <div className="border shadow-xl rounded-2xl p-6">
+            <RangeInput className={"border-none shadow-none p-0"} label="Price" unit={"DZD"} />
             {offerType == OFFER_TYPE.RENT &&
                 <Combobox options={rentOptions} />
             }
