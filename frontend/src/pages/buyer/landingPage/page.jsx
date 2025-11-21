@@ -10,7 +10,6 @@ import { BuyerHeader } from "../components/Header";
 export default function LandingPage() {
     return (
         <>
-            <BuyerHeader />
             <main className="px-20">
                 <section role="hero">
                     <div className="relative">
@@ -60,7 +59,7 @@ export default function LandingPage() {
                     <div className="flex justify-center items-center">
                         <h1 className="h1">Our Partners</h1>
                     </div>
-                    <div role="partners grid" className="grid grid-cols-4 gap-10">
+                    <div role="partners grid" className="mt-25 grid grid-cols-4 gap-10">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
                             .map((value, index) => <PartnerCard key={index} />
                             )}

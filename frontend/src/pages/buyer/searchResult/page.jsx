@@ -13,7 +13,6 @@ export default function SearchResults() {
 
     return (
         <div>
-            <BuyerHeader />
             <main className="px-20">
                 <section role="hero">
                     <div className="relative">
