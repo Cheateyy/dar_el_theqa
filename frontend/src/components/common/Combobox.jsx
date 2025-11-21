@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -44,7 +44,7 @@ export function Combobox({ className, options }) {
                     {value
                         ? options.find((options) => options.value === value)?.label
                         : "Select options..."}
-                    <ChevronsUpDown className="opacity-50" />
+                    <ChevronsDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent

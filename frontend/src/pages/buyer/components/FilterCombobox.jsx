@@ -44,9 +44,9 @@ export function FilterCombobox({ className, options, filtername }) {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={cn("w-[200px] flex-col items-start", className)}
+                    className={cn("w-[200px] h-full flex-col items-start", className)}
                 >
-                    <h4 className="">{filtername}</h4>
+                    <h4>{filtername}</h4>
                     <div>
                         {value
                             ? options.find((options) => options.value === value)?.label
