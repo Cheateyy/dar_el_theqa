@@ -2,12 +2,13 @@ import heroImg from "./assets/landing_hero.png";
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import MainFilters from "./components/MainFilters";
-import { ListingCard } from "@/components/common/ListingCard";
+import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
-import { BuyerHeader } from "../components/Header";
+import { ListingGrid } from "@/components/common/ListingGrid";
+import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
+    const navigate = useNavigate()
     return (
         <>
             <main className="px-20">
@@ -35,13 +36,13 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         </div>
-                        <MainFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
+                        <MainSearchFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
                     </div>
                 </section>
 
                 <section role="Search Listings" className="mt-10">
                     <div className="flex justify-center items-center">
-                        <Button>
+                        <Button onClick={() => navigate("/search-results")}>
                             <span>Search Listings</span>
                             <ArrowRight />
                         </Button>
@@ -51,8 +52,14 @@ export default function LandingPage() {
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
                     </div>
-                    <div className="mt-20 flex justify-around">
-                        {[1, 2, 3, 4].map(() => <ListingCard />)}
+                    <div className="mt-20">
+                        <div className="flex">
+                            <Button variant="ghost" className={'ml-auto'}>
+                                View more
+                                <ArrowRight />
+                            </Button>
+                        </div>
+                        <ListingGrid listings={[1, 2, 3, 4]} />
                     </div>
                 </section>
                 <section className="partners mt-36">

@@ -4,7 +4,7 @@ import { ButtonGroup } from "@/components/ui/button-group"
 import { useState } from "react"
 
 import { cn } from "@/lib/utils"
-import { OfferType as OFFER_TYPE } from "../../types"
+import { OFFER_TYPE } from "../../../buyer/types"
 import { Combobox } from "@/components/common/Combobox"
 import { MoreFilters } from "@/pages/buyer/searchResult/components/MoreFilters"
 import { RangeInput } from "../../components/RangeInput"

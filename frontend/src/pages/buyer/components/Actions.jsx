@@ -39,9 +39,9 @@ function MenuButton() {
 }
 
 export function NotLoggedInActions() {
-    return <div className="flex flex-row items-center">
+    return <div className="flex h-12 flex-row items-center">
         <LanguageSelector />
-        <Button className="ml-4 w-38 h-12 p-3">Log In</Button>
+        <Button className="ml-4 w-38  p-3">Log In</Button>
     </div>
 }
 export function LoggedInBuyerActions() {
