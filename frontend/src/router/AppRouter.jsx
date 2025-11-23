@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from '../pages/buyer/landingPage/page';
-import SearchResults from '@/pages/buyer/searchResult/page';
+import SearchResults from '@/pages/buyer/searchResults/page';
 import { Favorites } from '@/pages/buyer/favorites/page';
 import { BuyerLayout } from '@/pages/buyer/layout';
 import { Interests } from '@/pages/buyer/Interests/page';

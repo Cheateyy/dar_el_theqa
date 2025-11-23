@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { BuyerHeader } from "../../buyer/components/Header"
 import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
 import { ArrowRight } from "lucide-react";
@@ -27,16 +26,17 @@ export default function SearchResults() {
                                 </div>
                             </div>
                         </div>
-                        <SearchFilters className="w-281 absolute top-3/4 left-1/2 -translate-x-1/2" />
+
+                        <SearchFilters className="w-281 absolute top-65/100 left-1/2 -translate-x-1/2" />
                     </div>
                     <div className="flex justify-center items-center">
-                        <Button className="mt-30 w-54 py-4 px-8">
+                        <Button className="mt-40 w-54 py-4 px-8">
                             Apply filters
                             <ArrowRight className="ml-3" />
                         </Button>
                     </div>
                 </section>
-                <section role="search results">
+                <section role="search results" className="mt-11">
                     <ListingGrid listings={results} />
                 </section>
             </main>
