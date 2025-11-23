@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Check, ChevronsDown } from "lucide-react"
+import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,8 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
+import arrowDown from '../assets/arrowDown.svg'
+
 /**
  * @typedef {object} Option
  * @property {string | number} value - The unique value of the option.
@@ -27,8 +29,11 @@ import {
  * A custom combobox component for selecting an option from a list.
  * * @param {object} props - The component props.
  * @param {Array<Option>} props.options - The list of available options.
+ * 
+ * **NOTE**:
+ * This differ from Combobox by PopoverTrigger>Button styling
  */
-export function Combobox({ className, options }) {
+export function FilterCombobox({ className, options, filtername }) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
 
@@ -39,12 +44,18 @@ export function Combobox({ className, options }) {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={cn("w-[200px] justify-between", className)}
+                    className={cn("w-[200px] h-full flex-col items-start", className)}
                 >
-                    {value
-                        ? options.find((options) => options.value === value)?.label
-                        : "Select options..."}
-                    <ChevronsDown className="opacity-50" />
+                    <h4>{filtername}</h4>
+                    <div>
+                        {value
+                            ? options.find((options) => options.value === value)?.label
+                            : "select " + filtername.toLowerCase()}
+                    </div>
+                    <div>
+                        <span>change</span>
+                        <img src={arrowDown} alt="" className="ml-2 inline" />
+                    </div>
                 </Button>
             </PopoverTrigger>
             <PopoverContent
