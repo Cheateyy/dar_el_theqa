@@ -8,6 +8,7 @@ import { Interests } from '@/pages/buyer/Interests/page';
 {/*Put all your routers here */ }
 function AppRouter() {
 
+
   return (
     <Router>
       <Routes>
