@@ -6,6 +6,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+
 import filterIcon from '../assets/filter.svg'
 import switchOffIcon from '../assets/switchOff.svg'
 import switchOnIcon from '../assets/switchOn.svg'
@@ -16,6 +17,8 @@ import { useState } from "react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { PopoverAnchor } from "@radix-ui/react-popover"
+
 
 const SWITCH_STATUS = {
     OFF: 0,
@@ -26,13 +29,18 @@ export function MoreFilters({ className, variant }) {
     const [switchStatus, setSwitchStatus] = useState(SWITCH_STATUS.ON)
 
     return (
-        <Popover>
+        <Popover modal={true} className="fixed top-1/2 left-1/2">
+            <PopoverAnchor asChild>
+                <div className="fixed top-1/2 left-1/2"></div>
+            </PopoverAnchor>
+
             <PopoverTrigger asChild>
                 <Button variant={variant} className={className}>
                     <img src={filterIcon} alt="" />
                     More filters
                 </Button>
             </PopoverTrigger>
+
             <PopoverContent className={"w-full"}>
                 <h4 className="h4">More Filters</h4>
                 <div role="switch">
