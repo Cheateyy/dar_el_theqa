@@ -6,9 +6,13 @@ import { Combobox } from "@/components/common/Combobox"
 import { MoreFilters } from "@/pages/buyer/searchResults/components/MoreFilters"
 import { RangeInput } from "../../components/RangeInput"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
+import { Button } from "@/components/ui/button"
+
 
 export function SearchFilters({ className }) {
     const [selectedOfferType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
+    const [isDlgOpen, setIsDlgOpen] = useState(false)
+
     return (
         <SearchFiltersWrapper className={className} selectedOfferType={selectedOfferType} setSelectedOfferType={setSelectedOfferType}>
             <div className="flex overflow-auto min-h-32 relative gap-5 items-stretch">
@@ -17,8 +21,12 @@ export function SearchFilters({ className }) {
                 <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Appartement" />
                 <PriceInput offerType={selectedOfferType} />
             </div>
-            <div className="mt-4 flex">
-                <MoreFilters className={"ml-auto"} variant={'secondary'} />
+            <div className="mt-20 flex">
+                <Button variant={'secondary'} className={className} onClick={() => setIsDlgOpen(true)}>
+                    {/* <img src={filterIcon} alt="" /> */}
+                    More filters
+                </Button>
+                <MoreFilters className={"ml-auto"} variant={'secondary'} isOpen={isDlgOpen} setIsOpen={setIsDlgOpen} />
             </div>
         </SearchFiltersWrapper>
     )
