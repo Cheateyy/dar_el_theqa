@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-  {/*Put all your routers here */}
+import LandingPage from '../pages/landingPage/components/page';
+
+{/*Put all your routers here */ }
 function AppRouter() {
-           
+
   return (
     <Router>
       <Routes>
-        
+        <Route path="/" element={<LandingPage />}></Route>
       </Routes>
     </Router>
   );
