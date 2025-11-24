@@ -7,7 +7,7 @@ export function ListingGrid({ listings }) {
     }
     return (
         <div>
-            <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-9">
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-9">
                 {listings.map(() => <ListingCard />)}
             </div>
             <CustomPagination className="mt-14 mb-20" />

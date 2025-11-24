@@ -11,15 +11,15 @@ export default function LandingPage() {
     const navigate = useNavigate()
     return (
         <>
-            <main className="px-20">
+            <main className="px-4 sm:px-8 md:-px-20">
                 <section role="hero">
                     <div className="relative">
                         <div
                             role="hero image and MainFilters"
                             style={{ backgroundImage: `url(${heroImg})` }}
-                            className="bg-cover bg-center h-172 w-full rounded-4xl"
+                            className="w-full h-[420px] sm:h-[520px] md:h-172 bg-cover bg-center rounded-4xl"
                         >
-                            <div className="grid grid-cols-2 grid-rows-1 h-full justify-center items-center ml-20">
+                            <div className="h-full grid grid-cols-2 grid-rows-1 justify-center items-center ml-4 sm:ml-8 md:ml-20">
                                 <div role="hero-text-wrapper">
                                     <h1 className="h1 text-primary mb-4">
                                         Real Estate
@@ -36,11 +36,11 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         </div>
-                        <MainSearchFilters className="w-3/4 absolute top-65/100 left-1/2 -translate-x-1/2 " />
+                        <MainSearchFilters className="w-3/4 relative top-1/2 left-1/2 -translate-x-1/2 " />
                     </div>
                 </section>
 
-                <section role="Search Listings" className="mt-22">
+                <section role="Search Listings" className="mt-8 sm:mt-16 md:mt-20">
                     <div className="flex justify-center items-center">
                         <Button onClick={() => navigate("/search-results")}>
                             <span>Search Listings</span>
@@ -48,7 +48,8 @@ export default function LandingPage() {
                         </Button>
                     </div>
                 </section>
-                <section role="suggested listings" className="mt-21">
+
+                <section role="suggested listings" className="mt-8 sm:mt-16 md:mt-20">
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
                     </div>
@@ -62,18 +63,18 @@ export default function LandingPage() {
                         <ListingGrid listings={[1, 2, 3, 4]} />
                     </div>
                 </section>
-                <section className="partners mt-36">
+                <section className="partners mt-12 sm:mt-24 md:mt-36">
                     <div className="flex justify-center items-center">
                         <h1 className="h1">Our Partners</h1>
                     </div>
-                    <div role="partners grid" className="mt-25 grid grid-cols-4 gap-10">
+                    <div role="partners grid" className="mt-10 sm:mt-15 md:mt-25 grid grid-cols-2 md:grid-cols-4 gap-10">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
                             .map((value, index) => <PartnerCard key={index} />
                             )}
 
                     </div>
                     <div className="my-20 flex justify-center items-center">
-                        <Button className="w-78 h-13">
+                        <Button>
                             <p >Become a partner</p>
                             <ArrowRight className="ml-3" />
                         </Button>
