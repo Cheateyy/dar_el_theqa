@@ -15,7 +15,7 @@ export function SearchFilters({ className }) {
 
     return (
         <SearchFiltersWrapper className={className} selectedOfferType={selectedOfferType} setSelectedOfferType={setSelectedOfferType}>
-            <div className="flex overflow-auto min-h-32 relative gap-5 items-stretch">
+            <div className="flex overflow-auto relative gap-5">
                 <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Wilaya" />
                 <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Resgion" />
                 <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Appartement" />
@@ -38,7 +38,7 @@ function PriceInput({ offerType }) {
         { label: "per year", value: "per year" },
     ]
     return (
-        <div className="border shadow-xl rounded-2xl p-6">
+        <div className="border shadow-xl rounded-2xl p-6 h-32">
             <RangeInput className={"border-none shadow-none p-0"} label="Price" unit={"DZD"} />
             {offerType == OFFER_TYPE.RENT &&
                 <Combobox options={rentOptions} />

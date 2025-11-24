@@ -44,7 +44,7 @@ export function FilterCombobox({ className, options, filtername }) {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={cn("w-[200px] h-full flex-col items-start", className)}
+                    className={cn("w-[200px] h-32 flex-col items-start", className)}
                 >
                     <h4>{filtername}</h4>
                     <div>
