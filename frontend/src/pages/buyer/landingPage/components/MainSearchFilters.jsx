@@ -11,9 +11,9 @@ export default function MainSearchFilters({ className }) {
     <SearchFiltersWrapper className={className}
       selectedOfferType={selectedOfferType}
       setSelectedOfferType={setSelectedOfferType}>
-      <div className="grid grid-cols-2 gap-5">
-        <FilterCombobox className={'w-full h-32 rounded-2xl'} options={[]} filtername="Wilaya" />
-        <FilterCombobox className={'w-full h-32 rounded-2xl'} options={[]} filtername="Type" />
+      <div className="flex flex-col sm:flex-col md:flex-row gap-5">
+        <FilterCombobox className={'flex-1 h-32 rounded-2xl'} options={[]} filtername="Wilaya" />
+        <FilterCombobox className={'flex-1 h-32 rounded-2xl'} options={[]} filtername="Type" />
       </div>
     </SearchFiltersWrapper>
   )
