@@ -1,0 +1,102 @@
+.rent-priceSection.cardWrapper {
+    width: 80%;
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.rent-priceRow {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.rent-priceRow h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.rent-currency {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.rent-statusRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.2rem;
+}
+
+.rent-status p {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    margin: 0;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.rent-availableDate p {
+    margin: 0;
+}
+
+
+@media (max-width: 1600px){
+    .rent-priceSection.cardWrapper{
+        display: flex;
+        flex-direction: column;
+        padding: 2rem; 
+    }
+    
+.rent-priceRow {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.rent-priceRow h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.rent-currency {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.rent-statusRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.2rem;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem
+    ;
+}
+
+.rent-status p {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    margin: 0;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.rent-availableDate p {
+    margin: 0;
+}
+
+}
