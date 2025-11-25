@@ -36,11 +36,11 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         </div>
-                        <MainSearchFilters className="max-w-3/4 absolute top-3/4 left-1/2 -translate-x-1/2 " />
+                        <MainSearchFilters className="w-3/4 absolute top-65/100 left-1/2 -translate-x-1/2 " />
                     </div>
                 </section>
 
-                <section role="Search Listings" className="mt-10">
+                <section role="Search Listings" className="mt-22">
                     <div className="flex justify-center items-center">
                         <Button onClick={() => navigate("/search-results")}>
                             <span>Search Listings</span>
@@ -52,7 +52,7 @@ export default function LandingPage() {
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
                     </div>
-                    <div className="mt-20">
+                    <div className="mt-3">
                         <div className="flex">
                             <Button variant="ghost" className={'ml-auto'}>
                                 View more

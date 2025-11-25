@@ -108,6 +108,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* out of the theme */
+  --color-overlay: rgba(17, 24, 39, 0.12);
+  /* gray-900 @ 12% */
+
 }
 
 @layer base {
@@ -153,4 +158,8 @@
 
 @utility p4 {
   @apply text-[0.65rem] sm:text-xs md:text-sm lg:text-base;
+}
+
+@utility bg-overlay {
+  background-color: var(--color-overlay);
 }
