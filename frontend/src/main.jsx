@@ -1,9 +1,10 @@
+import '../src/assets/styles/index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
+import AppRouter from "./router/AppRouter.jsx"; 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AppRouter />
   </StrictMode>
 );

@@ -1,0 +1,390 @@
+/* Global Page Wrapper */
+.page-wrapper {
+  min-height: 100vh;
+  background-color: #F1F1F1; /* Unified page background color */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  font-family: 'Urbanist', sans-serif;
+}
+
+/* Form Card Container */
+.add-listing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* ensure children expand to container width */
+  padding: 32px 32px;
+  gap: 30px;
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  box-shadow: 0 4px 8px #0E446633;
+  border-radius: 40px;
+  margin: 0 auto;
+}
+
+
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%; /* make input stretch full width */
+}
+
+/* Make the form itself expand to the container width */
+.add-listing-form {
+  width: 100%;
+  display: block;
+}
+
+/* Footer */
+.form-footer {
+  display: flex;
+  justify-content: flex-end; /* aligns button to the right */
+  align-items: center;
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* Optional: make inputs and textarea full width */
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 12px 14px;
+  font-size: 15px;
+  background: #f9fafb;
+  color: #1f2937;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+/* Make textarea non-resizable */
+.form-field textarea {
+  resize: none;
+}
+
+
+/* Style selects so the label appears inside the field above the selected value */
+.form-field.select-inside .select-inner {
+  position: relative;
+}
+.form-field.select-inside .select-inside-label {
+  position: absolute;
+  left: 14px;
+  top: 8px;
+  font-size: 15px;
+  line-height: 1;
+  color: #111827; /* black-ish label */
+  pointer-events: none;
+}
+.form-field.select-inside select {
+  padding-top: 30px; /* make room for the inner label */
+}
+.form-field.select-inside select option {
+  font-weight: 400; /* options normal weight in dropdown */
+  color: #111827;
+}
+
+/* Placeholder vs value coloring */
+.form-field.select-inside .select-control.is-placeholder {
+  color: #9CA3AF; /* light gray for placeholders like 'Anywhere' or 'Unit of Time' */
+  font-weight: 400;
+}
+.form-field.select-inside .select-control.has-value {
+  color: #111827; /* black for actual selections */
+  font-weight: 400; /* default: normal weight for selections */
+}
+
+/* Explicitly make Sale and Rent appear bold when selected */
+.form-field.select-inside .select-control[data-value="sale"],
+.form-field.select-inside .select-control[data-value="rent"] {
+  font-weight: 700;
+}
+
+/* Hide number input spinners (defensive) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Stronger, specific rules to avoid overrides and ensure LTR full-width layout */
+.add-listing-container .form-field,
+.add-listing-container .form-field input,
+.add-listing-container .form-field textarea,
+.add-listing-container .form-field select {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.add-listing-container .form-section {
+  width: 100% !important;
+}
+
+
+
+button.back-button {
+  border: none;
+  background: transparent;
+  color: #226089;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+
+.back-button .back-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
+
+/* Page Title */
+.page-title {
+  font-size: 35px;
+  font-weight: 600;
+  margin: 0 0 -20px 0;
+  color:#141414;
+  font-family: 'Urbanist', sans-serif;
+  padding: 0;
+}
+
+
+/* Section */
+.form-section {
+  margin-top: 24px;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 500;
+  font-style: normal;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+  color: #141414;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+
+.form-field label {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #141414;
+  font-weight: 400;
+}
+
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+}
+
+/* Form Footer */
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* Custom dropdown arrow for selects */
+.form-field.select-inside .custom-select-arrow {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+.form-field.select-inside .custom-select-arrow img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.form-field.select-inside select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #f9fafb;
+}
+
+.error-text {
+  color: #d32f2f;  /* red */
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.input-error {
+  border-color: #d32f2f !important;
+}
+
+p.valid-text {
+  color: green;  /* green */
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .add-listing-container {
+    max-width: 96vw;
+    padding: 28px 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .add-listing-container {
+    max-width: 95vw;
+    padding: 28px 16px;
+    border-radius: 28px;
+    align-items: stretch;
+  }
+  .page-title {
+    font-size: 28px;
+  }
+  .section-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 16px 12px;
+  }
+  .add-listing-container {
+    max-width: 98vw;
+    padding: 20px 14px;
+    border-radius: 24px;
+  }
+  .page-title {
+    font-size: 24px;
+  }
+  .section-title {
+    font-size: 18px;
+  }
+  .form-field label {
+    font-size: 14px;
+  }
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 14px;
+    padding: 11px 13px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-wrapper {
+    padding: 12px 8px;
+  }
+  .add-listing-container {
+    padding: 18px 12px;
+    border-radius: 20px;
+    gap: 24px;
+  }
+  .page-title {
+    font-size: 20px;
+    margin-bottom: -12px;
+  }
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .form-field {
+    margin-bottom: 16px;
+  }
+  .form-field label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 13px;
+    padding: 10px 11px;
+    border-radius: 8px;
+  }
+  .next-button {
+    padding: 11px 24px;
+    font-size: 13px;
+  }
+  .back-button {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-wrapper {
+    padding: 10px 6px;
+  }
+  .add-listing-container {
+    padding: 14px 10px;
+    border-radius: 16px;
+    gap: 20px;
+  }
+  .page-title {
+    font-size: 18px;
+  }
+  .section-title {
+    font-size: 14px;
+  }
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 12px;
+    padding: 9px 10px;
+  }
+  .form-footer {
+    gap: 8px;
+  }
+  .next-button {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .add-listing-container {
+    padding: 12px 8px;
+    border-radius: 14px;
+  }
+  .page-title {
+    font-size: 16px;
+  }
+  .section-title {
+    font-size: 13px;
+  }
+  .form-field {
+    margin-bottom: 12px;
+  }
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 11px;
+    padding: 8px 9px;
+  }
+}
