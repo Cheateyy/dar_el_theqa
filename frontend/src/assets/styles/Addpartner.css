@@ -1,0 +1,211 @@
+
+
+.add-document-btn {
+  height: 38px;
+  width: 38px;
+  border: 1.5px solid #0E4466;
+  background: #0E4466;
+  border-radius: 100px;
+  color: #ffffff; 
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background-color 0.2s, opacity 0.2s;
+}
+
+/* Hover effect (only when enabled) */
+.add-document-btn:hover:not(:disabled) {
+  background-color: #083a58;
+}
+
+/* Disabled state (no hover) */
+.add-document-btn:disabled {
+  background: #dedfe4; 
+  border-color: #99a2b3;
+  border-style: dashed;
+  color: #000000;
+  cursor: not-allowed;
+  opacity: 1; 
+}
+
+/* Additional visual hint when a doc/logo has been added */
+.add-document-btn.added {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Card containing uploaded logo/file */
+.document-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-top: 12px;
+}
+
+/* Row: icon + filename on the left, remove button on the right */
+.document-file-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* vertically center icon and text */
+}
+
+/* Icon + filename */
+.document-filename {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #000000;
+  font-size: 16px;
+}
+
+/* Match the class used in JSX: className="small-pdf-icon" */
+.small-pdf-icon {
+  width: 40px;
+  height: 40px;
+  margin-left: -10px;
+}
+
+/* Remove button (icon only) */
+.remove-document-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.remove-icon {
+  width: 30px;
+  height: 30px;
+}
+
+/* Wrapper for logo upload area under header */
+.logo-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Header: "Company Logo" text on left, + button on right */
+.logo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.logo-header .section-title {
+  font-weight: 700;
+  font-size: 28px;
+  color: #000;
+}
+
+/* Error text under logo or inputs */
+.error-text {
+  color: #e74c3c; /* red */
+  font-size: 0.85rem;
+  display: block;
+}
+
+.success-text {
+  color: #28a745;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .logo-header .section-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-header {
+    margin-bottom: 12px;
+  }
+  .logo-header .section-title {
+    font-size: 20px;
+  }
+  .document-card {
+    padding: 14px;
+  }
+  .add-document-btn {
+    height: 36px;
+    width: 36px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .logo-header .section-title {
+    font-size: 18px;
+  }
+  .document-card {
+    padding: 12px;
+    border-radius: 14px;
+  }
+  .document-filename {
+    font-size: 14px;
+  }
+  .small-pdf-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .add-document-btn {
+    height: 32px;
+    width: 32px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-upload-wrapper {
+    gap: 6px;
+  }
+  .logo-header {
+    margin-bottom: 8px;
+  }
+  .logo-header .section-title {
+    font-size: 14px;
+  }
+  .document-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .document-filename {
+    font-size: 12px;
+  }
+  .small-pdf-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .remove-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .add-document-btn {
+    height: 28px;
+    width: 28px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .logo-header .section-title {
+    font-size: 13px;
+  }
+  .document-card {
+    padding: 8px;
+  }
+  .document-filename {
+    font-size: 11px;
+  }
+  .small-pdf-icon {
+    width: 28px;
+    height: 28px;
+  }
+}

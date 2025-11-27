@@ -1,0 +1,286 @@
+
+.document-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.document-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.info-icon {
+  font-size: 16px;
+  margin-left: 8px;
+  color: #00155c;
+  cursor: pointer;
+}
+.remove-document-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.add-document-btn:hover,
+.add-document-btn:focus {
+  background: #ffffff;
+}
+.plus-outline-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.add-document-btn.added {
+  cursor: not-allowed;
+  color:rgb(146, 146, 146);
+}
+
+.add-document-btn {
+  background: #ffffff;
+  color:#0E4466;
+  border:none;
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: lighter;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-left: auto;
+}
+.add-document-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.plus-solid-icon {
+  width: 22px;
+  height: 22px;
+  filter: brightness(9);
+}
+
+.document-row {
+  margin-bottom: 32px;
+  width: 100%;
+}
+.document-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+.document-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #141414;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-icon {
+  font-size: 20px;
+  margin-left: 6px;
+  color: #00189e;
+}
+
+.plus-outline-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.document-card {
+  background: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 8px 16px #0E446622;
+  padding: 16px;
+  margin-bottom: 25px;
+  margin-top: 8px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+   gap: 16px;
+}
+.document-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+textarea.notes-input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 10px;
+  font-size: 15px;
+  background: #f9fafb;
+  color: #1f2937;
+  outline: none;
+  transition: border-color 0.2s;  
+  resize: none;
+  max-height:50px ;
+}
+.document-filename {
+  background: transaparent;
+  padding: 10px 18px;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.notes-label {
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 14px;
+  margin-top: 7px;
+  display: block;
+}
+
+
+.small-pdf-icon {
+  width: 50px;
+  height: 50px;
+  margin-right: 6px;
+}
+
+.back-button {
+  border: none;
+  background: transparent;
+  color: #226089;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+}
+
+.back-button .back-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #141414;
+  margin-bottom: 20px;
+}
+
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  margin-top: 24px;
+}
+
+
+@media (max-width: 1024px) {
+  .document-card {
+    padding: 15px;
+  }
+  .section-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .document-card {
+    padding: 14px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+  }
+  .document-title {
+    font-size: 19px;
+  }
+  .notes-input {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 700px) {
+  .document-card {
+    padding: 12px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 20px;
+  }
+  .document-title {
+    font-size: 16px;
+  }
+  .document-filename {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  .notes-input {
+    font-size: 13px;
+    padding: 9px 10px;
+    border-radius: 9px;
+  }
+  .add-document-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .document-card {
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .document-head {
+    gap: 12px;
+  }
+  .document-title {
+    font-size: 14px;
+  }
+  .document-filename {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  .small-pdf-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .notes-input {
+    font-size: 12px;
+    padding: 8px 9px;
+  }
+  .add-document-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .document-card {
+    padding: 8px;
+  }
+  .section-title {
+    font-size: 16px;
+  }
+  .document-title {
+    font-size: 12px;
+  }
+  .document-filename {
+    font-size: 11px;
+  }
+}
+
