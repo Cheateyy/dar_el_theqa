@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+// src/pages/AddListingPage.jsx
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/addListing.css";
-import { wilayas, regions } from "../utils/algeria.js";
+// 🔧 FIX: import local wilaya names and local regions map so dropdowns never disappear
+import { wilayas as wilayaNamesLocal, regions as regionsLocal } from "../utils/algeria.js";
 
 import Input from "../components/common/Input.jsx";
 import Select from "../components/common/Select.jsx";
@@ -9,9 +11,12 @@ import TextArea from "../components/common/TextArea.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+const DRAFT_KEY = "createListingDraft"; // 🔧 ADDED FOR BACKEND: local draft storage key
+
 function AddListingPage() {
   const navigate = useNavigate();
 
+  // Form state (UI) - unchanged UI fields
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -23,8 +28,77 @@ function AddListingPage() {
     paymentUnit: "",
   });
 
+  // 🔧 ADDED FOR BACKEND: server-side choice lists (used only for resolving ids)
+  const [wilayasServer, setWilayasServer] = useState([]); // expected {id, name}
+  const [regionsServerCache, setRegionsServerCache] = useState({}); // map wilaya_id -> [{id,name},...]
+
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  // Load draft if exists (so user can navigate back and forth)
+  useEffect(() => {
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        if (parsed.stepData && parsed.stepData.step1) {
+          setFormData((prev) => ({ ...prev, ...parsed.stepData.step1 }));
+        } else if (parsed.stepData) {
+          // tolerant: merge whatever step1-like data exists
+          setFormData((prev) => ({ ...prev, ...(parsed.stepData.step1 || parsed.stepData) }));
+        }
+      } catch (e) {
+        // ignore parse error
+      }
+    }
+  }, []);
+
+  // 🔧 ADDED FOR BACKEND: fetch server wilayas so we can resolve name -> id at final submit
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/choices/wilayas/")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!mounted) return;
+        // expected array of { id, name }
+        setWilayasServer(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        // no server available yet — keep empty and fallback to local names at submit time
+        setWilayasServer([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // helper: find wilaya id by name (using server list)
+  const findWilayaIdByName = (name) => {
+    if (!name || !wilayasServer.length) return null;
+    const found = wilayasServer.find((w) => String(w.name).trim().toLowerCase() === String(name).trim().toLowerCase());
+    return found ? found.id : null;
+  };
+
+  // 🔧 ADDED FOR BACKEND: fetch regions for a wilaya id and cache them
+  const fetchRegionsForWilayaId = (wilayaId) => {
+    if (!wilayaId) return;
+    if (regionsServerCache[wilayaId]) return; // already cached
+    fetch(`/api/choices/regions/?wilayaid=${wilayaId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setRegionsServerCache((prev) => ({ ...prev, [wilayaId]: Array.isArray(data) ? data : [] }));
+      })
+      .catch(() => {
+        setRegionsServerCache((prev) => ({ ...prev, [wilayaId]: [] }));
+      });
+  };
+
+  // When user selects a wilaya name (UI uses local names), attempt to fetch server regions for it
+  useEffect(() => {
+    const wid = findWilayaIdByName(formData.wilaya);
+    if (wid) fetchRegionsForWilayaId(wid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.wilaya, wilayasServer]);
 
   // Validate single field
   const validateField = (name, value) => {
@@ -104,13 +178,12 @@ function AddListingPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Update form data
+    // Update form data (UI)
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Real-time validation: validate as user types
+    // Real-time validation
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
 
-    // Mark as touched so success messages can show
     setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
@@ -118,6 +191,23 @@ function AddListingPage() {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  // 🔧 ADDED FOR BACKEND: save step1 draft to localStorage
+  const saveDraftStep1 = (data) => {
+    const existing = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
+    const merged = {
+      ...existing,
+      step: 1,
+      stepData: {
+        ...(existing.stepData || {}),
+        step1: {
+          ...(existing.stepData?.step1 || {}),
+          ...data,
+        },
+      },
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(merged));
   };
 
   const handleSubmit = (e) => {
@@ -138,11 +228,27 @@ function AddListingPage() {
     });
     setTouched(allTouched);
 
-    // If no errors, navigate
+    // If no errors, save draft and navigate
     const hasErrors = Object.values(validationErrors).some((err) => err);
     if (!hasErrors) {
+      // 🔧 ADDED FOR BACKEND: save the UI values (we map to backend on final submit)
+      saveDraftStep1(formData);
       navigate("/add-listing/step-2");
     }
+  };
+
+  // 🔧 FIXED: returns local regions for UI (prevent disappearance). If local not found, try server cached regions.
+  const getRegionsForSelectedWilaya = () => {
+    if (!formData.wilaya) return [];
+    // Prefer local JSON regions (keeps UI unchanged)
+    if (regionsLocal && regionsLocal[formData.wilaya]) return regionsLocal[formData.wilaya];
+
+    // Fallback: use cached server regions (array of {id,name}) -> map to names
+    const wid = findWilayaIdByName(formData.wilaya);
+    if (wid && regionsServerCache[wid]) {
+      return regionsServerCache[wid].map((r) => r.name);
+    }
+    return [];
   };
 
   return (
@@ -177,7 +283,7 @@ function AddListingPage() {
             />
             {errors.title && <p className="error-text">{errors.title}</p>}
             {!errors.title && touched.title && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
 
             <TextArea
@@ -192,7 +298,7 @@ function AddListingPage() {
               <p className="error-text">{errors.description}</p>
             )}
             {!errors.description && touched.description && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
           </Section>
 
@@ -206,7 +312,8 @@ function AddListingPage() {
               onBlur={handleBlur}
             >
               <option value="">Select wilaya</option>
-              {wilayas.map((w) => (
+              {/* Keep UI names from local file; backend mapping is done separately */}
+              {wilayaNamesLocal.map((w) => (
                 <option key={w} value={w}>
                   {w}
                 </option>
@@ -214,7 +321,7 @@ function AddListingPage() {
             </Select>
             {errors.wilaya && <p className="error-text">{errors.wilaya}</p>}
             {!errors.wilaya && touched.wilaya && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
 
             <Select
@@ -226,16 +333,15 @@ function AddListingPage() {
               disabled={!formData.wilaya}
             >
               <option value="">Select region</option>
-              {formData.wilaya &&
-                regions[formData.wilaya]?.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
+              {getRegionsForSelectedWilaya().map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
             </Select>
             {errors.region && <p className="error-text">{errors.region}</p>}
             {!errors.region && touched.region && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
 
             <Input
@@ -249,7 +355,7 @@ function AddListingPage() {
             />
             {errors.address && <p className="error-text">{errors.address}</p>}
             {!errors.address && touched.address && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
           </Section>
 
@@ -279,7 +385,7 @@ function AddListingPage() {
             />
             {errors.price && <p className="error-text">{errors.price}</p>}
             {!errors.price && touched.price && (
-              <p class="valid-text">valid!</p>
+              <p className="valid-text">valid!</p>
             )}
 
             {formData.purpose === "rent" && (
@@ -302,7 +408,7 @@ function AddListingPage() {
                   <p className="error-text">{errors.paymentUnit}</p>
                 )}
                 {!errors.paymentUnit && touched.paymentUnit && (
-                  <p class="valid-text">valid!</p>
+                  <p className="valid-text">valid!</p>
                 )}
               </>
             )}

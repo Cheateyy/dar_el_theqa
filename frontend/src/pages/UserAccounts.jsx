@@ -1,13 +1,13 @@
-
+// src/pages/UserAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/UserAccounts.css";
 
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
-import activateIcon from "../assets/icons/active.svg";    
+import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
-import deleteIcon from "../assets/icons/delete.svg";      
+import deleteIcon from "../assets/icons/delete.svg";
 
 import fullnameIcon from "../assets/icons/fullname.svg";
 import phoneIcon from "../assets/icons/Call.svg";
@@ -16,30 +16,74 @@ import actionsIcon from "../assets/icons/actions.svg";
 
 import Section from "../components/common/Section.jsx";
 
+// 🔧 SWITCH: true = localStorage mock; false = real /api/admin/users/ backend
+const USE_MOCK_USERS = true;
+
 function UserAccounts() {
   const navigate = useNavigate();
 
+  // -------- STATE --------
   const [users, setUsers] = useState(() => {
-    const stored = localStorage.getItem("users");
-    try {
-      const parsed = stored ? JSON.parse(stored) : [];
-      return parsed.map((u) => ({
-        status: u.status || "active",
-        ...u,
-      }));
-    } catch {
-      return [];
+    if (USE_MOCK_USERS) {
+      const stored = localStorage.getItem("users");
+      try {
+        const parsed = stored ? JSON.parse(stored) : [];
+        return parsed.map((u) => ({
+          status: u.status || "active",
+          ...u,
+        }));
+      } catch {
+        return [];
+      }
     }
+    // backend mode: start empty; will be filled by fetch
+    return [];
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE || 1));
+  const [loading, setLoading] = useState(!USE_MOCK_USERS);
 
+  // -------- MOCK MODE: persist to localStorage --------
   useEffect(() => {
+    if (!USE_MOCK_USERS) return;
     localStorage.setItem("users", JSON.stringify(users));
   }, [users]);
 
+  // -------- BACKEND MODE: fetch /api/admin/users/ --------
+  useEffect(() => {
+    if (USE_MOCK_USERS) return;
+
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("/api/admin/users/", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        // If backend returns {count, results}, handle it
+        const list = Array.isArray(data) ? data : data.results || [];
+        setUsers(
+          list.map((u) => ({
+            // map backend fields to UI shape
+            id: u.id,
+            fullName: u.full_name,
+            phoneNumber: u.phone_number,
+            email: u.email,
+            status: u.status || (u.is_active ? "active" : "suspended"),
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to load users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // -------- DERIVED: sort + paginate --------
   const currentPageItems = useMemo(() => {
     const sorted = [...users].sort((a, b) => {
       const aSusp = a.status === "suspended" ? 1 : 0;
@@ -51,7 +95,10 @@ function UserAccounts() {
     return sorted.slice(start, start + PAGE_SIZE);
   }, [users, currentPage]);
 
+  // -------- HANDLERS --------
   const toggleStatus = (id) => {
+    // NOTE: backend has no status toggle endpoint in the doc yet,
+    // so this is UI-only for now in both modes. [attached_file:1]
     setUsers((prev) => {
       const user = prev.find((u) => u.id === id);
       if (!user) return prev;
@@ -72,13 +119,29 @@ function UserAccounts() {
     });
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const ok = window.confirm(
       "Are you sure you want to permanently delete this user account and all associated data?"
     );
     if (!ok) return;
 
+    // optimistic UI
     setUsers((prev) => prev.filter((u) => u.id !== id));
+
+    if (USE_MOCK_USERS) {
+      // localStorage will be updated by the effect above
+      return;
+    }
+
+    try {
+      await fetch(`/api/admin/users/${id}/`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      // Contract says DELETE returns status + userid + message. [attached_file:1]
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
   };
 
   const goToPage = (page) => {
@@ -132,6 +195,7 @@ function UserAccounts() {
 
   const pageItems = getPageNumbers();
 
+  // -------- RENDER --------
   return (
     <div className="user-page-wrapper">
       <div className="user-accounts-container">
@@ -141,82 +205,86 @@ function UserAccounts() {
 
         <Section>
           <div className="user-table-wrapper">
-            <table className="user-table">
-              <thead>
-                <tr>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={fullnameIcon} alt="" className="th-icon" />
-                      Full Name
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={phoneIcon} alt="" className="th-icon" />
-                      Phone Number
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={emailIcon} alt="" className="th-icon" />
-                      Email
-                    </span>
-                  </th>
-                  <th className="actions-col-header">
-                    <span className="th-with-icon">
-                      <img src={actionsIcon} alt="" className="th-icon" />
-                      Actions
-                    </span>
-                  </th>
-                </tr>
-              </thead>
+            {loading && !USE_MOCK_USERS ? (
+              <p className="empty-row">Loading users...</p>
+            ) : (
+              <table className="user-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={fullnameIcon} alt="" className="th-icon" />
+                        Full Name
+                      </span>
+                    </th>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={phoneIcon} alt="" className="th-icon" />
+                        Phone Number
+                      </span>
+                    </th>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={emailIcon} alt="" className="th-icon" />
+                        Email
+                      </span>
+                    </th>
+                    <th className="actions-col-header">
+                      <span className="th-with-icon">
+                        <img src={actionsIcon} alt="" className="th-icon" />
+                        Actions
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {currentPageItems.length > 0 ? (
-                  currentPageItems.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.fullName}</td>
-                      <td>{user.phoneNumber}</td>
-                      <td>{user.email}</td>
-                      <td className="actions-col">
-                        <button
-                          type="button"
-                          className="row-action-btn row-action-status"
-                          onClick={() => toggleStatus(user.id)}
-                        >
-                          <img
-                            src={
-                              user.status === "suspended"
-                                ? suspendIcon
-                                : activateIcon
-                            }
-                            alt={
-                              user.status === "suspended"
-                                ? "Activate account"
-                                : "Suspend account"
-                            }
-                          />
-                        </button>
+                <tbody>
+                  {currentPageItems.length > 0 ? (
+                    currentPageItems.map((user) => (
+                      <tr key={user.id}>
+                        <td>{user.fullName || user.full_name}</td>
+                        <td>{user.phoneNumber || user.phone_number}</td>
+                        <td>{user.email}</td>
+                        <td className="actions-col">
+                          <button
+                            type="button"
+                            className="row-action-btn row-action-status"
+                            onClick={() => toggleStatus(user.id)}
+                          >
+                            <img
+                              src={
+                                user.status === "suspended"
+                                  ? suspendIcon
+                                  : activateIcon
+                              }
+                              alt={
+                                user.status === "suspended"
+                                  ? "Activate account"
+                                  : "Suspend account"
+                              }
+                            />
+                          </button>
 
-                        <button
-                          type="button"
-                          className="row-action-btn row-action-delete"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          <img src={deleteIcon} alt="Delete account" />
-                        </button>
+                          <button
+                            type="button"
+                            className="row-action-btn row-action-delete"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <img src={deleteIcon} alt="Delete account" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="empty-row">
+                        No users found.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="empty-row">
-                      No users found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </Section>
       </div>

@@ -1,4 +1,4 @@
-
+// src/pages/AuditLog.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import "../assets/styles/AuditLog.css";
 
@@ -12,25 +12,81 @@ import actionIcon from "../assets/icons/AuditAction.svg";
 
 import Section from "../components/common/Section.jsx";
 
+// 🔧 SWITCH: true = localStorage mock; false = real /admin/audit-logs/ backend
+const USE_MOCK_AUDIT = true;
+
 function AuditLog() {
   const [entries, setEntries] = useState(() => {
-    const stored = localStorage.getItem("auditLog");
-    try {
-      const parsed = stored ? JSON.parse(stored) : [];
-      return parsed;
-    } catch {
-      return [];
+    if (USE_MOCK_AUDIT) {
+      const stored = localStorage.getItem("auditLog");
+      try {
+        const parsed = stored ? JSON.parse(stored) : [];
+        return parsed;
+      } catch {
+        return [];
+      }
     }
+    // backend mode: start empty, will be filled by fetch
+    return [];
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE || 1));
+  const [loading, setLoading] = useState(!USE_MOCK_AUDIT);
 
+  // -------- MOCK MODE: persist to localStorage --------
   useEffect(() => {
+    if (!USE_MOCK_AUDIT) return;
     localStorage.setItem("auditLog", JSON.stringify(entries));
   }, [entries]);
 
+  // -------- BACKEND MODE: fetch /admin/audit-logs/ --------
+  useEffect(() => {
+    if (USE_MOCK_AUDIT) return;
+
+    const fetchAuditLogs = async () => {
+      try {
+        const res = await fetch("/admin/audit-logs/", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        // Spec shows array; but if it's paginated {count, results}, handle both. [attached_file:1]
+        const list = Array.isArray(data) ? data : data.results || [];
+
+        // Map backend fields to the shape used in the table
+        const mapped = list.map((e) => {
+          const created = e.created_at ? new Date(e.created_at) : null;
+          const date =
+            created && !Number.isNaN(created.getTime())
+              ? created.toISOString().slice(0, 10)
+              : "";
+          const time =
+            created && !Number.isNaN(created.getTime())
+              ? created.toISOString().slice(11, 19)
+              : "";
+
+          return {
+            id: e.id,
+            adminName: e.admin_name,
+            date,
+            time,
+            action: `${e.action_type} – ${e.description}`,
+          };
+        });
+
+        setEntries(mapped);
+      } catch (err) {
+        console.error("Failed to load audit logs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAuditLogs();
+  }, []);
+
+  // -------- DERIVED: sort + paginate --------
   const currentPageItems = useMemo(() => {
     const sorted = [...entries].sort((a, b) => {
       const aTs = new Date(`${a.date} ${a.time}`).getTime();
@@ -93,6 +149,7 @@ function AuditLog() {
 
   const pageItems = getPageNumbers();
 
+  // -------- RENDER --------
   return (
     <div className="audit-page-wrapper">
       <div className="audit-container">
@@ -102,55 +159,59 @@ function AuditLog() {
 
         <Section>
           <div className="audit-table-wrapper">
-            <table className="audit-table">
-              <thead>
-                <tr>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={adminIcon} alt="" className="th-icon" />
-                      Admin Name
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={dateIcon} alt="" className="th-icon" />
-                      Date
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={timeIcon} alt="" className="th-icon" />
-                      Time
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={actionIcon} alt="" className="th-icon" />
-                      Action
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {currentPageItems.length > 0 ? (
-                  currentPageItems.map((entry) => (
-                    <tr key={entry.id}>
-                      <td>{entry.adminName}</td>
-                      <td>{entry.date}</td>
-                      <td>{entry.time}</td>
-                      <td>{entry.action}</td>
-                    </tr>
-                  ))
-                ) : (
+            {loading && !USE_MOCK_AUDIT ? (
+              <p className="empty-row">Loading audit events...</p>
+            ) : (
+              <table className="audit-table">
+                <thead>
                   <tr>
-                    <td colSpan={4} className="empty-row">
-                      No audit events recorded yet.
-                    </td>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={adminIcon} alt="" className="th-icon" />
+                        Admin Name
+                      </span>
+                    </th>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={dateIcon} alt="" className="th-icon" />
+                        Date
+                      </span>
+                    </th>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={timeIcon} alt="" className="th-icon" />
+                        Time
+                      </span>
+                    </th>
+                    <th>
+                      <span className="th-with-icon">
+                        <img src={actionIcon} alt="" className="th-icon" />
+                        Action
+                      </span>
+                    </th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {currentPageItems.length > 0 ? (
+                    currentPageItems.map((entry) => (
+                      <tr key={entry.id}>
+                        <td>{entry.adminName}</td>
+                        <td>{entry.date}</td>
+                        <td>{entry.time}</td>
+                        <td>{entry.action}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="empty-row">
+                        No audit events recorded yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </Section>
       </div>

@@ -61,6 +61,8 @@
   border-radius: 18px;
   width: 100%;
   min-width: 640px; 
+  border-collapse: collapse;  /* NEW: remove gaps between cells */
+  border-spacing: 0; 
 }
 
 .partners-table th,
@@ -69,7 +71,7 @@
   font-size: 14px;
   color:#000000;
   text-align: left;
-  border: #d9dadb 0.89px solid;
+  border: #e5e5e7 0.5px solid;
 }
 
 .partners-table thead {

@@ -11,10 +11,12 @@ import Section from "../components/common/Section.jsx";
 
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
+const USE_MOCK_PARTNERS = true; // change to false when backend is ready
 
 function AddPartner() {
   const navigate = useNavigate();
   const logoInputRef = useRef(null);
+
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -30,8 +32,9 @@ function AddPartner() {
   const [touched, setTouched] = useState({});
   const [logoFile, setLogoFile] = useState(null);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Single-field validator (runs on each change)
+  // Single-field validator
   const validateField = (name, value) => {
     switch (name) {
       case "companyName": {
@@ -47,18 +50,15 @@ function AddPartner() {
         return "";
       }
       case "phoneNumber": {
-        // Valid Algerian phone: 00213 / +213 / 0, then 5/6/7, then 8 digits
         const phoneRegex = /^(00213|\+213|0)(5|6|7)[0-9]{8}$/;
         if (!value) return "Required";
         if (!phoneRegex.test(value)) return "Invalid Algerian phone number";
         return "";
       }
       case "wilaya":
-        if (!value) return "Required";
-        return "";
+        return value ? "" : "Required";
       case "region":
-        if (!value) return "Required";
-        return "";
+        return value ? "" : "Required";
       case "address": {
         const v = value.trim();
         if (!v) return "Required";
@@ -66,14 +66,13 @@ function AddPartner() {
         return "";
       }
       case "logo":
-        if (!value) return "Required";
-        return "";
+        return value ? "" : "Required";
       default:
         return "";
     }
   };
 
-  // Full-form validator (backup on submit)
+  // Full-form validator
   const validateForm = () => {
     const newErrors = {};
     Object.entries(formData).forEach(([name, value]) => {
@@ -83,7 +82,7 @@ function AddPartner() {
     return newErrors;
   };
 
-  // Real-time: validate each field as user types/selects
+  // Real-time validation
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -125,7 +124,7 @@ function AddPartner() {
     setErrors((prev) => ({ ...prev, logo: fieldError }));
   };
 
-  // Derive isFormValid whenever data or errors change (controls Save button)
+  // Derive isFormValid
   useEffect(() => {
     const hasErrors = Object.values(errors).some((msg) => msg);
 
@@ -141,17 +140,18 @@ function AddPartner() {
     setIsFormValid(!hasErrors && !!allRequiredFilled);
   }, [errors, formData]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const newErrors = validateForm();
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      setIsFormValid(false);
-      return;
-    }
+  const newErrors = validateForm();
+  setErrors(newErrors);
+  if (Object.keys(newErrors).length > 0) {
+    setIsFormValid(false);
+    return;
+  }
 
-    // Build the partner object to store
+  // 1) MOCK MODE: use localStorage (NOW)
+  if (USE_MOCK_PARTNERS) {
     const newPartner = {
       id: Date.now(),
       companyName: formData.companyName,
@@ -160,14 +160,42 @@ function AddPartner() {
       email: formData.email,
     };
 
-    // Read existing partners, append, and save back
     const stored = localStorage.getItem("partners");
     const partners = stored ? JSON.parse(stored) : [];
     partners.push(newPartner);
-    localStorage.setItem("partners", JSON.stringify(partners)); // persists across pages [web:209][web:213][web:218]
+    localStorage.setItem("partners", JSON.stringify(partners));
 
     navigate("/partner-accounts");
-  };
+    return; // stop here, no backend call
+  }
+
+  // 2) REAL BACKEND MODE: when teammates finish API
+  const payload = new FormData();
+  payload.append("name", formData.companyName);
+  payload.append("email", formData.email);
+  payload.append("phone_number", formData.phoneNumber);
+  payload.append(
+    "address",
+    `${formData.address}, ${formData.region}, ${formData.wilaya}`
+  );
+  if (logoFile) {
+    payload.append("logo", logoFile);
+  }
+
+  const res = await fetch("/api/admin/partners/", {
+    method: "POST",
+    body: payload,
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    console.error("Failed to create partner", await res.text());
+    return;
+  }
+
+  navigate("/partner-accounts");
+};
+
 
   return (
     <div className="page-wrapper">
@@ -189,7 +217,6 @@ function AddPartner() {
 
         <form className="add-listing-form" onSubmit={handleSubmit}>
           <Section title="Basics">
-            {/* Company Name */}
             <Input
               label="Company Name *"
               name="companyName"
@@ -206,7 +233,6 @@ function AddPartner() {
               )
             )}
 
-            {/* Email */}
             <Input
               label="Email *"
               name="email"
@@ -222,7 +248,6 @@ function AddPartner() {
               formData.email && <span className="success-text">Valid!</span>
             )}
 
-            {/* Phone Number */}
             <Input
               label="Phone Number *"
               name="phoneNumber"
@@ -242,7 +267,6 @@ function AddPartner() {
           </Section>
 
           <Section title="Location">
-            {/* Wilaya */}
             <Select
               label="Wilaya *"
               name="wilaya"
@@ -263,7 +287,6 @@ function AddPartner() {
               formData.wilaya && <span className="success-text">Valid!</span>
             )}
 
-            {/* Region */}
             <Select
               label="Region *"
               name="region"
@@ -286,7 +309,6 @@ function AddPartner() {
               formData.region && <span className="success-text">Valid!</span>
             )}
 
-            {/* Listing Address */}
             <Input
               label="Listing Address *"
               name="address"
@@ -302,7 +324,6 @@ function AddPartner() {
             )}
           </Section>
 
-          {/* Company Logo */}
           <Section title="">
             <div className="logo-header">
               <span className="section-title">Company Logo *</span>
@@ -361,10 +382,10 @@ function AddPartner() {
             <Button
               type="submit"
               variant="primary"
-              disabled={!isFormValid}
+              disabled={!isFormValid || submitting}
               className={!isFormValid ? "disabled-btn" : ""}
             >
-              Save
+              {submitting ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>
