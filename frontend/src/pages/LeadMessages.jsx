@@ -5,7 +5,7 @@ import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
 
 import dateIcon from "../assets/icons/Calender.svg";
-import listingIcon from "../assets/icons/listing.svg";
+import listingIcon from "../assets/icons/Listing.svg";
 import clientIcon from "../assets/icons/fullname.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import closeIcon from "../assets/icons/removeimage.png";

@@ -9,8 +9,10 @@ import Select from "../components/common/Select.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
+
 const USE_MOCK_PARTNERS = true; // change to false when backend is ready
 
 function AddPartner() {
@@ -141,60 +143,60 @@ function AddPartner() {
   }, [errors, formData]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const newErrors = validateForm();
-  setErrors(newErrors);
-  if (Object.keys(newErrors).length > 0) {
-    setIsFormValid(false);
-    return;
-  }
+    const newErrors = validateForm();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setIsFormValid(false);
+      return;
+    }
 
-  // 1) MOCK MODE: use localStorage (NOW)
-  if (USE_MOCK_PARTNERS) {
-    const newPartner = {
-      id: Date.now(),
-      companyName: formData.companyName,
-      address: `${formData.address}, ${formData.region}, ${formData.wilaya}`,
-      phoneNumber: formData.phoneNumber,
-      email: formData.email,
-    };
+    // 1) MOCK MODE: use localStorage (NOW)
+    if (USE_MOCK_PARTNERS) {
+      const newPartner = {
+        id: Date.now(),
+        companyName: formData.companyName,
+        address: `${formData.address}, ${formData.region}, ${formData.wilaya}`,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+      };
 
-    const stored = localStorage.getItem("partners");
-    const partners = stored ? JSON.parse(stored) : [];
-    partners.push(newPartner);
-    localStorage.setItem("partners", JSON.stringify(partners));
+      const stored = localStorage.getItem("partners");
+      const partners = stored ? JSON.parse(stored) : [];
+      partners.push(newPartner);
+      localStorage.setItem("partners", JSON.stringify(partners));
 
-    navigate("/partner-accounts");
-    return; // stop here, no backend call
-  }
+      navigate("/forms-tables/partner-accounts");
+      return; // stop here, no backend call
+    }
 
-  // 2) REAL BACKEND MODE: when teammates finish API
-  const payload = new FormData();
-  payload.append("name", formData.companyName);
-  payload.append("email", formData.email);
-  payload.append("phone_number", formData.phoneNumber);
-  payload.append(
-    "address",
-    `${formData.address}, ${formData.region}, ${formData.wilaya}`
-  );
-  if (logoFile) {
-    payload.append("logo", logoFile);
-  }
+    // 2) REAL BACKEND MODE: when teammates finish API
+    const payload = new FormData();
+    payload.append("name", formData.companyName);
+    payload.append("email", formData.email);
+    payload.append("phone_number", formData.phoneNumber);
+    payload.append(
+      "address",
+      `${formData.address}, ${formData.region}, ${formData.wilaya}`
+    );
+    if (logoFile) {
+      payload.append("logo", logoFile);
+    }
 
-  const res = await fetch("/api/admin/partners/", {
-    method: "POST",
-    body: payload,
-    credentials: "include",
-  });
+    const res = await fetch("/api/admin/partners/", {
+      method: "POST",
+      body: payload,
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    console.error("Failed to create partner", await res.text());
-    return;
-  }
+    if (!res.ok) {
+      console.error("Failed to create partner", await res.text());
+      return;
+    }
 
-  navigate("/partner-accounts");
-};
+    navigate("/forms-tables/partner-accounts");
+  };
 
 
   return (
@@ -206,7 +208,7 @@ function AddPartner() {
           onClick={() => navigate(-1)}
         >
           <img
-            src="../src/assets/icons/back.svg"
+            src={BackIcon}
             className="back-icon"
             alt="Back"
           />

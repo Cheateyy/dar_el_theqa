@@ -11,6 +11,9 @@ import TextArea from "../components/common/TextArea.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+// import icons via alias (use @)
+import BackIcon from "@/assets/icons/back.svg";
+
 const DRAFT_KEY = "createListingDraft"; // 🔧 ADDED FOR BACKEND: local draft storage key
 
 function AddListingPage() {
@@ -233,7 +236,7 @@ function AddListingPage() {
     if (!hasErrors) {
       // 🔧 ADDED FOR BACKEND: save the UI values (we map to backend on final submit)
       saveDraftStep1(formData);
-      navigate("/add-listing/step-2");
+      navigate("/forms-tables/add-listing/step-2");
     }
   };
 
@@ -260,7 +263,7 @@ function AddListingPage() {
           onClick={() => window.history.back()}
         >
           <img
-            src="../src/assets/icons/back.svg"
+            src={BackIcon}
             alt="back"
             className="back-icon"
           />

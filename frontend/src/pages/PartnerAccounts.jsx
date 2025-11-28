@@ -7,13 +7,13 @@ import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
 import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
-import deleteIcon from "../assets/icons/delete.svg";
+import deleteIcon from "../assets/icons/Delete.svg";
 import Section from "../components/common/Section.jsx";
 import companyIcon from "../assets/icons/companyIcon.svg";
 import addressIcon from "../assets/icons/AddressIcon.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
-import actionsIcon from "../assets/icons/actions.svg";
+import actionsIcon from "../assets/icons/Actions.svg";
 
 // 🔧 SWITCH: true = localStorage mock (no backend yet)
 //            false = real backend /api/admin/partners/ (when ready)
@@ -119,7 +119,7 @@ function PartnerAccounts() {
 
   // -------- HANDLERS --------
   const handleAddPartner = () => {
-    navigate("/add-partner");
+    navigate("/forms-tables/add-partner");
   };
 
   const toggleStatus = (id) => {
@@ -352,9 +352,8 @@ function PartnerAccounts() {
             <button
               key={page}
               type="button"
-              className={`page-dot ${
-                page === currentPage ? "active" : ""
-              }`}
+              className={`page-dot ${page === currentPage ? "active" : ""
+                }`}
               onClick={() => goToPage(page)}
             >
               {page}

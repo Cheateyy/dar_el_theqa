@@ -8,6 +8,11 @@ import Input from "../components/common/Input.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+import BackIcon from "@/assets/icons/back.svg"
+import AddImageIcon from "@/assets/icons/Addimage.svg";
+import ImageFileIcon from "@/assets/icons/imageicon.svg";
+import RemoveImageIcon from "@/assets/icons/removeimage.png";
+
 const DRAFT_KEY = "createListingDraft"; // 🔧 ADDED FOR BACKEND
 
 const MAX_IMAGES = 20;
@@ -106,10 +111,10 @@ function AddListingPage2() {
       return value.trim() === ""
         ? "Area is required"
         : isNaN(value)
-        ? "Area must be a number"
-        : value <= 0
-        ? "Area must be greater than 0"
-        : "";
+          ? "Area must be a number"
+          : value <= 0
+            ? "Area must be greater than 0"
+            : "";
     }
 
     if (["floors", "bedrooms", "bathrooms"].includes(name)) {
@@ -123,10 +128,10 @@ function AddListingPage2() {
       return value.trim() === ""
         ? "Required"
         : isNaN(value)
-        ? "Must be a number"
-        : value < 0
-        ? "Cannot be negative"
-        : "";
+          ? "Must be a number"
+          : value < 0
+            ? "Cannot be negative"
+            : "";
     }
 
     return "";
@@ -239,7 +244,7 @@ function AddListingPage2() {
     // 🔧 ADDED FOR BACKEND: save draft for step 2 and persist files in-memory
     saveDraftStep2();
     persistImagesInMemory();
-    navigate("/add-listing/step-2/step-3");
+    navigate("/forms-tables/add-listing/step-2/step-3");
   };
 
   return (
@@ -251,7 +256,7 @@ function AddListingPage2() {
           onClick={() => navigate(-1)}
         >
           <img
-            src="../src/assets/icons/back.svg"
+            src={BackIcon}
             className="back-icon"
             alt="back"
           />
@@ -267,13 +272,12 @@ function AddListingPage2() {
           <div className="property-details-grid">
             {/* FULL ROW — PROPERTY TYPE */}
             <div
-              className={`property-type-field property-type-row ${
-                errors.propertyType
-                  ? "input-error"
-                  : propertyType
+              className={`property-type-field property-type-row ${errors.propertyType
+                ? "input-error"
+                : propertyType
                   ? "input-valid"
                   : ""
-              }`}
+                }`}
             >
               <label htmlFor="propertyType">Property Type *</label>
 
@@ -319,9 +323,8 @@ function AddListingPage2() {
 
             {/* AREA */}
             <div
-              className={`form-field inside-label ${
-                errors.area ? "input-error" : area ? "input-valid" : ""
-              }`}
+              className={`form-field inside-label ${errors.area ? "input-error" : area ? "input-valid" : ""
+                }`}
             >
               <label htmlFor="area">Area *</label>
               <input
@@ -343,9 +346,8 @@ function AddListingPage2() {
             {/* FLOORS */}
             {!isLandType && (
               <div
-                className={`form-field inside-label ${
-                  errors.floors ? "input-error" : floors ? "input-valid" : ""
-                }`}
+                className={`form-field inside-label ${errors.floors ? "input-error" : floors ? "input-valid" : ""
+                  }`}
               >
                 <label htmlFor="floors">Floors</label>
                 <input
@@ -368,13 +370,12 @@ function AddListingPage2() {
             {/* BEDROOMS */}
             {!hideRooms && (
               <div
-                className={`form-field inside-label ${
-                  errors.bedrooms
-                    ? "input-error"
-                    : bedrooms
+                className={`form-field inside-label ${errors.bedrooms
+                  ? "input-error"
+                  : bedrooms
                     ? "input-valid"
                     : ""
-                }`}
+                  }`}
               >
                 <label htmlFor="bedrooms">Bedrooms</label>
                 <input
@@ -399,13 +400,12 @@ function AddListingPage2() {
             {/* BATHROOMS */}
             {!hideRooms && (
               <div
-                className={`form-field inside-label ${
-                  errors.bathrooms
-                    ? "input-error"
-                    : bathrooms
+                className={`form-field inside-label ${errors.bathrooms
+                  ? "input-error"
+                  : bathrooms
                     ? "input-valid"
                     : ""
-                }`}
+                  }`}
               >
                 <label htmlFor="bathrooms">Bathrooms</label>
                 <input
@@ -446,7 +446,7 @@ function AddListingPage2() {
               onClick={handleAddImageClick}
               disabled={images.filter((img) => img.file).length >= MAX_IMAGES}
             >
-              <img src="../src/assets/icons/Addimage.svg" alt="add" />
+              <img src={AddImageIcon} alt="add" />
             </button>
           </div>
 
@@ -474,7 +474,7 @@ function AddListingPage2() {
                     <div className="img-actions-row">
                       <span className="image-filename">
                         <img
-                          src="../src/assets/icons/imageicon.svg"
+                          src={ImageFileIcon}
                           className="small-image-icon"
                           alt="file"
                         />
@@ -497,7 +497,7 @@ function AddListingPage2() {
                         onClick={() => removeImageRow(idx)}
                       >
                         <img
-                          src="../src/assets/icons/removeimage.png"
+                          src={RemoveImageIcon}
                           alt="Remove"
                         />
                       </button>

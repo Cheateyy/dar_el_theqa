@@ -7,12 +7,12 @@ import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
 import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
-import deleteIcon from "../assets/icons/delete.svg";
+import deleteIcon from "../assets/icons/Delete.svg";
 
 import fullnameIcon from "../assets/icons/fullname.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
-import actionsIcon from "../assets/icons/actions.svg";
+import actionsIcon from "../assets/icons/Actions.svg";
 
 import Section from "../components/common/Section.jsx";
 
