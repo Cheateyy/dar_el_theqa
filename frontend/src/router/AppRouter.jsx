@@ -5,7 +5,7 @@ import AddListingPage from "../pages/AddListingPage.jsx";
 import AddListingPage2 from "../pages/AddListingPage2.jsx";
 import AddListingPage3 from "../pages/AddListingPage3.jsx";
 import Addpartner from "../pages/Addpartner.jsx";
-import PartnerAccounts from "../pages/partnerAccounts.jsx";
+import PartnerAccounts from "../pages/PartnerAccounts.jsx";
 import UserAccounts from "../pages/UserAccounts.jsx";
 import AuditLog from "../pages/AuditLog.jsx";
 import LeadMessages from "../pages/LeadMessages.jsx";
