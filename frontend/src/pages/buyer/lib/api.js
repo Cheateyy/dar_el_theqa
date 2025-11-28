@@ -1,6 +1,8 @@
 import { api } from "@/lib/api_client";
 
-export async function fetch_listings() {
+/**@typedef {import('@/types/ListingModel')}*/
+
+export async function get_listings() {
     const res = await api.get("/api/listings/featured");
     if (!res.ok) {
         const error = await res.text();
@@ -8,11 +10,12 @@ export async function fetch_listings() {
     }
     const data = await res.json();
     console.log("Listings fetch in the provider", data);
+    /**@type {Listing[]} */
     return data;
 };
 
 /**
- * @typedef ToggleLikeResponse
+ * @typedef {Object} ToggleLikeResponse
  * @property {"added" | "removed"} status
  * @property {string} message
  */
@@ -26,5 +29,18 @@ export async function toggle_like(listing_id) {
     /**@type {ToggleLikeResponse} */
     const data = await res.json();
     console.log(`Listing like is ${data.status}`)
+    return data;
+}
+
+/**@typedef {import('@/types/common')}*/
+
+export async function get_property_types() {
+    const res = await api.get("/api/choices/property-types");
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    /**@type {Option[]} */
+    const data = await res.json()
     return data;
 }

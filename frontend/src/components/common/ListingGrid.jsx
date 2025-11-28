@@ -1,7 +1,7 @@
 import { ListingCard } from "./ListingCard"
 import { CustomPagination } from "@/components/common/Pagination"
 
-/** @typedef {import("@/models/ListingModel")}*/
+/** @typedef {import("@/types/ListingModel")}*/
 
 /**
  * 

@@ -9,7 +9,7 @@ import isVerifiedSvg from '@/assets/icons/is_verified.svg'
 import isPartiallyVerifiedSvg from '@/assets/icons/is_partially_verified.svg'
 import { toggle_like } from "@/pages/buyer/lib/api"
 
-/** @typedef {import("@/models/ListingModel")}*/
+/** @typedef {import("@/types/ListingModel")}*/
 
 /**
  * @param {Object} props
