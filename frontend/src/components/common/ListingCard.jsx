@@ -3,7 +3,9 @@ import {
 } from "@/components/ui/card"
 import listingCardImage from '@/assets/images/listing_card.jpg'
 import heartSvg from '@/assets/images/heart.svg'
-import isVerifiedListingSvg from '@/assets/images/verified_listing.svg'
+import isVerifiedSvg from '@/assets/icons/is_verified.svg'
+import isPartiallyVerifiedSvg from '@/assets/icons/is_partially_verified.svg'
+
 
 /** @typedef {import("@/models/ListingModel")}*/
 
@@ -13,6 +15,20 @@ import isVerifiedListingSvg from '@/assets/images/verified_listing.svg'
  * @returns 
  */
 export function ListingCard({ listing }) {
+    let verification_status_icon;
+    switch (listing.verification_status) {
+        case "VERIFIED":
+            verification_status_icon = isVerifiedSvg;
+            break;
+        case "PARTIAL":
+            verification_status_icon = isPartiallyVerifiedSvg;
+            break;
+        case "NONE":
+            verification_status_icon = null;
+            break;
+        default:
+            console.error("ListingCard: unsupported verification status")
+    }
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
@@ -34,7 +50,7 @@ export function ListingCard({ listing }) {
                         <p className="text-sm sm:text-base font-medium truncate">{listing.title}</p>
                         <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya}</p>
                     </div>
-                    <img src={isVerifiedListingSvg} alt="verified" className="ml-auto w-4 h-4 sm:w-5 sm:h-5" />
+                    {verification_status_icon && <img src={verification_status_icon} alt="verified" className="ml-auto" />}
                 </div>
                 <div className="mt-2">
                     <span className="text-base sm:text-lg font-semibold">{listing.price}</span>

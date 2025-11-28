@@ -8,7 +8,7 @@ import UpdateListing from '../pages/seller_Update_listing/Listing.jsx';
 import AdminReviewSell from '../pages/admin_ListingReview_sell/adminReviewSell.jsx';
 import AdminReviewRent from '../pages/admin_ListingReview_rent/adminReviewRent.jsx';
 import LandingPage from '../pages/buyer/landingPage/page';
-import SearchResults from '@/pages/buyer/searchResult/page';
+import SearchResults from '@/pages/buyer/searchResults/page';
 import { Favorites } from '@/pages/buyer/favorites/page';
 import { BuyerLayout } from '@/pages/buyer/layout';
 import { Interests } from '@/pages/buyer/Interests/page';

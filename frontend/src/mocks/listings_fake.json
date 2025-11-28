@@ -30,7 +30,7 @@
     "rent_unit": "month",
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app3.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL"
   },
   {
     "id": 4,
@@ -63,7 +63,7 @@
     "rent_unit": "month",
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app6.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL"
   },
   {
     "id": 7,
@@ -74,7 +74,7 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app7.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "PARTIAL"
   },
   {
     "id": 8,
@@ -107,7 +107,7 @@
     "rent_unit": null,
     "wilaya": "Béjaïa",
     "cover_image": "https://example.com/img/app10.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL"
   },
   {
     "id": 11,
@@ -140,7 +140,7 @@
     "rent_unit": null,
     "wilaya": "Tlemcen",
     "cover_image": "https://example.com/img/app13.jpg",
-    "verification_status": "REJECTED"
+    "verification_status": "NONE"
   },
   {
     "id": 14,
@@ -162,7 +162,7 @@
     "rent_unit": "month",
     "wilaya": "Constantine",
     "cover_image": "https://example.com/img/app15.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL"
   },
   {
     "id": 16,

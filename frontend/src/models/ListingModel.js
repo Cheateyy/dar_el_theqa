@@ -8,5 +8,5 @@
  * @property {string|null} rent_unit - Rent unit (e.g. "month"), null if not applicable.
  * @property {string} wilaya - Region or province where the property is located.
  * @property {string} cover_image - URL of the main image for the property.
- * @property {"VERIFIED" | "PENDING" | "REJECTED"} verification_status - Verification status of the listing.
+ * @property {"VERIFIED" | "PARTIAL" | "NONE"} verification_status - Verification status of the listing.
  */
