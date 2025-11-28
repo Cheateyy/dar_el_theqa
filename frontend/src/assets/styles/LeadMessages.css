@@ -1,0 +1,597 @@
+.leads-page-wrapper {
+  min-height: 100vh;
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  font-family: "Urbanist", sans-serif;
+}
+
+.leads-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 16px;
+  gap: 12px;
+  width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0f1724;
+}
+
+.leads-card-header {
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.leads-main-layout {
+  display: grid;
+  grid-template-columns: 1fr; /* default: single column when no details */
+  gap: 0;
+  align-items: start;
+}
+
+/* When a lead is selected show details column */
+.leads-main-layout.has-details {
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Table column wrapper - contains table and pagination */
+.leads-table-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Table card matches other pages */
+.leads-table-section {
+  background: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 4px 8px rgba(14, 68, 102, 0.12);
+  padding: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.leads-table-wrapper {
+  width: 100%;
+  border-radius: 20px;
+  overflow-x: auto;
+}
+
+.leads-table {
+  border-radius: 18px;
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.leads-table thead {
+  background: #edf7fd;
+}
+
+.leads-table thead tr:first-child th {
+  color: #0e4466;
+}
+
+.leads-table tbody tr:nth-child(even) {
+  background: #edf7fd;
+}
+
+.leads-table th,
+.leads-table td {
+  padding: 10px 18px;
+  font-size: 14px;
+  color: #000000;
+  text-align: left;
+  border: 0.89px solid #d9dadb;
+}
+
+.th-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #0e4466;
+}
+.th-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.leads-table tbody tr {
+  height: 64px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.leads-table tbody td {
+  color: #0f1724;
+}
+
+.leads-table tbody tr:hover {
+  background: rgba(14, 68, 102, 0.08);
+}
+
+.leads-table tbody tr.selected {
+  background: #d6e9f8;
+}
+
+.lead-row {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.lead-row:hover {
+  background: rgba(14, 68, 102, 0.08);
+}
+.lead-row.selected {
+  background: #d6e9f8;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 24px 0;
+  color: #6b7280;
+}
+
+/* Details tables styling */
+.lead-details-table,
+.lead-property-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.lead-details-table th,
+.lead-property-table th {
+  text-align: left;
+  font-size: 13px;
+  color: #6b7280;
+  padding: 12px 10px;
+  vertical-align: top;
+  width: 40%;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.lead-details-table td,
+.lead-property-table td {
+  padding: 12px 10px;
+  font-size: 14px;
+  color: #0f1724;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.message-td {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  color: #475569;
+}
+
+/* Pagination - match other pages - now outside wrapper */
+.leads-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 12px 0;
+  width: 100%;
+}
+
+.leads-pagination .page-dot.active {
+  background: transparent;
+  color: #0e4466;
+}
+.leads-pagination .paging-button {
+  height: 38px;
+  width: 38px;
+  border-radius: 100%;
+  border: 1px solid #0e4466;
+  background: transparent;
+  color: #0e4466;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Details card on right */
+.lead-details-card {
+  background: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 4px 8px rgba(14, 68, 102, 0.12);
+  padding: 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+.close-panel-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.close-panel-btn img {
+  width: 35px;
+  height: 35px;
+  display: block;
+}
+
+/* .close-panel-btn:hover {
+  background: rgba(14, 68, 102, 0.06);
+} */
+
+.lead-client-info {
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
+.lead-client-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #0f1724;
+}
+.lead-client-phone,
+.lead-client-email {
+  font-size: 14px;
+  color: #475569;
+  margin: 2px 0;
+}
+
+.lead-message-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 18px;
+  border: 1px solid #eef2f7;
+}
+.lead-message-box h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f1724;
+  margin: 0 0 8px;
+}
+.lead-message-box p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.lead-property-summary {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 12px;
+  border: 1px solid #eef2f7;
+}
+.property-image-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+}
+.lead-property-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
+}
+.lead-property-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 12px 6px 6px;
+  color: #0f1724;
+}
+.lead-property-address {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 6px 8px;
+}
+.lead-property-price {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 6px 10px;
+  color: #0e4466;
+}
+.lead-property-price-unit {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 8px;
+}
+.lead-property-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.meta-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.meta-label {
+  color: #9ca3af;
+  font-size: 12px;
+}
+.meta-value {
+  font-weight: 700;
+}
+
+
+@media (max-width: 1200px) {
+  .leads-container {
+    max-width: 97vw;
+    padding: 16px 14px;
+  }
+  .page-title {
+    font-size: 22px;
+  }
+  .leads-table-section {
+    padding: 16px;
+  }
+  .lead-details-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .leads-container {
+    max-width: 95vw;
+    padding: 18px 14px;
+  }
+  .page-title {
+    font-size: 20px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .leads-pagination .page-dot {
+    min-width: 40px;
+    height: 26px;
+    font-size: 12px;
+  }
+  .leads-pagination .paging-button {
+    height: 35px;
+    width: 35px;
+  }
+  .lead-client-name {
+    font-size: 16px;
+  }
+  .lead-property-price {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 992px) {
+  .leads-main-layout.has-details {
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+  }
+  .lead-details-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 780px) {
+  .leads-main-layout,
+  .leads-main-layout.has-details {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .lead-details-card {
+    width: 100%;
+    margin-top: 20px;
+    min-height: auto;
+  }
+  .leads-table {
+    min-width: 520px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 6px 3px;
+    font-size: 10px;
+  }
+  .leads-table tbody tr {
+    height: 50px;
+  }
+  .page-title {
+    font-size: 18px;
+  }
+  .lead-client-name {
+    font-size: 14px;
+  }
+  .lead-property-image {
+    height: 140px;
+  }
+}
+
+@media (max-width: 640px) {
+  .leads-page-wrapper {
+    padding: 16px 12px;
+  }
+  .leads-container {
+    padding: 12px 8px;
+    gap: 8px;
+  }
+  .leads-table-section {
+    border-radius: 20px;
+    padding: 12px;
+    min-height: auto;
+  }
+  .leads-table {
+    min-width: 100%;
+    font-size: 9px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 4px 2px;
+    font-size: 9px;
+  }
+  .page-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .leads-pagination {
+    margin-top: 8px;
+    gap: 4px;
+  }
+  .leads-pagination .page-dot {
+    min-width: 28px;
+    height: 24px;
+    font-size: 10px;
+  }
+  .leads-pagination .paging-button {
+    height: 28px;
+    width: 28px;
+    font-size: 1rem;
+  }
+  .lead-details-card {
+    border-radius: 20px;
+    padding: 12px;
+  }
+  .close-panel-btn {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    right: 8px;
+  }
+  .close-panel-btn img {
+    width: 24px;
+    height: 24px;
+  }
+  .lead-client-name {
+    font-size: 13px;
+  }
+  .lead-message-box,
+  .lead-property-summary {
+    padding: 8px;
+  }
+  .lead-property-image {
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leads-page-wrapper {
+    padding: 12px 8px;
+    align-items: center;
+  }
+  .leads-container {
+    padding: 8px 4px;
+    max-width: 100%;
+  }
+  .leads-table-section {
+    border-radius: 16px;
+    padding: 8px;
+  }
+  .page-title {
+    font-size: 14px;
+  }
+  .leads-table {
+    min-width: 100%;
+    font-size: 8px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 3px 2px;
+    font-size: 8px;
+  }
+  .leads-table tbody tr {
+    height: 40px;
+  }
+  .th-icon {
+    width: 12px;
+    height: 12px;
+  }
+  .leads-pagination .page-dot {
+    min-width: 24px;
+    height: 20px;
+    font-size: 9px;
+  }
+  .leads-pagination .paging-button {
+    height: 24px;
+    width: 24px;
+    font-size: 0.9rem;
+  }
+  .lead-details-card {
+    margin-top: 12px;
+  }
+  .lead-client-info {
+    margin-bottom: 12px;
+  }
+  .lead-client-name {
+    font-size: 12px;
+  }
+  .lead-client-phone,
+  .lead-client-email {
+    font-size: 11px;
+  }
+  .lead-message-box h3 {
+    font-size: 11px;
+  }
+  .lead-message-box p {
+    font-size: 12px;
+  }
+  .lead-property-title {
+    font-size: 14px;
+  }
+  .lead-property-price {
+    font-size: 16px;
+  }
+  .meta-label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .leads-page-wrapper {
+    padding: 8px 4px;
+  }
+  .leads-container {
+    padding: 4px 0;
+  }
+  .leads-table-section,
+  .lead-details-card {
+    border-radius: 12px;
+    padding: 6px;
+  }
+  .page-title {
+    font-size: 12px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 2px 1px;
+    font-size: 7px;
+  }
+}

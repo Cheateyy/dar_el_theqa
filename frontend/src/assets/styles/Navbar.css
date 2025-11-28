@@ -1,0 +1,180 @@
+.navbar {
+  position: relative; 
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #F1F1F1;  
+  box-sizing: border-box;
+  font-family: 'Urbanist', sans-serif;
+}
+
+
+.navbar-left {
+  display: flex;
+}
+
+.navbar-logo {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  left: 25px;
+  top: -20px;
+}
+
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-divider {
+  width: 1px;
+  height: 40px;
+  border-left: 1px dashed #c8c8c8;
+}
+
+/* Right */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.navbar-link {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  cursor: pointer;
+}
+.navbar-link:hover .navbar-icon,.navbar-link:hover .navbar-explore-icon {
+  transform: scale(1.1); 
+}
+.navbar-icon-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  
+}
+
+.navbar-icon-btn:hover {
+  transform: scale(1.1); 
+}
+
+.navbar-icon {
+  width: 129px;
+  height: 48px;
+}
+.navbar-explore-icon {
+  width: 192px;
+  height: 48px;
+}
+
+
+/* Tablet screens */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 24px;
+    height: 60px;
+  }
+  .navbar-logo {
+    width: 140px;
+    height: 140px;
+    left: 20px;
+  }
+  .navbar-icon {
+    width: 100px;
+    height: 40px;
+  }
+  .navbar-explore-icon {
+    width: 150px;
+    height: 40px;
+  }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 56px;
+  }
+  .navbar-logo {
+    width: 100px;
+    height: 100px;
+    left: 12px;
+    top: -8px;
+  }
+  .navbar-icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .navbar-icon {
+    width: 60px;
+    height: 35px;
+  }
+  .navbar-explore-icon {
+    width: 80px;
+    height: 35px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 12px;
+    height: 52px;
+  }
+  .navbar-logo {
+    width: 80px;
+    height: 80px;
+    left: 4px;
+    top: 0;
+  }
+  .navbar-icon-btn {
+    width: 22px;
+    height: 22px;
+  }
+  .navbar-icon {
+    width: 44px;
+    height: 28px;
+  }
+  .navbar-explore-icon {
+    width: 50px;
+    height: 28px;
+  }
+  .navbar-link {
+    font-size: 12px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .navbar {
+    padding: 0 8px;
+    height: 48px;
+  }
+  .navbar-logo {
+    width: 70px;
+    height: 70px;
+    left: 2px;
+  }
+  .navbar-icon-btn {
+    width: 18px;
+    height: 18px;
+  }
+  .navbar-icon {
+    width: 36px;
+    height: 24px;
+  }
+  .navbar-explore-icon {
+    width: 40px;
+    height: 24px;
+  }
+}
