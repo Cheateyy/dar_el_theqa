@@ -1,4 +1,7 @@
 // Made by Chatgpt
+
+import { API_BASE_URL } from "@/config/api";
+
 /**
  * Single configured api client to be used across the application
  * 
@@ -49,8 +52,6 @@ export function createApiClient({ baseURL, defaultHeaders = {} }) {
     };
 }
 
-// Usage
-const API_BASE_URL = 'http://localhost:3000';
 
 export const api = createApiClient({
     baseURL: API_BASE_URL,
