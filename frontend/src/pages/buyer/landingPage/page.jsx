@@ -6,8 +6,10 @@ import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
 import { ListingGrid } from "@/components/common/ListingGrid";
 import { useNavigate } from "react-router-dom";
+import { useListings } from "./context/ListingsContext";
 
 export default function LandingPage() {
+    const { listings } = useListings()
     const navigate = useNavigate()
     return (
         <>
@@ -60,7 +62,7 @@ export default function LandingPage() {
                                 <ArrowRight />
                             </Button>
                         </div>
-                        <ListingGrid listings={[1, 2, 3, 4]} />
+                        <ListingGrid listings={listings} />
                     </div>
                 </section>
                 <section className="partners mt-12 sm:mt-24 md:mt-36">

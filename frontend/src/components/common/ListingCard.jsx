@@ -5,7 +5,14 @@ import listingCardImage from '@/assets/images/listing_card.jpg'
 import heartSvg from '@/assets/images/heart.svg'
 import isVerifiedListingSvg from '@/assets/images/verified_listing.svg'
 
-export function ListingCard() {
+/** @typedef {import("@/models/ListingModel")}*/
+
+/**
+ * @param {Object} props
+ * @param {Listing} props.listing 
+ * @returns 
+ */
+export function ListingCard({ listing }) {
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
@@ -24,13 +31,13 @@ export function ListingCard() {
             <div className="mb-3 text-white px-4 py-3 sm:px-5 sm:py-4 relative z-10" role="listing info">
                 <div className="flex items-start gap-3">
                     <div className="min-w-0">
-                        <p className="text-sm sm:text-base font-medium truncate">Property title</p>
-                        <p className="text-xs sm:text-sm text-gray-200 truncate">Wilaya</p>
+                        <p className="text-sm sm:text-base font-medium truncate">{listing.title}</p>
+                        <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya}</p>
                     </div>
                     <img src={isVerifiedListingSvg} alt="verified" className="ml-auto w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="mt-2">
-                    <span className="text-base sm:text-lg font-semibold">128,928,309 DA</span>
+                    <span className="text-base sm:text-lg font-semibold">{listing.price}</span>
                 </div>
             </div>
         </Card>
