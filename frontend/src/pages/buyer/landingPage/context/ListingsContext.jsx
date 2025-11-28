@@ -1,5 +1,6 @@
 import { api } from "@/lib/api_client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { fetch_listings } from "../../lib/api";
 
 /** @typedef {import("@/models/ListingModel")}*/
 
@@ -11,24 +12,17 @@ const ListingsContext = createContext(null);
  */
 export function ListingProvider({ children }) {
     /** @type {[Listing[], import('react').Dispatch<import('react').SetStateAction<Listing[]>>]} */
-    const [listings, setListings] = useState([]);
+    const [listings, set_listings] = useState([]);
 
     useEffect(() => {
-        const fetchListings = async () => {
-            const res = await api.get("/api/listings/featured");
-            if (!res.ok) {
-                const error = await res.text();
-                throw new Error(error);
-            }
-            const data = await res.json();
-            console.log("Listings fetch in the provider", data);
-            setListings(data);
+        const fetchData = async () => {
+            set_listings(await fetch_listings());
         };
-        fetchListings();
+        fetchData();
     }, []);
 
     return (
-        <ListingsContext.Provider value={{ listings, setListings }}>
+        <ListingsContext.Provider value={{ listings, setListings: set_listings }}>
             {children}
         </ListingsContext.Provider>
     );

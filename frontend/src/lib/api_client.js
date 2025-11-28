@@ -1,6 +1,6 @@
 // Made by Chatgpt
 
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL } from "@/config/env";
 
 /**
  * Single configured api client to be used across the application
