@@ -8,6 +8,11 @@ import Input from "../components/common/Input.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+import BackIcon from "@/assets/icons/back.svg"
+import AddImageIcon from "@/assets/icons/Addimage.svg";
+import ImageFileIcon from "@/assets/icons/imageicon.svg";
+import RemoveImageIcon from "@/assets/icons/removeimage.png";
+
 const DRAFT_KEY = "createListingDraft"; // 🔧 ADDED FOR BACKEND
 
 const MAX_IMAGES = 20;
@@ -251,7 +256,7 @@ function AddListingPage2() {
           onClick={() => navigate(-1)}
         >
           <img
-            src="../src/assets/icons/back.svg"
+            src={BackIcon}
             className="back-icon"
             alt="back"
           />
@@ -441,7 +446,7 @@ function AddListingPage2() {
               onClick={handleAddImageClick}
               disabled={images.filter((img) => img.file).length >= MAX_IMAGES}
             >
-              <img src="../src/assets/icons/Addimage.svg" alt="add" />
+              <img src={AddImageIcon} alt="add" />
             </button>
           </div>
 
@@ -469,7 +474,7 @@ function AddListingPage2() {
                     <div className="img-actions-row">
                       <span className="image-filename">
                         <img
-                          src="../src/assets/icons/imageicon.svg"
+                          src={ImageFileIcon}
                           className="small-image-icon"
                           alt="file"
                         />
@@ -492,7 +497,7 @@ function AddListingPage2() {
                         onClick={() => removeImageRow(idx)}
                       >
                         <img
-                          src="../src/assets/icons/removeimage.png"
+                          src={RemoveImageIcon}
                           alt="Remove"
                         />
                       </button>

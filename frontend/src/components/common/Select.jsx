@@ -1,4 +1,5 @@
 import React from "react";
+import DownIcon from "@/assets/icons/Down.svg";
 
 function Select({ label, name, value, onChange, children }) {
   const selectClass = `select-control ${value ? "has-value" : "is-placeholder"}`;

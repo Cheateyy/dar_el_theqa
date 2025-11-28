@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "../assets/styles/addListing3.css";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
+import BackIcon from "@/assets/icons/back.svg";
+import DocumentIcon from "@/assets/icons/document.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 
 // 🔧 ADDED FOR BACKEND – We load the Step 1 + Step 2 data from localStorage
@@ -191,11 +193,7 @@ function AddListingPage3() {
           type="button"
           onClick={() => navigate(-1)}
         >
-          <img
-            src="../../src/assets/icons/back.svg"
-            className="back-icon"
-            alt="Back"
-          />
+          <img src={BackIcon} className="back-icon" alt="Back" />
           Back
         </button>
 
@@ -244,7 +242,7 @@ function AddListingPage3() {
                     <div className="document-file-row">
                       <span className="document-filename">
                         <img
-                          src="../../src/assets/icons/document.svg"
+                          src={DocumentIcon}
                           className="small-pdf-icon"
                           alt="file"
                         />
@@ -256,11 +254,7 @@ function AddListingPage3() {
                         className="remove-document-btn"
                         onClick={() => handleRemoveFile(idx)}
                       >
-                        <img
-                          src={removeIcon}
-                          className="remove-icon"
-                          alt="Remove file"
-                        />
+                        <img src={removeIcon} className="remove-icon" alt="Remove file" />
                       </button>
                     </div>
                   </div>

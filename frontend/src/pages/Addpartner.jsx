@@ -9,8 +9,10 @@ import Select from "../components/common/Select.jsx";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
 
+import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
+
 const USE_MOCK_PARTNERS = true; // change to false when backend is ready
 
 function AddPartner() {
@@ -206,7 +208,7 @@ function AddPartner() {
           onClick={() => navigate(-1)}
         >
           <img
-            src="../src/assets/icons/back.svg"
+            src={BackIcon}
             className="back-icon"
             alt="Back"
           />
