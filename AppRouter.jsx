@@ -28,7 +28,7 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        <Route path="/details" element={<Outlet />}>
+        {/* <Route path="/details" element={<Outlet />}>
           <Route path="property-details-sell" element={<ListingDetails_sell />} />
           <Route path="property-details-rent" element={<ListingDetails_rent />} />
           <Route path="sellerListing-sell" element={<SellerListingSell />} />
@@ -37,7 +37,7 @@ function AppRouter() {
           <Route path="sellerUpdateListing" element={<UpdateListing />} />
           <Route path="adminReviewSell" element={<AdminReviewSell />} />
           <Route path="adminReviewRent" element={<AdminReviewRent />} />
-        </Route>
+        </Route> */}
 
         <Route path="/" element={<BuyerLayout />}>
           <Route index element={<LandingPage />} />
@@ -46,8 +46,8 @@ function AppRouter() {
           <Route path="interests" element={<Interests />} />
         </Route>
 
-        <Route path="/forms-tables">
-          <Route index={true} element={<><Navbar /><AddListingPage /></>} />
+        {/* <Route path="/forms-tables" element={<Outlet />}>
+          <Route path="" element={<><Navbar /><AddListingPage /></>} />
           <Route path="add-listing" element={<><Navbar /><AddListingPage /></>} />
           <Route path="add-listing/step-2" element={<><Navbar /><AddListingPage2 /></>} />
           <Route path="add-listing/step-2/step-3" element={<><Navbar /><AddListingPage3 /></>} />
@@ -56,7 +56,7 @@ function AppRouter() {
           <Route path="user-accounts" element={<><Navbar /><UserAccounts /></>} />
           <Route path="audit-log" element={<><Navbar /><AuditLog /></>} />
           <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
-        </Route>
+        </Route> */}
 
       </Routes>
     </Router>

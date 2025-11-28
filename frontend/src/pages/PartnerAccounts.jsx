@@ -119,7 +119,7 @@ function PartnerAccounts() {
 
   // -------- HANDLERS --------
   const handleAddPartner = () => {
-    navigate("/add-partner");
+    navigate("/forms-tables/add-partner");
   };
 
   const toggleStatus = (id) => {
@@ -352,9 +352,8 @@ function PartnerAccounts() {
             <button
               key={page}
               type="button"
-              className={`page-dot ${
-                page === currentPage ? "active" : ""
-              }`}
+              className={`page-dot ${page === currentPage ? "active" : ""
+                }`}
               onClick={() => goToPage(page)}
             >
               {page}

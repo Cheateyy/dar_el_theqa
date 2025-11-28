@@ -176,7 +176,7 @@ function AddListingPage3() {
       window.__CREATE_LISTING_IMAGES_PROPERTYTYPE = undefined;
       window.__CREATE_LISTING_IMAGES_META = undefined;
 
-      navigate("/add-listing/confirmation");
+      navigate("/forms-tables/add-listing/confirmation");
     } catch (error) {
       console.error("Error submitting listing:", error);
       alert("Error submitting listing.");
@@ -230,9 +230,8 @@ function AddListingPage3() {
 
                   <button
                     type="button"
-                    className={`add-document-btn ${
-                      documents[idx].file ? "added" : ""
-                    }`}
+                    className={`add-document-btn ${documents[idx].file ? "added" : ""
+                      }`}
                     disabled={!!documents[idx].file}
                     onClick={() => handleAddFileClick(idx)}
                   >

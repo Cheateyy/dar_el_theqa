@@ -239,7 +239,7 @@ function AddListingPage2() {
     // 🔧 ADDED FOR BACKEND: save draft for step 2 and persist files in-memory
     saveDraftStep2();
     persistImagesInMemory();
-    navigate("/add-listing/step-2/step-3");
+    navigate("/forms-tables/add-listing/step-2/step-3");
   };
 
   return (

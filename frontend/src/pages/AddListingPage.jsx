@@ -233,7 +233,7 @@ function AddListingPage() {
     if (!hasErrors) {
       // 🔧 ADDED FOR BACKEND: save the UI values (we map to backend on final submit)
       saveDraftStep1(formData);
-      navigate("/add-listing/step-2");
+      navigate("/forms-tables/add-listing/step-2");
     }
   };
 
