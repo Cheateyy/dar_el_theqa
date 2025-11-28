@@ -1,7 +1,7 @@
 import { api } from "@/lib/api_client";
 import { createContext, useContext, useEffect, useState } from "react";
 
-/** @typedef {import("../models/ListingModel")}*/
+/** @typedef {import("@/models/ListingModel")}*/
 
 /** @type {React.Context<{ listings: Listing[], setListings: import('react').Dispatch<import('react').SetStateAction<Listing[]>> }>} */
 const ListingsContext = createContext(null);
