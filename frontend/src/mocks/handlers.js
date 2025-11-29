@@ -1,7 +1,9 @@
 import { API_BASE_URL } from "@/config/env";
 import { HttpResponse, http } from "msw";
+
 import listings from './listings_mock.json'; // works because Vite supports JSON imports
 import property_types from './property_types_mock.json';
+import wilayas from './wilayas_mock.json';
 
 export const handlers = [
     http.get(API_BASE_URL + "/api/listings/featured", async () => {
@@ -18,5 +20,9 @@ export const handlers = [
 
     http.get(API_BASE_URL + "/api/choices/property-types", async () => {
         return HttpResponse.json(property_types);
-    })
+    }),
+
+    http.get(API_BASE_URL + "/api/choices/wilayas", async () => {
+        return HttpResponse.json(wilayas);
+    }),
 ]

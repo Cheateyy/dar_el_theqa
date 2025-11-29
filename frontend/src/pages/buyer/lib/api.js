@@ -34,13 +34,25 @@ export async function toggle_like(listing_id) {
 
 /**@typedef {import('@/types/common')}*/
 
+/**@returns {Promise<Option[]>} */
 export async function get_property_types() {
     const res = await api.get("/api/choices/property-types");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
     }
-    /**@type {Option[]} */
+
+    const data = await res.json()
+    return data;
+}
+
+/**@returns {Promise<Wilaya[]>} */
+export async function get_wilayas() {
+    const res = await api.get("/api/choices/wilayas");
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
     const data = await res.json()
     return data;
 }
