@@ -41,7 +41,7 @@ function AppRouter() {
 
         <Route path="/" element={<BuyerLayout />}>
           <Route index element={<LandingPage />} />
-          <Route path="search-results" element={<SearchResults />} />
+          <Route path="search" element={<SearchResults />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="interests" element={<Interests />} />
         </Route>

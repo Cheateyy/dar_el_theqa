@@ -5,12 +5,12 @@ import { ArrowRight } from "lucide-react";
 import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
 import { ListingGrid } from "@/components/common/ListingGrid";
-import { useNavigate } from "react-router-dom";
 import { useListings } from "./context/ListingsContext";
+
 
 export default function LandingPage() {
     const { listings } = useListings()
-    const navigate = useNavigate()
+
     return (
         <>
             <main className="px-4 sm:px-8 md:-px-20">
@@ -39,15 +39,6 @@ export default function LandingPage() {
                             </div>
                         </div>
                         <MainSearchFilters className="w-3/4 relative top-1/2 left-1/2 -translate-x-1/2 " />
-                    </div>
-                </section>
-
-                <section role="Search Listings" className="mt-8 sm:mt-16 md:mt-20">
-                    <div className="flex justify-center items-center">
-                        <Button onClick={() => navigate("/search-results")}>
-                            <span>Search Listings</span>
-                            <ArrowRight />
-                        </Button>
                     </div>
                 </section>
 

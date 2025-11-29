@@ -7,19 +7,59 @@ import { MoreFilters } from "@/pages/buyer/searchResults/components/MoreFilters"
 import { RangeInput } from "../../components/RangeInput"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
 import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
+import { useWilayaOptions } from "../../lib/hooks"
 
+/**@type {import('@/types/common')} */
+
+/**
+ * @typedef SearchFilters
+ * @property {string} wilaya
+ * @property {string} region
+ * @property {string} appartement
+ * @property {[string, string]} price_range
+ */
 
 export function SearchFilters({ className }) {
     const [selectedOfferType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
     const [isDlgOpen, setIsDlgOpen] = useState(false)
+    /**@type {InputControl<SearchFilters>} */
+    const [filter_input_values, set_filter_input_values] = useState({ wilaya: null, type: null, appartement: null, price_range: [-Infinity, Infinity] })
+
+    const wilaya_options = useWilayaOptions()
 
     return (
         <SearchFiltersWrapper className={className} selectedOfferType={selectedOfferType} setSelectedOfferType={setSelectedOfferType}>
             <div className="flex overflow-auto relative gap-5">
-                <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Wilaya" />
-                <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Resgion" />
-                <FilterCombobox className={'w-48 rounded-2xl'} options={[]} filtername="Appartement" />
-                <PriceInput offerType={selectedOfferType} />
+                <FilterCombobox
+                    filtername="Wilaya"
+                    input_control={
+                        [filter_input_values.wilaya,
+                        (new_wilaya) => set_filter_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
+
+                    className={'w-48 rounded-2xl'}
+                    options={wilaya_options}
+                />
+                <FilterCombobox
+                    filtername="Region"
+                    input_control={
+                        [filter_input_values.wilaya,
+                        (new_region) => set_filter_input_values(prev => ({ ...prev, region: new_region }))]}
+                    className={'w-48 rounded-2xl'}
+                    options={[]}
+                />
+                <FilterCombobox
+                    filtername="Appartement"
+                    input_control={
+                        [filter_input_values.wilaya,
+                        (new_appartement) => set_filter_input_values(prev => ({ ...prev, appartement: new_appartement }))]}
+                    className={'w-48 rounded-2xl'}
+                    options={[]}
+                />
+                <PriceInput
+                    offerType={selectedOfferType}
+                    input_control={[filter_input_values.price_range, (new_range) => set_filter_input_values(prev => ({ ...prev, price_range: new_range }))]}
+                />
             </div>
             <div className="mt-20 flex">
                 <Button variant={'secondary'} className={className} onClick={() => setIsDlgOpen(true)}>
@@ -28,18 +68,32 @@ export function SearchFilters({ className }) {
                 </Button>
                 <MoreFilters className={"ml-auto"} variant={'secondary'} isOpen={isDlgOpen} setIsOpen={setIsDlgOpen} />
             </div>
+
+            <div className="flex justify-center items-center">
+                <Button className="mt-6 md:mt-10 w-full max-w-xs md:max-w-sm py-3 px-4">
+                    Apply filters
+                    <ArrowRight className="ml-3" />
+                </Button>
+            </div>
         </SearchFiltersWrapper>
     )
 }
 
-function PriceInput({ offerType }) {
+/**
+ * @param {Object} props
+ * @param {InputControl<[string, string]> } props.input_control
+ */
+function PriceInput({ offerType, input_control }) {
     const rentOptions = [
         { label: "per month", value: "per month" },
         { label: "per year", value: "per year" },
     ]
     return (
         <div className="border shadow-xl rounded-2xl p-6 h-32">
-            <RangeInput className={"border-none shadow-none p-0"} label="Price" unit={"DZD"} />
+            <RangeInput
+                input_control={input_control}
+                className={"border-none shadow-none p-0"} label="Price" unit={"DZD"}
+            />
             {offerType == OFFER_TYPE.RENT &&
                 <Combobox options={rentOptions} />
             }

@@ -3,12 +3,14 @@ import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
 import { ArrowRight } from "lucide-react";
 import { ListingGrid } from "../../../components/common/ListingGrid";
+import { useListings } from "../landingPage/context/ListingsContext";
 
 export default function SearchResults() {
     const results = []
     for (let i = 0; i < 16; i++) {
         results.push(i)
     }
+    const { listings } = useListings()
 
     return (
         <div>
@@ -33,16 +35,11 @@ export default function SearchResults() {
                         <SearchFilters className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0" />
                     </div>
 
-                    <div className="flex justify-center items-center">
-                        <Button className="mt-6 md:mt-10 w-full max-w-xs md:max-w-sm py-3 px-4">
-                            Apply filters
-                            <ArrowRight className="ml-3" />
-                        </Button>
-                    </div>
+
                 </section>
 
                 <section role="search results" className="mt-8 md:mt-12">
-                    <ListingGrid listings={results} />
+                    <ListingGrid listings={listings} />
                 </section>
             </main>
         </div>

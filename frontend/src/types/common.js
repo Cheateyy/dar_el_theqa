@@ -1,11 +1,16 @@
 /**
- * @typedef {Object} Option
+ * @typedef Option
  * @property {string} label
  * @property {string} value
  */
 
 /**
- * @typedef {Object} Wilaya
+ * @typedef Wilaya
  * @property {int} id
  * @property {string} name
+ */
+
+/**
+ * @template T
+ * @typedef {[T, import('react').Dispatch<import('react').SetStateAction<T>>]} InputControl
  */
