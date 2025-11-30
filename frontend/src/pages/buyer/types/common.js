@@ -14,4 +14,5 @@
  * @property {string} region
  * @property {string} property_type
  * @property {[string, string]} price_range
+ * @property {string} rent_time_unit
  */

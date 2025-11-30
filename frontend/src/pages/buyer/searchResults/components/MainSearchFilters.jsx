@@ -5,6 +5,7 @@ import { useWilayaOptions } from "../../lib/hooks"
 import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
+import { Combobox } from "@/components/common/Combobox"
 
 /**@type {import("../../types/common")} */
 
@@ -52,6 +53,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                     <PriceInput
                         offerType={selected_property_type}
                         input_control={[filters.price_range, (new_range) => set_filters(prev => ({ ...prev, price_range: new_range }))]}
+                        rent_unit_control={[filters.rent_time_unit, (new_rent_unit) => set_filters(prev => ({ ...prev, rent_time_unit: new_rent_unit }))]}
                     />
                 </div>
                 {/*render more filters button iff dialog is not opened */}
@@ -71,9 +73,10 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
 /**
  * @param {Object} props
  * @param {InputControl<[string, string]> } props.input_control
+ * @param {InputControl<string> } props.rent_unit_control
  */
-function PriceInput({ offerType, input_control }) {
-    const rentOptions = [
+function PriceInput({ offerType, input_control, rent_unit_control }) {
+    const rent_unit_options = [
         { label: "per month", value: "per month" },
         { label: "per year", value: "per year" },
     ]
@@ -84,7 +87,7 @@ function PriceInput({ offerType, input_control }) {
                 className={"border-none shadow-none p-0"} label="Price" unit={"DZD"}
             />
             {offerType == OFFER_TYPE.RENT &&
-                <Combobox options={rentOptions} />
+                <Combobox options={rent_unit_options} state_control={rent_unit_control} />
             }
         </div>
     )

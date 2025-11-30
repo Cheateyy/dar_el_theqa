@@ -63,7 +63,7 @@ export function SearchFilters({ className }) {
     /**
         * @returns {SearchPayload}
         */
-    function get_search_obj() {
+    function get_search_params_obj() {
         return {
             transaction_type: selected_property_type,
             wilaya_id: filters.wilaya,
@@ -71,6 +71,8 @@ export function SearchFilters({ className }) {
             property_type: filters.property_type,
             price_min: filters.price_range[0],
             price_max: filters.price_range[1],
+            rent_time_unit: filters.rent_time_unit,
+
             // more filters
             floors: more_filters.floors,
             bedrooms: more_filters.bedrooms,
@@ -78,14 +80,15 @@ export function SearchFilters({ className }) {
 
             // not included in filters
             // TODO: controll this inputs
-            rent_time_unit: null,
             is_verified_only: false,
             page: null,
         }
     }
 
     useEffect(() => {
-        set_search_params(new URLSearchParams(get_search_obj()))
+        const params_obj = get_search_params_obj()
+        console.log("Search params", params_obj)
+        set_search_params(new URLSearchParams(params_obj))
     }, [filters, more_filters])
 
     return (
