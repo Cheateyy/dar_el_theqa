@@ -1,7 +1,7 @@
 import { FilterCombobox } from "../../components/FilterCombobox"
 import { useState } from "react"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
-import { OFFER_TYPE } from "../../types"
+import { OFFER_TYPE } from "../../enum"
 import { useListings } from "../../context/ListingsContext"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"

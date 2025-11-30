@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/popover"
 import ReactModal from "react-modal"
 
-import filterIcon from '../assets/filter.svg'
 import switchOffIcon from '../assets/switchOff.svg'
 import switchOnIcon from '../assets/switchOn.svg'
 import starIcon from '../assets/star.svg'
@@ -16,7 +15,7 @@ import { useState } from "react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { PopoverAnchor } from "@radix-ui/react-popover"
+/**@type {import('../../types/common')} */
 
 
 const SWITCH_STATUS = {
@@ -26,7 +25,13 @@ const SWITCH_STATUS = {
 
 ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
-export function MoreFilters({ isOpen, setIsOpen }) {
+/**
+ * 
+ * @param {Object} props
+ * @param {StateControl<MoreFilters>} props.state_control
+ */
+export function MoreFilters({ isOpen, setIsOpen, state_control }) {
+    const [more_filters, set_more_filters] = state_control
     const [switchStatus, setSwitchStatus] = useState(SWITCH_STATUS.ON)
     return (
         <ReactModal
@@ -50,13 +55,23 @@ export function MoreFilters({ isOpen, setIsOpen }) {
             </div>
             <div role="filters" className="flex flex-col gap-6 items-stretch">
                 <div className="flex gap-5">
-                    <RangeInput label="Area" unit={"m2"} />
-                    <FilterInput label={"floors"} />
-                    <FilterInput label={"Bedrooms"} />
-                    <FilterInput label={"Bathrooms"} />
+                    <RangeInput label="Area" unit={"m2"}
+                        input_control={[more_filters.area_range, (new_range) => set_more_filters(prev => ({ ...prev, area_range: new_range }))]}
+                    />
+                    <FilterInput label={"floors"}
+                        state_control={[more_filters.floors, (new_floors) => set_more_filters(prev => ({ ...prev, floors: new_floors }))]}
+                    />
+                    <FilterInput label={"Bedrooms"}
+                        state_control={[more_filters.bedrooms, (new_bedrooms) => set_more_filters(prev => ({ ...prev, area_range: new_bedrooms }))]}
+                    />
+                    <FilterInput label={"Bathrooms"}
+                        state_control={[more_filters.bathrooms, (new_bathrooms) => set_more_filters(prev => ({ ...prev, area_range: new_bathrooms }))]}
+                    />
                 </div>
                 <div>
-                    <FilterInput className="w-full" label={"Ratings"} unit={<img src={starIcon} alt="start icon" />} />
+                    <FilterInput
+                        state_control={[more_filters.rating, (new_rating) => set_more_filters(prev => ({ ...prev, rating: new_rating }))]}
+                        className="w-full" label={"Ratings"} unit={<img src={starIcon} alt="start icon" />} />
                 </div>
             </div>
             <div role="actions" className="flex">
@@ -70,13 +85,22 @@ export function MoreFilters({ isOpen, setIsOpen }) {
     )
 }
 
-function FilterInput({ className, label, unit, }) {
+/**
+ * 
+ * @param {Object} props
+ * @param {StateControl<string>} props.state_control
+ */
+function FilterInput({ className, label, unit, state_control }) {
+    const [value, set_value] = state_control
     return (
         <div className={cn("w-48 border shadox-xs rounded-2xl py-5 px-6 flex justify-start", className)}>
             <div className="flex flex-col justify-center">
                 <Label>{label}</Label>
                 <div className="flex">
-                    <input type="text" placeholder="Any" className="w-12" />
+                    <input
+                        type="text" placeholder="Any" className="w-12"
+                        value={value} onChange={(e) => set_value(e.target.value)}
+                    />
                     {unit}
                 </div>
             </div>

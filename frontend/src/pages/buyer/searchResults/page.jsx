@@ -48,15 +48,14 @@ export default function SearchResults() {
                         </div>
 
                         <SearchFilters
-                            search_control={[search_params, set_search_params]}
                             className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0"
                         />
                     </div>
 
 
                 </section>
-
-                <section role="search results" className="mt-8 md:mt-12">
+                {/* TODO: fix top margin */}
+                <section role="search results" className="mt-8 md:mt-12 lg:mt-100">
                     <ListingGrid listings={listings} />
                 </section>
             </main>

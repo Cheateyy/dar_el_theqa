@@ -1,7 +1,7 @@
 import { FilterCombobox } from "../../components/FilterCombobox"
 import { useEffect, useState } from "react"
 
-import { OFFER_TYPE } from "../../../buyer/types"
+import { OFFER_TYPE } from "../../enum"
 import { Combobox } from "@/components/common/Combobox"
 import { MoreFilters } from "@/pages/buyer/searchResults/components/MoreFilters"
 import { RangeInput } from "../../components/RangeInput"
@@ -9,10 +9,15 @@ import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { useWilayaOptions } from "../../lib/hooks"
+import { useSearchParams } from "react-router-dom"
+
+import filterIcon from '../assets/filter.svg'
 
 /**@type {import('@/types/common')} */
+/**@type {import('../../types/common')} */
 
 /**
+ * 
  * @typedef SearchFilters
  * @property {string} wilaya
  * @property {string} region
@@ -21,73 +26,114 @@ import { useWilayaOptions } from "../../lib/hooks"
  */
 
 /**
- * 
+ * @typedef SearchPayload
+ * @property {"BUY" | "RENT"} transaction_type
+ * @property {int} wilaya_id
+ * @property {int} region_id
+ * @property {string} property_type
+ * @property {double} price_min
+ * @property {double} price_max
+ * @property {double | null} rent_time_unit
+ * @property {boolean} is_verified_only
+ * @property {int} area_min
+ * @property {int} area_max
+ * @property {int} floors
+ * @property {int} bedrooms 
+ * @property {int} bathrooms
+ * @property {int} page
+ */
+
+/**
  * @param {Object} props
  * @param {StateControl<URLSearchParams>} props.search_control
  */
-export function SearchFilters({ className, search_control }) {
-    const [selectedOfferType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
+export function SearchFilters({ className }) {
+    const [search_params, set_search_params] = useSearchParams()
+
+    const [selectedPropertyType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
     const [isDlgOpen, setIsDlgOpen] = useState(false)
+
     /**@type {InputControl<SearchFilters>} */
-    const [filter_input_values, set_filter_input_values] = useState({ wilaya: null, type: null, appartement: null, price_range: [-Infinity, Infinity] })
+    const [filters, set_filter_input_values] = useState({ wilaya: null, type: null, appartement: null, price_range: [-Infinity, Infinity], })
+    /**@type {StateControl<MoreFilters>} */
+    const [more_filters, set_more_filters] = useState({ area_range: [-Infinity, Infinity], floors: null, bedrooms: null, bathrooms: null, rating: null, })
 
     const wilaya_options = useWilayaOptions()
 
+    // ==== Search state mng ======
+    /**
+    * @param {SearchFilters} search_filters 
+    * @returns {SearchPayload}
+    */
+    // function get_search_payload(search_filters) {
+    //     return {
+    //         transaction_type: selectedPropertyType,
+    //         wilaya_id: filters.wilaya,
+    //         region_id: filters.region,
+    //         property_type: selectedPropertyType,
+
+    //         // not included in filters
+    //         is_verified_only: false,
+    //     }
+    // }
     // We are updating searchParams each time filter_input_values got changed
     // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
-    const [search_params, set_search_params] = search_control
     useEffect(() => {
-        set_search_params(new URLSearchParams(filter_input_values))
-    }, [filter_input_values])
+        set_search_params(new URLSearchParams(filters))
+    }, [filters])
 
     return (
-        <SearchFiltersWrapper className={className} selectedOfferType={selectedOfferType} setSelectedOfferType={setSelectedOfferType}>
-            <div className="flex overflow-auto relative gap-5">
-                <FilterCombobox
-                    filtername="Wilaya"
-                    input_control={
-                        [filter_input_values.wilaya,
-                        (new_wilaya) => set_filter_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
-
-                    className={'w-48 rounded-2xl'}
-                    options={wilaya_options}
-                />
-                <FilterCombobox
-                    filtername="Region"
-                    input_control={
-                        [filter_input_values.wilaya,
-                        (new_region) => set_filter_input_values(prev => ({ ...prev, region: new_region }))]}
-                    className={'w-48 rounded-2xl'}
-                    options={[]}
-                />
-                <FilterCombobox
-                    filtername="Appartement"
-                    input_control={
-                        [filter_input_values.wilaya,
-                        (new_appartement) => set_filter_input_values(prev => ({ ...prev, appartement: new_appartement }))]}
-                    className={'w-48 rounded-2xl'}
-                    options={[]}
-                />
-                <PriceInput
-                    offerType={selectedOfferType}
-                    input_control={[filter_input_values.price_range, (new_range) => set_filter_input_values(prev => ({ ...prev, price_range: new_range }))]}
-                />
-            </div>
-            <div className="mt-20 flex">
-                <Button variant={'secondary'} className={className} onClick={() => setIsDlgOpen(true)}>
-                    {/* <img src={filterIcon} alt="" /> */}
-                    More filters
-                </Button>
-                <MoreFilters className={"ml-auto"} variant={'secondary'} isOpen={isDlgOpen} setIsOpen={setIsDlgOpen} />
-            </div>
-
+        <div>
+            <SearchFiltersWrapper className={className} selectedOfferType={selectedPropertyType} setSelectedOfferType={setSelectedOfferType}>
+                <div className="flex overflow-auto relative gap-5">
+                    <FilterCombobox
+                        filtername="Wilaya"
+                        input_control={
+                            [filters.wilaya,
+                            (new_wilaya) => set_filter_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
+                        className={'w-48 rounded-2xl'}
+                        options={wilaya_options}
+                    />
+                    <FilterCombobox
+                        filtername="Region"
+                        input_control={
+                            [filters.wilaya,
+                            (new_region) => set_filter_input_values(prev => ({ ...prev, region: new_region }))]}
+                        className={'w-48 rounded-2xl'}
+                        options={[]}
+                    />
+                    <FilterCombobox
+                        filtername="Appartement"
+                        input_control={
+                            [filters.wilaya,
+                            (new_appartement) => set_filter_input_values(prev => ({ ...prev, appartement: new_appartement }))]}
+                        className={'w-48 rounded-2xl'}
+                        options={[]}
+                    />
+                    <PriceInput
+                        offerType={selectedPropertyType}
+                        input_control={[filters.price_range, (new_range) => set_filter_input_values(prev => ({ ...prev, price_range: new_range }))]}
+                    />
+                </div>
+                <div className="mt-20 flex">
+                    <Button variant={'secondary'} className={"ml-auto"} onClick={() => setIsDlgOpen(true)}>
+                        <img src={filterIcon} alt="" />
+                        More filters
+                    </Button>
+                    <MoreFilters
+                        state_control={[more_filters, set_more_filters]}
+                        isOpen={isDlgOpen}
+                        setIsOpen={setIsDlgOpen}
+                    />
+                </div>
+            </SearchFiltersWrapper>
             <div className="flex justify-center items-center">
                 <Button className="mt-6 md:mt-10 w-full max-w-xs md:max-w-sm py-3 px-4">
                     Apply filters
                     <ArrowRight className="ml-3" />
                 </Button>
             </div>
-        </SearchFiltersWrapper>
+        </div>
     )
 }
 
