@@ -1,4 +1,4 @@
-import { useListings } from "../landingPage/context/ListingsContext"
+import { useListings } from "../context/ListingsContext"
 
 export function useWilayaOptions() {
     const { wilayas } = useListings()

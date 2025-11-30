@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { get_listings, get_property_types, get_wilayas } from "../../lib/api";
+import { get_listings, get_property_types, get_wilayas } from "../lib/api";
 
 /** @typedef {import("@/types/ListingModel")}*/
 /** @typedef {import("@/types/common")}*/

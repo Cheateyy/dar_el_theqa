@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
 import { ListingGrid } from "@/components/common/ListingGrid";
-import { useListings } from "./context/ListingsContext";
+import { useListings } from "../context/ListingsContext";
 
 
 export default function LandingPage() {
