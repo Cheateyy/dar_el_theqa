@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthLayout from '../components/common/AuthLayout';
-import backIcon from '../assets/icons/back-icon.svg';
+import backIcon from '../assets/icons/back.svg';
 
 function ConfirmEmailPage() {
   const navigate = useNavigate();

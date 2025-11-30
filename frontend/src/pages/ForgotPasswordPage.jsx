@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/common/AuthLayout';
-import backIcon from '../assets/icons/back-icon.svg';
+import backIcon from '../assets/icons/back.svg';
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
