@@ -1,0 +1,91 @@
+/* BASE BUTTON */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 35px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+/* DISABLED (GLOBAL) */
+.btn:disabled {
+  background: #bebbbb !important;
+  cursor: not-allowed !important;
+  color: #646161 !important;
+  border-color: transparent !important;
+}
+
+/* LOADING STATE */
+.btn-loading {
+  opacity: 0.7;
+  cursor: wait !important;
+}
+
+.btn-loading .button-icon {
+  display: none;
+}
+
+/* --------------------------- */
+/* PRIMARY BUTTON */
+/* --------------------------- */
+.btn.primary {
+  background: #0E4466;
+  color: white;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: #083a58;
+}
+
+.btn.primary:active:not(:disabled) {
+  background: #0E4466;
+}
+
+/* --------------------------- */
+/* SECONDARY BUTTON */
+/* --------------------------- */
+.btn.secondary {
+  background: transparent;
+  border: 2px solid #007bff;
+  color: #007bff;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.btn.secondary:active:not(:disabled) {
+  background: rgba(0, 123, 255, 0.2);
+}
+
+/* --------------------------- */
+/* DANGER BUTTON */
+/* --------------------------- */
+.btn.danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn.danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn.danger:active:not(:disabled) {
+  background: #bd2130;
+}
+
+/* --------------------------- */
+/* ICON */
+/* --------------------------- */
+.button-icon {
+  width: 20px;
+  height: 20px;
+}
+
+

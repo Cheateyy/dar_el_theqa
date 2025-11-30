@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/common/AuthLayout';
 import OpenEyeIcon from '../assets/icons/openEye.svg';
 import ClosedEyeIcon from '../assets/icons/closedEye.svg';
-import backIcon from '../assets/icons/back.svg';
+import backIcon from '../assets/icons/back-icon.svg';
 
 function SignUpPage() {
   const navigate = useNavigate();
