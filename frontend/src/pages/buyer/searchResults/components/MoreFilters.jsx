@@ -5,17 +5,10 @@ import switchOnIcon from '../assets/switchOn.svg'
 import starIcon from '../assets/star.svg'
 
 import { RangeInput } from "../../components/RangeInput"
-import { useState } from "react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 /**@type {import('../../types/common')} */
-
-
-const SWITCH_STATUS = {
-    OFF: 0,
-    ON: 1,
-}
 
 
 /**
@@ -25,15 +18,16 @@ const SWITCH_STATUS = {
  */
 export function MoreFilters({ className, state_control }) {
     const [more_filters, set_more_filters] = state_control
-    const [switchStatus, setSwitchStatus] = useState(SWITCH_STATUS.ON)
     return (
         <div className={cn(className, "w-full p-10 shadow-xl rounded-xl outline bg-white relative")}>
             <h4 className="h4">More Filters</h4>
             <div role="switch">
                 <button className="cursor-pointer"
-                    onClick={() => setSwitchStatus((prev) => prev == SWITCH_STATUS.ON ? SWITCH_STATUS.OFF : SWITCH_STATUS.ON)}>
+                    onClick={() =>
+                        set_more_filters((prev) =>
+                            ({ ...prev, is_verified_only: more_filters.is_verified_only ? false : true }))}>
                     <img
-                        src={switchStatus == SWITCH_STATUS.ON ? switchOnIcon : switchOffIcon}
+                        src={more_filters.is_verified_only ? switchOnIcon : switchOffIcon}
                         alt="verifed doc switch" className="inline" />
                 </button>
                 <p className="ml-1 inline">Only show verified properties where all the documents are provided by the owner</p>
@@ -68,7 +62,7 @@ export function MoreFilters({ className, state_control }) {
                     <ArrowRight />
                 </Button>
             </div>
-        </div>
+        </div >
     )
 }
 

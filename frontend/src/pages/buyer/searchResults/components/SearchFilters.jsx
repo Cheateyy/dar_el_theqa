@@ -48,6 +48,7 @@ export function SearchFilters({ className }) {
     })
     /**@type {StateControl<MoreFilters>} */
     const [more_filters, set_more_filters] = useState({
+        is_verified_only: search_params.get("is_verified_only"),
         area_range: search_params.get("area_range") ?? [-Infinity, Infinity],
         floors: search_params.get("floors"),
         bedrooms: search_params.get("bedrooms"),
@@ -74,13 +75,13 @@ export function SearchFilters({ className }) {
             rent_time_unit: filters.rent_time_unit,
 
             // more filters
+            is_verified_only: more_filters.is_verified_only,
             floors: more_filters.floors,
             bedrooms: more_filters.bedrooms,
             bathrooms: more_filters.bathrooms,
 
             // not included in filters
             // TODO: controll this inputs
-            is_verified_only: false,
             page: null,
         }
     }

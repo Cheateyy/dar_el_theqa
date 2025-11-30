@@ -1,5 +1,6 @@
 /**
  * @typedef MoreFilters
+ * @property {boolean} is_verified_only
  * @property {[string, string]} area_range
  * @property {int} floors
  * @property {int} bedrooms
