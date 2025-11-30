@@ -66,3 +66,15 @@ export async function search(search_info) {
     const data = await res.json()
     return data;
 }
+
+/**@type {import('@/types/PartnerModel')} */
+/**@returns {Promise<Partner[]>} */
+export async function get_partners() {
+    const res = await api.get("/api/partners")
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json()
+    return data;
+}

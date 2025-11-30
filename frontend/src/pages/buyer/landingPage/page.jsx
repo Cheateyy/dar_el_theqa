@@ -6,10 +6,22 @@ import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
 import { ListingGrid } from "@/components/common/ListingGrid";
 import { useListings } from "../context/ListingsContext";
+import { useEffect, useState } from "react";
+import { get_partners } from "../lib/api";
 
+/**@type {import('@/types/PartnerModel')} */
+/**@type {import('@/types/common')} */
 
 export default function LandingPage() {
     const { listings } = useListings()
+    /**@type {StateControl<Partner[]>} */
+    const [partners, set_partners] = useState([])
+    useEffect(() => {
+        async function fetch_data() {
+            set_partners(await get_partners())
+        }
+        fetch_data()
+    }, [])
 
     return (
         <>
@@ -60,9 +72,10 @@ export default function LandingPage() {
                     <div className="flex justify-center items-center">
                         <h1 className="h1">Our Partners</h1>
                     </div>
+
                     <div role="partners grid" className="mt-10 sm:mt-15 md:mt-25 grid grid-cols-2 md:grid-cols-4 gap-10">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
-                            .map((value, index) => <PartnerCard key={index} />
+                        {partners
+                            .map((partner) => <PartnerCard key={partner.id} partner={partner} />
                             )}
 
                     </div>
