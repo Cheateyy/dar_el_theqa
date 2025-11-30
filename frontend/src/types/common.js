@@ -14,3 +14,13 @@
  * @template T
  * @typedef {[T, import('react').Dispatch<import('react').SetStateAction<T>>]} InputControl
  */
+
+/**
+ * @template T
+ * @typedef {[T, import('react').Dispatch<import('react').SetStateAction<T>>]} StateControl
+ */
+
+/**
+ * @template T
+ * @typedef {import('react').Dispatch<import('react').SetStateAction<T>>} SetState
+ */

@@ -1,16 +1,32 @@
-import { Button } from "@/components/ui/button";
 import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
-import { ArrowRight } from "lucide-react";
 import { ListingGrid } from "../../../components/common/ListingGrid";
-import { useListings } from "../landingPage/context/ListingsContext";
+import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { search as get_search_listings } from "../lib/api";
 
+/**@type {import('@/types/common')} */
+/**
+ * @typedef SearchResult
+ * @property {number} count
+ * @property {Listing[]} listings
+ * 
+ */
 export default function SearchResults() {
-    const results = []
-    for (let i = 0; i < 16; i++) {
-        results.push(i)
-    }
-    const { listings } = useListings()
+    const [search_params, set_search_params] = useSearchParams()
+
+    /**@type {StateControl<Listing[]>} */
+    const [listings, set_listings] = useState([])
+    useEffect(() => {
+        async function fetchData() {
+            const search_params_obj = Object.fromEntries(search_params.entries())
+            /**@type {SearchResult} */
+            const search_result = await get_search_listings(search_params_obj)
+            set_listings(search_result.listings)
+        }
+        fetchData()
+    },
+        [search_params])
 
     return (
         <div>
@@ -31,8 +47,10 @@ export default function SearchResults() {
                             </div>
                         </div>
 
-                        {/* SearchFilters: full width on small, positioned over hero on md+ */}
-                        <SearchFilters className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0" />
+                        <SearchFilters
+                            search_control={[search_params, set_search_params]}
+                            className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0"
+                        />
                     </div>
 
 

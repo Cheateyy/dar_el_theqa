@@ -56,3 +56,13 @@ export async function get_wilayas() {
     const data = await res.json()
     return data;
 }
+
+export async function search(search_info) {
+    const res = await api.post("/api/listings/search", search_info);
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json()
+    return data;
+}

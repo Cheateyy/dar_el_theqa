@@ -1,5 +1,5 @@
 import { FilterCombobox } from "../../components/FilterCombobox"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { OFFER_TYPE } from "../../../buyer/types"
 import { Combobox } from "@/components/common/Combobox"
@@ -20,13 +20,25 @@ import { useWilayaOptions } from "../../lib/hooks"
  * @property {[string, string]} price_range
  */
 
-export function SearchFilters({ className }) {
+/**
+ * 
+ * @param {Object} props
+ * @param {StateControl<URLSearchParams>} props.search_control
+ */
+export function SearchFilters({ className, search_control }) {
     const [selectedOfferType, setSelectedOfferType] = useState(OFFER_TYPE.BUY)
     const [isDlgOpen, setIsDlgOpen] = useState(false)
     /**@type {InputControl<SearchFilters>} */
     const [filter_input_values, set_filter_input_values] = useState({ wilaya: null, type: null, appartement: null, price_range: [-Infinity, Infinity] })
 
     const wilaya_options = useWilayaOptions()
+
+    // We are updating searchParams each time filter_input_values got changed
+    // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
+    const [search_params, set_search_params] = search_control
+    useEffect(() => {
+        set_search_params(new URLSearchParams(filter_input_values))
+    }, [filter_input_values])
 
     return (
         <SearchFiltersWrapper className={className} selectedOfferType={selectedOfferType} setSelectedOfferType={setSelectedOfferType}>
