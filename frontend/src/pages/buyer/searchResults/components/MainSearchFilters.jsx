@@ -2,11 +2,11 @@ import { FilterCombobox } from "../../components/FilterCombobox"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
 import { Button } from "@/components/ui/button"
 import { useWilayaOptions } from "../../lib/hooks"
-import { useSearchParams } from "react-router-dom"
-import { useEffect } from "react"
 import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
+
+/**@type {import("../../types/common")} */
 
 /**
  * @param {Object} props
@@ -18,30 +18,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
     const [filters, set_filters] = state_control
     const [selected_property_type, set_selected_property_type] = property_type_control
     const wilaya_options = useWilayaOptions()
-    const [_, set_search_params] = useSearchParams()
     const [is_dlg_open, set_is_dlg_open] = dialog_control
-
-    // ==== Search state mng ======
-    /**
-    * @param {SearchFilters} search_filters 
-    * @returns {SearchPayload}
-    */
-    // function get_search_payload(search_filters) {
-    //     return {
-    //         transaction_type: selectedPropertyType,
-    //         wilaya_id: filters.wilaya,
-    //         region_id: filters.region,
-    //         property_type: selectedPropertyType,
-
-    //         // not included in filters
-    //         is_verified_only: false,
-    //     }
-    // }
-    // We are updating searchParams each time filter_input_values got changed
-    // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
-    useEffect(() => {
-        set_search_params(new URLSearchParams(filters))
-    }, [filters])
 
     return (
         <div>
@@ -58,7 +35,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                     <FilterCombobox
                         filtername="Region"
                         input_control={
-                            [filters.wilaya,
+                            [filters.region,
                             (new_region) => set_filters(prev => ({ ...prev, region: new_region }))]}
                         className={'w-48 rounded-2xl'}
                         options={[]}
@@ -66,22 +43,25 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                     <FilterCombobox
                         filtername="Appartement"
                         input_control={
-                            [filters.wilaya,
+                            [filters.property_type,
                             (new_appartement) => set_filters(prev => ({ ...prev, appartement: new_appartement }))]}
                         className={'w-48 rounded-2xl'}
                         options={[]}
                     />
+
                     <PriceInput
                         offerType={selected_property_type}
                         input_control={[filters.price_range, (new_range) => set_filters(prev => ({ ...prev, price_range: new_range }))]}
                     />
                 </div>
+                {/*render more filters button iff dialog is not opened */}
                 {!is_dlg_open && <div className="mt-20 flex">
                     <Button variant={'secondary'} className={"ml-auto"} onClick={() => set_is_dlg_open(true)}>
                         <img src={filterIcon} alt="" />
                         More filters
                     </Button>
                 </div>}
+
             </SearchFiltersWrapper>
 
         </div>

@@ -25,7 +25,7 @@ export default function LandingPage() {
 
     return (
         <>
-            <main className="px-4 sm:px-8 md:-px-20">
+            <main className="px-4 sm:px-8">
                 <section role="hero">
                     <div className="relative">
                         <div

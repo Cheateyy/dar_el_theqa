@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { OFFER_TYPE } from "../../enum"
 import { MoreFilters } from "@/pages/buyer/searchResults/components/MoreFilters"
@@ -8,20 +8,13 @@ import ReactModal from "react-modal"
 import { MainSearchFilters } from "./MainSearchFilters"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { useSearchParams } from "react-router-dom"
 
 ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
 /**@type {import('@/types/common')} */
 /**@type {import('../../types/common')} */
 
-/**
- * 
- * @typedef SearchFilters
- * @property {string} wilaya
- * @property {string} region
- * @property {string} appartement
- * @property {[string, string]} price_range
- */
 
 /**
  * @typedef SearchPayload
@@ -43,13 +36,57 @@ ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
 export function SearchFilters({ className }) {
     const [is_dialog_open, set_is_dialog_open] = useState(false)
-
     const [selected_property_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
+    const [search_params, set_search_params] = useSearchParams()
 
     /**@type {InputControl<SearchFilters>} */
-    const [filters, set_filters] = useState({ wilaya: null, type: null, appartement: null, price_range: [-Infinity, Infinity], })
+    const [filters, set_filters] = useState({
+        wilaya: search_params.get("wilaya"),
+        type: search_params.get("type"),
+        property_type: search_params.get("property_type"),
+        price_range: search_params.get("price_range") ?? [-Infinity, Infinity],
+    })
     /**@type {StateControl<MoreFilters>} */
-    const [more_filters, set_more_filters] = useState({ area_range: [-Infinity, Infinity], floors: null, bedrooms: null, bathrooms: null, rating: null, })
+    const [more_filters, set_more_filters] = useState({
+        area_range: search_params.get("area_range") ?? [-Infinity, Infinity],
+        floors: search_params.get("floors"),
+        bedrooms: search_params.get("bedrooms"),
+        bathrooms: search_params.get("bathrooms"),
+        rating: search_params.get("rating"),
+    })
+
+    // We are updating searchParams each time filter_input_values got changed
+    // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
+
+    // ==== Search state mng ======
+
+    /**
+        * @returns {SearchPayload}
+        */
+    function get_search_obj() {
+        return {
+            transaction_type: selected_property_type,
+            wilaya_id: filters.wilaya,
+            region_id: filters.region,
+            property_type: filters.property_type,
+            price_min: filters.price_range[0],
+            price_max: filters.price_range[1],
+            // more filters
+            floors: more_filters.floors,
+            bedrooms: more_filters.bedrooms,
+            bathrooms: more_filters.bathrooms,
+
+            // not included in filters
+            // TODO: controll this inputs
+            rent_time_unit: null,
+            is_verified_only: false,
+            page: null,
+        }
+    }
+
+    useEffect(() => {
+        set_search_params(new URLSearchParams(get_search_obj()))
+    }, [filters, more_filters])
 
     return (
         <div>
@@ -64,7 +101,6 @@ export function SearchFilters({ className }) {
             <ReactModal
                 isOpen={is_dialog_open}
                 onRequestClose={() => set_is_dialog_open(false)}
-                // className="z-50 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-xl max-w-4xl max-h-[90vh] overflow-auto"
                 className="
                     fixed left-1/2 top-1/2 
                     transform -translate-x-1/2 -translate-y-1/2 
@@ -106,7 +142,7 @@ export function SearchFilters({ className }) {
                     property_type_control={[selected_property_type, set_selected_offer_type]}
                 />
 
-                <MoreFilters className={"mt-8 p-10 rounded-2xl bg-white  "} state_control={[more_filters, set_more_filters]} />
+                <MoreFilters className={"mt-8 p-10 rounded-2xl bg-white"} state_control={[more_filters, set_more_filters]} />
             </ReactModal>
         </div>
     )

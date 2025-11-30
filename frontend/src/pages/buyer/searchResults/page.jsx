@@ -13,10 +13,11 @@ import { search as get_search_listings } from "../lib/api";
  * 
  */
 export default function SearchResults() {
-    const [search_params, set_search_params] = useSearchParams()
+    const [search_params, _] = useSearchParams()
 
     /**@type {StateControl<Listing[]>} */
     const [listings, set_listings] = useState([])
+
     useEffect(() => {
         async function fetchData() {
             const search_params_obj = Object.fromEntries(search_params.entries())
@@ -30,7 +31,7 @@ export default function SearchResults() {
 
     return (
         <div>
-            <main className="px-4 sm:px-8 md:px-20 max-w-7xl mx-auto">
+            <main className="px-4 sm:px-8 max-w-7xl mx-auto">
                 <section role="hero">
                     <div className="relative">
                         <div
@@ -49,11 +50,8 @@ export default function SearchResults() {
                             className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0"
                         />
                     </div>
-
-
                 </section>
-                {/* TODO: fix top margin */}
-                <section role="search results" className="mt-8 md:mt-12 lg:mt-100">
+                <section role="search results" className="mt-30 md:mt-90 lg:mt-100">
                     <ListingGrid listings={listings} />
                 </section>
             </main>

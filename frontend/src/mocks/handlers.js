@@ -29,7 +29,8 @@ export const handlers = [
         return HttpResponse.json(wilayas);
     }),
 
-    http.post(API_BASE_URL + "/api/listings/search", async () => {
+    http.post(API_BASE_URL + "/api/listings/search", async (req) => {
+        console.log("MOCKING: search params are: ", req.params)
         return HttpResponse.json({ count: '12', listings: search_listings })
     }),
 

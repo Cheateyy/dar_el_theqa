@@ -6,3 +6,12 @@
  * @property {int} bathrooms
  * @property {int} rating
  */
+
+/**
+ * 
+ * @typedef SearchFilters
+ * @property {string} wilaya
+ * @property {string} region
+ * @property {string} property_type
+ * @property {[string, string]} price_range
+ */
