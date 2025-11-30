@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import ReactModal from "react-modal"
+
 
 import switchOffIcon from '../assets/switchOff.svg'
 import switchOnIcon from '../assets/switchOn.svg'
@@ -23,26 +18,17 @@ const SWITCH_STATUS = {
     ON: 1,
 }
 
-ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
 /**
  * 
  * @param {Object} props
  * @param {StateControl<MoreFilters>} props.state_control
  */
-export function MoreFilters({ isOpen, setIsOpen, state_control }) {
+export function MoreFilters({ state_control }) {
     const [more_filters, set_more_filters] = state_control
     const [switchStatus, setSwitchStatus] = useState(SWITCH_STATUS.ON)
     return (
-        <ReactModal
-            isOpen={isOpen}
-            onRequestClose={() => setIsOpen(false)}
-            className="z-50 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl max-w-4xl max-h-[90vh] overflow-auto"
-            // overlayClassName="fixed inset-0 flex items-center justify-center p-4"
-            ariaHideApp={false}
-            shouldCloseOnOverlayClick={true}
-            shouldCloseOnEsc={true}
-        >
+        <div>
             <h4 className="h4">More Filters</h4>
             <div role="switch">
                 <button className="cursor-pointer"
@@ -81,7 +67,7 @@ export function MoreFilters({ isOpen, setIsOpen, state_control }) {
                     <ArrowRight />
                 </Button>
             </div>
-        </ReactModal>
+        </div>
     )
 }
 
