@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button"
 
-
 import switchOffIcon from '../assets/switchOff.svg'
 import switchOnIcon from '../assets/switchOn.svg'
 import starIcon from '../assets/star.svg'
@@ -24,11 +23,11 @@ const SWITCH_STATUS = {
  * @param {Object} props
  * @param {StateControl<MoreFilters>} props.state_control
  */
-export function MoreFilters({ state_control }) {
+export function MoreFilters({ className, state_control }) {
     const [more_filters, set_more_filters] = state_control
     const [switchStatus, setSwitchStatus] = useState(SWITCH_STATUS.ON)
     return (
-        <div>
+        <div className={cn(className, "w-full p-10 shadow-xl rounded-xl outline bg-white relative")}>
             <h4 className="h4">More Filters</h4>
             <div role="switch">
                 <button className="cursor-pointer"
@@ -39,6 +38,7 @@ export function MoreFilters({ state_control }) {
                 </button>
                 <p className="ml-1 inline">Only show verified properties where all the documents are provided by the owner</p>
             </div>
+
             <div role="filters" className="flex flex-col gap-6 items-stretch">
                 <div className="flex gap-5">
                     <RangeInput label="Area" unit={"m2"}
@@ -60,7 +60,8 @@ export function MoreFilters({ state_control }) {
                         className="w-full" label={"Ratings"} unit={<img src={starIcon} alt="start icon" />} />
                 </div>
             </div>
-            <div role="actions" className="flex">
+
+            <div role="actions" className="flex mt-9">
                 <Button variant={'ghost'} className={'text-red-500'}>Clear All</Button>
                 <Button variant={'default'} className={'ml-auto'}>
                     Apply filters

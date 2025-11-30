@@ -5,10 +5,11 @@ import { ListingProvider } from "./context/ListingsContext";
 export function BuyerLayout() {
     return (
         <ListingProvider>
-            <div>
-                <BuyerHeader />
-                <Outlet />
-            </div>
+            <BuyerHeader />
+            <Outlet />
+            <footer className="mt-20">
+                .
+            </footer>
         </ListingProvider>
     )
 }

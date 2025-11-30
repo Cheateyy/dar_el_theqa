@@ -38,12 +38,10 @@ export default function SearchResults() {
                             style={{ backgroundImage: `url(${heroImg})` }}
                             className="bg-cover bg-center w-full rounded-4xl h-56 sm:h-80 md:h-172"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 h-full items-center">
-                                <div role="hero-text-wrapper" className="px-6 md:pl-20">
-                                    <h1 className="h1 text-white mb-2 text-center md:text-left">
-                                        Explore Trusted Properties
-                                    </h1>
-                                </div>
+                            <div role="hero-text-wrapper" className="px-6 md:pl-20">
+                                <h1 className="h1 text-white mb-2 text-center pt-10 sm:pt-15 md:pt-32">
+                                    Explore Trusted Properties
+                                </h1>
                             </div>
                         </div>
 
