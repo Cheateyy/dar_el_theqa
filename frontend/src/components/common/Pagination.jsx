@@ -53,7 +53,6 @@ export function CustomPagination({
                 {/* Previous */}
                 <PaginationItem>
                     <PaginationPrevious
-                        asChild
                         onClick={() => goToPage(page - 1)}
                         aria-disabled={page === 1}
                         className={page === 1 ? "pointer-events-none opacity-50" : ""}
@@ -69,7 +68,6 @@ export function CustomPagination({
                             <PaginationLink
                                 isActive={p === page}
                                 onClick={() => goToPage(p)}
-                                asChild
                             >
                                 <button>{p}</button>
                             </PaginationLink>
@@ -80,7 +78,6 @@ export function CustomPagination({
                 {/* Next */}
                 <PaginationItem>
                     <PaginationNext
-                        asChild
                         onClick={() => goToPage(page + 1)}
                         aria-disabled={page === total_pages}
                         className={page === total_pages ? "pointer-events-none opacity-50" : ""}
