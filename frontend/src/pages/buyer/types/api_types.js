@@ -17,9 +17,14 @@
  */
 
 /**
- * @typedef SearchResponse
+ * @typedef {Paginated<Listing>} SearchResponse
+ */
+
+/**
+ * @template T
+ * @typedef Paginated
  * @property {int} count
  * @property {string} next
  * @property {string} previous
- * @property {Listing[]} results
+ * @property {T[]} results 
  */

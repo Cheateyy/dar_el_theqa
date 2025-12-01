@@ -2,6 +2,7 @@ import { api } from "@/lib/api_client";
 
 /**@typedef {import('@/types/ListingModel')}*/
 
+/**@returns {Prmose<Listing[]>} */
 export async function get_listings() {
     const res = await api.get("/api/listings/featured");
     if (!res.ok) {
@@ -9,8 +10,6 @@ export async function get_listings() {
         throw new Error(error);
     }
     const data = await res.json();
-    console.log("Listings fetch in the provider", data);
-    /**@type {Listing[]} */
     return data;
 };
 
@@ -93,3 +92,14 @@ export async function get_regions() {
     const data = await res.json()
     return data;
 }
+
+/**@returns {Promise<Paginated<Listing>>} */
+export async function get_favorites() {
+    const res = await api.get("/api/listings/favorites");
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json();
+    return data;
+};

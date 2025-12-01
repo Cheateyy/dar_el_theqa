@@ -7,6 +7,7 @@ import wilayas from './wilayas_mock.json';
 import search_listings from './search_listings_mock.json';
 import partners from './partners_mock.json';
 import regions from './regions_mock.json';
+import favorites from './favorites_mock.json';
 
 
 /**@type {import("@/pages/buyer/types/common")} */
@@ -41,7 +42,7 @@ export const handlers = [
         const next = API_BASE_URL + "/api/listings/search" + `?page=${page ?? 0 + 1}`
         const previous = page ? page - 1 : null
         // debugger;
-        return HttpResponse.json({ count: '12', next, previous, results: search_listings })
+        return HttpResponse.json({ count: search_listings.length, next, previous, results: search_listings })
     }),
 
     http.get(API_BASE_URL + "/api/partners", async () => {
@@ -50,5 +51,15 @@ export const handlers = [
 
     http.get(API_BASE_URL + "/api/choices/regions", async () => {
         return HttpResponse.json(regions);
+    }),
+
+    http.get(API_BASE_URL + "/api/listings/favorites", async () => {
+        /**@type {Paginated<Listing[]>} */
+        // TODO : from where to get the page
+        const page = 1
+        const next = API_BASE_URL + "/api/listings/favorites" + `?page=${page ?? 0 + 1}`
+        const previous = page ? page - 1 : null
+
+        return HttpResponse.json({ count: favorites.length, next, previous, results: favorites })
     }),
 ]
