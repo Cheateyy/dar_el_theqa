@@ -1,11 +1,12 @@
 import { FilterCombobox } from "../../components/FilterCombobox"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
 import { Button } from "@/components/ui/button"
-import { useWilayaOptions } from "../../lib/hooks"
+import { useRegionOptions, useWilayaOptions } from "../../lib/hooks"
 import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
 import { Combobox } from "@/components/common/Combobox"
+import { useListings } from "../../context/ListingsContext"
 
 /**@type {import("../../types/common")} */
 
@@ -20,6 +21,8 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
     const [selected_property_type, set_selected_property_type] = property_type_control
     const wilaya_options = useWilayaOptions()
     const [is_dlg_open, set_is_dlg_open] = dialog_control
+
+    const regions = useRegionOptions()
 
     return (
         <div>
@@ -39,7 +42,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                             [filters.region,
                             (new_region) => set_filters(prev => ({ ...prev, region: new_region }))]}
                         className={'w-48 rounded-2xl'}
-                        options={[]}
+                        options={regions}
                     />
                     <FilterCombobox
                         filtername="Appartement"

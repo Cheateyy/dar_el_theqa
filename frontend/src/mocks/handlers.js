@@ -6,6 +6,8 @@ import property_types from './property_types_mock.json';
 import wilayas from './wilayas_mock.json';
 import search_listings from './search_listings_mock.json';
 import partners from './partners_mock.json';
+import regions from './regions_mock.json';
+
 
 /**@type {import("@/pages/buyer/types/common")} */
 
@@ -44,5 +46,9 @@ export const handlers = [
 
     http.get(API_BASE_URL + "/api/partners", async () => {
         return HttpResponse.json(partners)
+    }),
+
+    http.get(API_BASE_URL + "/api/choices/regions", async () => {
+        return HttpResponse.json(regions);
     }),
 ]

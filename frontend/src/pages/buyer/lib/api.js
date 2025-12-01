@@ -82,3 +82,14 @@ export async function get_partners() {
     const data = await res.json()
     return data;
 }
+
+/**@returns {Promise<Region[]>} */
+export async function get_regions() {
+    const res = await api.get("/api/choices/regions")
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json()
+    return data;
+}

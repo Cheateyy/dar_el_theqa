@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { get_listings, get_property_types, get_wilayas } from "../lib/api";
+import { get_listings, get_property_types, get_regions, get_wilayas } from "../lib/api";
 
 /** @typedef {import("@/types/ListingModel")}*/
 /** @typedef {import("@/types/common")}*/
@@ -14,6 +14,9 @@ import { get_listings, get_property_types, get_wilayas } from "../lib/api";
  * 
  * @property {Wilaya[]} wilayas
  * @property {import('react').Dispatch<import('react').SetStateAction<Wilaya[]>>} set_wilayas
+ * 
+ * @property {Region[]} regions
+ * @property {import('react').Dispatch<import('react').SetStateAction<Region[]>>} set_regions
  */
 
 /** @type {React.Context<ListingsStore>} */
@@ -32,11 +35,15 @@ export function ListingProvider({ children }) {
     /** @type {[Wilaya[], import('react').Dispatch<import('react').SetStateAction<Wilaya[]>>]} */
     const [wilayas, set_wilayas] = useState([]);
 
+    /** @type {[Wilaya[], import('react').Dispatch<import('react').SetStateAction<Region[]>>]} */
+    const [regions, set_regions] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
             set_listings(await get_listings());
             set_property_types(await get_property_types())
             set_wilayas(await get_wilayas())
+            set_regions(await get_regions())
         };
         fetchData();
     }, []);
@@ -44,8 +51,9 @@ export function ListingProvider({ children }) {
     return (
         <ListingsContext.Provider value={{
             listings, set_listings,
-            property_types, set_property_types,
-            wilayas, set_wilayas,
+            property_types,
+            wilayas,
+            regions,
         }}>
             {children}
         </ListingsContext.Provider>

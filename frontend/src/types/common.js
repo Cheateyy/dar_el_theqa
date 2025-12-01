@@ -11,6 +11,12 @@
  */
 
 /**
+ * @typedef Region
+ * @property {int} id
+ * @property {string} name
+ */
+
+/**
  * @template T
  * @typedef {[T, import('react').Dispatch<import('react').SetStateAction<T>>]} InputControl
  */
