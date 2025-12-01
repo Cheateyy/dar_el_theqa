@@ -34,7 +34,7 @@ ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
  * @property {int} page
  */
 
-export function SearchFilters({ className }) {
+export function SearchFilters({ className, page }) {
     const [is_dialog_open, set_is_dialog_open] = useState(false)
     const [selected_property_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
     const [search_params, set_search_params] = useSearchParams()
@@ -80,9 +80,8 @@ export function SearchFilters({ className }) {
             bedrooms: more_filters.bedrooms,
             bathrooms: more_filters.bathrooms,
 
-            // not included in filters
-            // TODO: controll this inputs
-            page: null,
+            // from parent page
+            page: page,
         }
     }
 
@@ -90,7 +89,7 @@ export function SearchFilters({ className }) {
         const params_obj = get_search_params_obj()
         console.log("Search params", params_obj)
         set_search_params(new URLSearchParams(params_obj))
-    }, [filters, more_filters])
+    }, [filters, more_filters, page])
 
     return (
         <div>

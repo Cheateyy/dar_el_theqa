@@ -18,6 +18,8 @@ export default function SearchResults() {
     /**@type {StateControl<Listing[]>} */
     const [listings, set_listings] = useState([])
 
+    const [page, set_page] = useState(1)
+
     useEffect(() => {
         async function fetchData() {
             const search_params_obj = Object.fromEntries(search_params.entries())
@@ -47,12 +49,13 @@ export default function SearchResults() {
                         </div>
 
                         <SearchFilters
+                            page={page}
                             className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0"
                         />
                     </div>
                 </section>
                 <section role="search results" className="mt-30 md:mt-90 lg:mt-100">
-                    <ListingGrid listings={listings} />
+                    <ListingGrid listings={listings} page_control={[page, set_page]} />
                 </section>
             </main>
         </div>

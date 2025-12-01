@@ -16,6 +16,8 @@ export default function LandingPage() {
     const { listings } = useListings()
     /**@type {StateControl<Partner[]>} */
     const [partners, set_partners] = useState([])
+
+    const [page, set_page] = useState(1)
     useEffect(() => {
         async function fetch_data() {
             set_partners(await get_partners())
@@ -65,7 +67,7 @@ export default function LandingPage() {
                                 <ArrowRight />
                             </Button>
                         </div>
-                        <ListingGrid listings={listings} />
+                        <ListingGrid listings={listings} page_control={[page, set_page]} />
                     </div>
                 </section>
                 <section className="partners mt-12 sm:mt-24 md:mt-36">
