@@ -12,28 +12,6 @@ import { useSearchParams } from "react-router-dom"
 
 ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
-/**@type {import('@/types/common')} */
-/**@type {import('../../types/common')} */
-
-
-/**
- * @typedef SearchPayload
- * @property {"BUY" | "RENT"} transaction_type
- * @property {int} wilaya_id
- * @property {int} region_id
- * @property {string} property_type
- * @property {double} price_min
- * @property {double} price_max
- * @property {double | null} rent_time_unit
- * @property {boolean} is_verified_only
- * @property {int} area_min
- * @property {int} area_max
- * @property {int} floors
- * @property {int} bedrooms 
- * @property {int} bathrooms
- * @property {int} page
- */
-
 export function SearchFilters({ className, page }) {
     const [is_dialog_open, set_is_dialog_open] = useState(false)
     const [selected_property_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
@@ -87,7 +65,6 @@ export function SearchFilters({ className, page }) {
 
     useEffect(() => {
         const params_obj = get_search_params_obj()
-        console.log("Search params", params_obj)
         set_search_params(new URLSearchParams(params_obj))
     }, [filters, more_filters, page])
 

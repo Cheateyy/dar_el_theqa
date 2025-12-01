@@ -5,13 +5,6 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { search as get_search_listings } from "../lib/api";
 
-/**@type {import('@/types/common')} */
-/**
- * @typedef SearchResult
- * @property {number} count
- * @property {Listing[]} listings
- * 
- */
 export default function SearchResults() {
     const [search_params, _] = useSearchParams()
 
@@ -23,9 +16,8 @@ export default function SearchResults() {
     useEffect(() => {
         async function fetchData() {
             const search_params_obj = Object.fromEntries(search_params.entries())
-            /**@type {SearchResult} */
             const search_result = await get_search_listings(search_params_obj)
-            set_listings(search_result.listings)
+            set_listings(search_result.results)
         }
         fetchData()
     },

@@ -7,6 +7,7 @@ import wilayas from './wilayas_mock.json';
 import search_listings from './search_listings_mock.json';
 import partners from './partners_mock.json';
 
+/**@type {import("@/pages/buyer/types/common")} */
 
 export const handlers = [
     http.get(API_BASE_URL + "/api/listings/featured", async () => {
@@ -29,9 +30,16 @@ export const handlers = [
         return HttpResponse.json(wilayas);
     }),
 
-    http.post(API_BASE_URL + "/api/listings/search", async (req) => {
-        console.log("MOCKING: search params are: ", req.params)
-        return HttpResponse.json({ count: '12', listings: search_listings })
+    http.post(API_BASE_URL + "/api/listings/search", async ({ request }) => {
+        /**@type {SearchPayload} */
+        const body = await request.clone().json()
+        console.log("MOCKING: search filters payload is: ", body)
+
+        const page = body.page
+        const next = API_BASE_URL + "/api/listings/search" + `?page=${page ?? 0 + 1}`
+        const previous = page ? page - 1 : null
+        // debugger;
+        return HttpResponse.json({ count: '12', next, previous, results: search_listings })
     }),
 
     http.get(API_BASE_URL + "/api/partners", async () => {

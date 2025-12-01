@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ListingCard } from "./ListingCard"
 import { CustomPagination } from "@/components/common/Pagination"
-
-/** @typedef {import("@/types/ListingModel")}*/
-/** @type {import('@/types/common')} */
 
 /**
  * 

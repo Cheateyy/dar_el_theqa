@@ -10,8 +10,6 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-/**@type {import("@/types/common")} */
-
 /**
  * 
  * @param {Object} props
