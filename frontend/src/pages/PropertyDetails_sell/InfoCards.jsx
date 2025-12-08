@@ -5,7 +5,7 @@ export default function InfoCards({ propertyType, area, bedrooms, bathrooms }) {
     const [showModal, setShowModal] = useState(false);
 
     return (
-        <div className="sell-listingInfo">
+        <div className="sell-listingInfoCards">
             <div className="sell-infoCard">
                 <p>Property Type</p>
                 <h2>{propertyType}</h2>

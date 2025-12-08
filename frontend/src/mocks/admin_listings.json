@@ -1,0 +1,54 @@
+[
+  {
+    "id": 101,
+    "slug": "residence-les-pins-f4",
+    "title": "Résidence Les Pins F4",
+    "transaction_type": "RENT",
+    "price": 40000,
+    "rent_unit": "MONTH",
+    "wilaya": "Alger",
+    "cover_image": "https://example.com/img/app3.jpg",
+    "verification_status": "PENDING",
+    "address": "21 street Down town, next to the hospital",
+    "area_m2": 120,
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "images": [
+      "https://example.com/img/image1.jpg",
+      "https://example.com/img/image2.jpg",
+      "https://example.com/img/image3.jpg"
+    ],
+    "documents_summary": {
+      "ownership_certificate": 1,
+      "contract": 1
+    },
+    "status": "PENDING",
+    "verification_status": "PARTIAL"
+  },
+  {
+    "id": 102,
+    "slug": "villa-hydra-f5",
+    "title": "Villa Hydra F5",
+    "transaction_type": "BUY",
+    "price": 500000,
+    "rent_unit": null,
+    "wilaya": "Alger",
+    "cover_image": "https://example.com/img/app2.jpg",
+    "verification_status": "PENDING",
+    "address": "2126 street Down town, next to the hospital",
+    "area_m2": 150,
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "images": [
+      "https://example.com/img/image4.jpg",
+      "https://example.com/img/image5.jpg",
+      "https://example.com/img/image6.jpg"
+    ],
+    "documents_summary": {
+      "ownership_certificate": 1,
+      "contract": 2
+    },
+    "status": "PENDING",
+    "verification_status": "PARTIAL"
+  }
+]

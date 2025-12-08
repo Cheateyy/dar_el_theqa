@@ -13,12 +13,20 @@ export default function RightSection({
     propertyType,
     area,
     bedrooms,
-    bathrooms
+    bathrooms,
+    reviews = [],
+    rentUnit,
+    availableDate,
 }) {
     return (
         <div className="rent-listingRight card">
             <UpperSection address={address} region={region} />
-            <PriceSection status={status} price={price} />
+            <PriceSection
+                status={status}
+                price={price}
+                rentUnit={rentUnit}
+                availableDate={availableDate}
+            />
             <InfoCards
                 propertyType={propertyType}
                 area={area}
@@ -26,7 +34,7 @@ export default function RightSection({
                 bathrooms={bathrooms}
             />
             <div className="RightSectionReviewMoreListings">
-                <ReviewsSection />
+                <ReviewsSection reviews={reviews} limit={3} allow_Delete={false} /> 
                 <AddReview />
                 <MoreListings />
             </div>

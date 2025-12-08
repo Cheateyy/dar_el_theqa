@@ -120,3 +120,23 @@
     background-color: #E7E7E7;
     color: #8F8F8F;
 }
+
+.seller-rent-status p.approved-pending {
+    background-color: #E5EFFF;
+    color: #0F405E;
+}
+
+.seller-rent-status p.partial {
+    background-color: #FFF2D6;
+    color: #B45309;
+}
+
+.seller-rent-status p.paused {
+    background-color: #E0E7FF;
+    color: #3730A3;
+}
+
+.seller-rent-status p.rented {
+    background-color: #E0F7F4;
+    color: #0F766E;
+}
