@@ -7,7 +7,7 @@ import { worker as browserWorker } from './mocks/browser';
 async function enableMocking() {
   // `worker.start()` returns a Promise that resolves
   // once the Service Worker is up and ready to intercept requests.
-  return browserWorker.start()
+  // return browserWorker.start()
 }
 
 enableMocking().then(() => {

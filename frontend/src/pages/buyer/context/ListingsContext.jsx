@@ -40,10 +40,16 @@ export function ListingProvider({ children }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            set_listings(await get_listings());
-            set_property_types(await get_property_types())
-            set_wilayas(await get_wilayas())
-            set_regions(await get_regions())
+            const [listingsData, propertyTypesData, wilayasData, regionsData] = await Promise.all([
+                get_listings(),
+                get_property_types(),
+                get_wilayas(),
+                get_regions(),
+            ]);
+            set_listings(listingsData);
+            set_property_types(propertyTypesData);
+            set_wilayas(wilayasData);
+            set_regions(regionsData);
         };
         fetchData();
     }, []);
