@@ -383,6 +383,68 @@
     justify-content: flex-end;
 }
 
+.seller-updateButtons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.seller-update-statusWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.seller-update-statusBadge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background-color: #e7e7e7;
+    color: #374151;
+}
+
+.seller-update-status-approved {
+    background-color: #ecfeef;
+    color: #15803d;
+}
+
+.seller-update-status-approved-pending {
+    background-color: #e5efff;
+    color: #0f405e;
+}
+
+.seller-update-status-pending {
+    background-color: #fff2d6;
+    color: #b45309;
+}
+
+.seller-update-status-inactive {
+    background-color: #e7e7e7;
+    color: #4b5563;
+}
+
+.seller-update-status-paused {
+    background-color: #e0e7ff;
+    color: #312e81;
+}
+
+.seller-update-status-rented {
+    background-color: #e0f7f4;
+    color: #0f766e;
+}
+
+.seller-update-status-deleted {
+    background-color: #ffe0e0;
+    color: #b91c1c;
+}
+
+.seller-update-statusNote {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
 
 
 @media (max-width: 1600px) {

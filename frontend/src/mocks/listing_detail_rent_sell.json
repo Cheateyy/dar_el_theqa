@@ -1,0 +1,33 @@
+{
+  "id": 101,
+  "slug": "residence-les-pins-f4",
+  "title": "Appartement F4 - Résidence Les Pins",
+  "description": "Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence...",
+  "transaction_type": "RENT",
+  "verification_status": "APPROVED",
+  "wilaya": "Alger",
+  "region": "Hydra",
+  "street_address": "12 Rue des Pins, Sidi Yahia",
+  "google_maps_link": "https://maps.google.com/...",
+  "price": 450000,
+  "rent_unit": "MONTH",
+  "property_type": "apartment",
+  "area": 126,
+  "bedrooms": 3,
+  "bathrooms": 1,
+  "floors": 2,
+  "rental_status": "NOT AVAILABLE",
+  "available_date": "2023-11-01",
+  "images": [
+    "/images/dummyPropertyImages/image1.jpg",
+    "/images/dummyPropertyImages/image2.jpg",
+    "/images/dummyPropertyImages/image3.jpg",
+    "/images/dummyPropertyImages/image4.jpg",
+    "/images/dummyPropertyImages/image5.jpg",
+    "/images/dummyPropertyImages/image6.jpg"
+  ],
+  "is_liked": false,
+  "has_contacted": true,
+  "can_review": true,
+  "partner": { "id": 5, "name": "Groupe Bessa", "logo": "https://via.placeholder.com/100" }
+}

@@ -50,6 +50,47 @@
 }
 
 
+.rent-statusBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.rent-statusBadge.status-success {
+    background-color: #ecfeef;
+    color: #0f8c3a;
+    border-color: #b4f1c2;
+}
+
+.rent-statusBadge.status-warning {
+    background-color: #fff4e5;
+    color: #b76100;
+    border-color: #ffd6a8;
+}
+
+.rent-statusBadge.status-danger {
+    background-color: #ffe0e0;
+    color: #c20d0d;
+    border-color: #ffb3b3;
+}
+
+.rent-statusBadge.status-muted {
+    background-color: #f4f4f5;
+    color: #6b7280;
+    border-color: #d1d5db;
+}
+
+.rent-statusBadge.status-default {
+    background-color: #e0f2ff;
+    color: #0f3e78;
+    border-color: #bcdfff;
+}
+
+
 @media (max-width: 1600px){
     .rent-priceSection.cardWrapper{
         display: flex;

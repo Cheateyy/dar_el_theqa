@@ -1,66 +1,98 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
+import status_icon from "../../assets/icons/certified_button.png";
 
-import img1 from "../../assets/images/dummyPropertyImages/image1.jpg";
-import img2 from "../../assets/images/dummyPropertyImages/image2.jpg";
-import img3 from "../../assets/images/dummyPropertyImages/image3.jpg";
-import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
-import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
-import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
-import certifiedIcon from "../../assets/icons/certified_button.png";
+import {
+    getListingDetails,
+    getListingReviews
+} from "../../lib/api_3.js";
+
 
 import "./ListingDetails.css";
 
 export default function ListingDetails_rent() {
-    const [showLogin, setShowLogin] = useState(false);
+    const { listingId } = useParams();
 
-    const handleLoginClick = () => setShowLogin(true);
-    const handleCloseModal = () => setShowLogin(false);
+    const [listing, setListing] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // 🟦 Static variables (replace with backend later)
-    const listing = {
-        images: [img1, img2, img3, img4, img5, img6],
-        certifiedIcon: certifiedIcon,
-        description: "Beautiful apartment located in the city center with great access to services.",
-        address: "21 street Down town, next to the hospital .",
-        region: "Region, Wilaya",
-        price: 40000,
-        status: "available",
-        propertyType: "Apartment",
-        area: 120,
-        bedrooms: 3,
-        bathrooms: 2,
-    };
+
+
+    useEffect(() => {
+  async function fetchData() {
+    setLoading(true);
+    try {
+      const data = await getListingDetails(listingId);
+      setListing(data);
+
+      const reviewsData = await getListingReviews(listingId);
+      setReviews(reviewsData.results.slice(0, 3)); // only top 3
+    } catch (err) {
+      console.error("Error fetching listing data:", err);
+      setListing(null);
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchData();
+}, [listingId]);
+
+
+    if (loading) return <p>Loading...</p>;
+    if (!listing) return <p>Listing not found.</p>;
+
+    const address = listing.street_address || listing.address || "N/A";
+    const region = listing.region || listing.wilaya || "N/A";
+    const priceValue = Number(listing.price) || 0;
+    const propertyType = listing.property_type || listing.appartement_type || "N/A";
+    const areaValue = listing.area || listing.area_m2 || 0;
+    const bedrooms = listing.bedrooms ?? listing.bedroom_count ?? 0;
+    const bathrooms = listing.bathrooms ?? listing.bathroom_count ?? 0;
+    const rentUnit = listing.rent_unit || listing.rentUnit || "MONTH";
+    const availableDate = listing.available_date || listing.activation_date || null;
+    const statusCode = (listing.rental_status || listing.status || "AVAILABLE").toUpperCase();
+    const verificationStatus = listing.verification_status || listing.status;
 
     return (
         <>
             <nav>
-                <NavBar onLoginClick={handleLoginClick} />
+                <NavBar/>
             </nav>
 
             <div className="rent-ListingDetails">
                 <LeftSection
-                    images={listing.images}
-                    certifiedIcon={listing.certifiedIcon}
-                    description={listing.description}
+                    images={listing.images || []}
+                    description={listing.description || ""}
+                    status_icon={status_icon}
+                    reviews={reviews}
+                    title={listing.slug || ""}
+                  verificationStatus={verificationStatus}
+
                 />
 
                 <RightSection
-                    address={listing.address}
-                    region={listing.region}
-                    price={listing.price}
-                    status={listing.status}
-                    propertyType={listing.propertyType}
-                    area={listing.area}
-                    bedrooms={listing.bedrooms}
-                    bathrooms={listing.bathrooms}
+                  address={address}
+                  region={region}
+                  price={priceValue}
+                  status={statusCode}
+                  propertyType={propertyType}
+                  area={areaValue}
+                  bedrooms={bedrooms}
+                  bathrooms={bathrooms}
+                  reviews={reviews}
+                  rentUnit={rentUnit}
+                  availableDate={availableDate}
                 />
+
             </div>
 
-            <LoginModal show={showLogin} onClose={handleCloseModal} />
         </>
     );
 }

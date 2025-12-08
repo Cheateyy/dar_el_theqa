@@ -1,0 +1,32 @@
+[
+  {
+    "doc_id": 401,
+    "type": "ownership_certificate",
+    "label": "Ownership certificate",
+    "files": [
+      {
+        "file_id": 7001,
+        "filename": "ownership_page1.pdf",
+        "url": "media/docs/7001.pdf",
+        "uploaded_at": "2025-11-12T13:00:00Z"
+      }
+    ],
+    "status": "PENDING",
+    "review_comment": null
+  },
+  {
+    "doc_id": 402,
+    "type": "building_permit",
+    "label": "Building permit",
+    "files": [
+      {
+        "file_id": 7002,
+        "filename": "permit.pdf",
+        "url": "media/docs/7002.pdf",
+        "uploaded_at": "2025-11-12T14:00:00Z"
+      }
+    ],
+    "status": "ACCEPTED",
+    "review_comment": null
+  }
+]

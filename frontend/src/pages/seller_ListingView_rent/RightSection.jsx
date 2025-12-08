@@ -8,15 +8,17 @@ export default function RightSection({
     region,
     price,
     status,
+    rentUnit,
     propertyType,
     area,
     bedrooms,
-    bathrooms
+    bathrooms,
+    ListingId
 }) {
     return (
         <div className="seller-rent-listingRight card">
-            <UpperSection address={address} region={region} />
-            <PriceSection price={price} status={status} />
+            <UpperSection address={address} region={region} ListingId={ListingId} />
+            <PriceSection price={price} status={status} rentUnit={rentUnit} />
             <InfoCards
                 propertyType={propertyType}
                 area={area}
