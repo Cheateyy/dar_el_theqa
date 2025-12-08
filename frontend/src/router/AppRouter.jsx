@@ -1,4 +1,13 @@
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+
+// Auth pages imports
+import LoginPage from '../pages/LoginPage';
+import SignUpPage from '../pages/SignUpPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
+import ConfirmEmailPage from '../pages/ConfirmEmailPage';
+
+// Property details imports
 import ListingDetails_sell from '../pages/PropertyDetails_sell/ListingDetails_sell.jsx';
 import ListingDetails_rent from '../pages/PropertyDetails_rent/ListingDetails_rent.jsx';
 import SellerListingSell from '../pages/seller_ListingView_sell/seller_ListingView_sell.jsx';
@@ -13,7 +22,7 @@ import { Favorites } from '@/pages/buyer/favorites/page';
 import { BuyerLayout } from '@/pages/buyer/layout';
 import { Interests } from '@/pages/buyer/Interests/page';
 
-// forms-tables imports
+// Forms-tables imports
 import AddListingPage from "../pages/AddListingPage.jsx";
 import AddListingPage2 from "../pages/AddListingPage2.jsx";
 import AddListingPage3 from "../pages/AddListingPage3.jsx";
@@ -26,8 +35,16 @@ import Navbar from "../components/Navbar.jsx";
 
 function AppRouter() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
+        {/* Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+
+        {/* Property Details Routes */}
         <Route path="/details" element={<Outlet />}>
           <Route path="property-details-sell" element={<ListingDetails_sell />} />
           <Route path="property-details-rent" element={<ListingDetails_rent />} />
@@ -39,6 +56,7 @@ function AppRouter() {
           <Route path="adminReviewRent" element={<AdminReviewRent />} />
         </Route>
 
+        {/* Buyer Routes */}
         <Route path="/" element={<BuyerLayout />}>
           <Route index element={<LandingPage />} />
           <Route path="search" element={<SearchResults />} />
@@ -46,6 +64,7 @@ function AppRouter() {
           <Route path="interests" element={<Interests />} />
         </Route>
 
+        {/* Forms and Tables Routes */}
         <Route path="/forms-tables">
           <Route index={true} element={<><Navbar /><AddListingPage /></>} />
           <Route path="add-listing" element={<><Navbar /><AddListingPage /></>} />
@@ -58,8 +77,10 @@ function AppRouter() {
           <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
         </Route>
 
+        {/* 404 - Catch all unknown routes */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
