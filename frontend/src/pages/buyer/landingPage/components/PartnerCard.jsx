@@ -1,9 +1,15 @@
 import partnerImg from "../assets/partner_card.jpg";
 
-export function PartnerCard() {
+/**@type {import("@/types/PartnerModel")}*/
+
+/**
+ * @param {Object} props
+ * @param {Partner} props.partner
+ */
+export function PartnerCard({ partner }) {
     return (
         <div className="rounded-2xl shadow-xl">
-            <img src={partnerImg} alt="partner card" />
+            <a href={partner.website} target="_blank"><img src={partnerImg} alt={partner.name} /></a>
         </div>
     )
 }

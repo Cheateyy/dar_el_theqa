@@ -8,7 +8,8 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app1.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": true
   },
   {
     "id": 2,
@@ -19,7 +20,8 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app2.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 3,
@@ -30,7 +32,8 @@
     "rent_unit": "month",
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app3.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL",
+    "is_liked": false
   },
   {
     "id": 4,
@@ -41,7 +44,8 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app4.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 5,
@@ -52,7 +56,8 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app5.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 6,
@@ -63,7 +68,8 @@
     "rent_unit": "month",
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app6.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL",
+    "is_liked": true
   },
   {
     "id": 7,
@@ -74,7 +80,8 @@
     "rent_unit": null,
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app7.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "PARTIAL",
+    "is_liked": true
   },
   {
     "id": 8,
@@ -85,7 +92,8 @@
     "rent_unit": "month",
     "wilaya": "Alger",
     "cover_image": "https://example.com/img/app8.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": true
   },
   {
     "id": 9,
@@ -96,7 +104,8 @@
     "rent_unit": null,
     "wilaya": "Tizi Ouzou",
     "cover_image": "https://example.com/img/app9.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 10,
@@ -107,7 +116,8 @@
     "rent_unit": null,
     "wilaya": "Béjaïa",
     "cover_image": "https://example.com/img/app10.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL",
+    "is_liked": false
   },
   {
     "id": 11,
@@ -118,7 +128,8 @@
     "rent_unit": "month",
     "wilaya": "Annaba",
     "cover_image": "https://example.com/img/app11.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 12,
@@ -129,7 +140,8 @@
     "rent_unit": null,
     "wilaya": "Oran",
     "cover_image": "https://example.com/img/app12.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 13,
@@ -140,7 +152,8 @@
     "rent_unit": null,
     "wilaya": "Tlemcen",
     "cover_image": "https://example.com/img/app13.jpg",
-    "verification_status": "REJECTED"
+    "verification_status": "NONE",
+    "is_liked": true
   },
   {
     "id": 14,
@@ -151,7 +164,8 @@
     "rent_unit": null,
     "wilaya": "Blida",
     "cover_image": "https://example.com/img/app14.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   },
   {
     "id": 15,
@@ -162,7 +176,8 @@
     "rent_unit": "month",
     "wilaya": "Constantine",
     "cover_image": "https://example.com/img/app15.jpg",
-    "verification_status": "PENDING"
+    "verification_status": "PARTIAL",
+    "is_liked": false
   },
   {
     "id": 16,
@@ -173,6 +188,7 @@
     "rent_unit": null,
     "wilaya": "Tipaza",
     "cover_image": "https://example.com/img/app16.jpg",
-    "verification_status": "VERIFIED"
+    "verification_status": "VERIFIED",
+    "is_liked": false
   }
 ]

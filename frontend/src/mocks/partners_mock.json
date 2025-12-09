@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "name": "Djezzy",
+        "logo": "https://www.djezzy.dz/assets/logo-djezzy.png",
+        "website": "https://www.djezzy.dz"
+    },
+    {
+        "id": 2,
+        "name": "Mobilis",
+        "logo": "https://www.mobilis.dz/img/logo-mobilis.svg",
+        "website": "https://www.mobilis.dz"
+    },
+    {
+        "id": 3,
+        "name": "Ooredoo Algérie",
+        "logo": "https://www.ooredoo.dz/media/ooredoo-logo.png",
+        "website": "https://www.ooredoo.dz"
+    },
+    {
+        "id": 4,
+        "name": "Air Algérie",
+        "logo": "https://www.airalgerie.dz/wp-content/uploads/air-algerie-logo.png",
+        "website": "https://www.airalgerie.dz"
+    },
+    {
+        "id": 5,
+        "name": "Banque Nationale d’Algérie",
+        "logo": "https://www.bna.dz/assets/logo-bna.png",
+        "website": "https://www.bna.dz"
+    },
+    {
+        "id": 6,
+        "name": "Algérie Télécom",
+        "logo": "https://www.algerietelecom.dz/images/logo-algerietelecom.png",
+        "website": "https://www.algerietelecom.dz"
+    }
+]
