@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL } from "@/config/env";
 import { HttpResponse, http } from "msw";
 
 // Mock JSON data
