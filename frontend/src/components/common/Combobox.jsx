@@ -29,7 +29,7 @@ import {
  * @param {Array<Option>} props.options - The list of available options.
  * @param {StateControl<string>} props.state_control 
  */
-export function Combobox({ className, options, state_control, label, variant }) {
+export function Combobox({ className, options = [], state_control, label, variant }) {
     if (state_control) {
         return <ControlledCombobox className={className} options={options}
             state_control={state_control} label={label} variant={variant}

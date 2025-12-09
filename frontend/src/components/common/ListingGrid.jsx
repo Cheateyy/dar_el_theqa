@@ -23,14 +23,19 @@ function ControlledListingGrid({ listings, page_control }) {
         console.log("Page: ", page)
     }, [page])
 
-    if (!listings?.length) {
+    if (!listings) {
         return null;
     }
     return (
-        <div>
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-9">
-                {listings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}
-            </div>
+        <div className="mt-8">
+            {listings.length == 0 ?
+                <p className="text-center p2">"No listings"</p> :
+
+                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-9">
+
+                    {listings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}
+                </div>
+            }
             <CustomPagination className="mt-14 mb-20" page_control={[page, set_page]} total_pages={12} />
         </div>
     )
@@ -42,14 +47,18 @@ function UncontrolledListingGrid({ listings }) {
         console.log("Page: ", page)
     }, [page])
 
-    if (!listings?.length) {
+    if (!listings) {
         return null;
     }
     return (
-        <div>
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-9">
-                {listings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}
-            </div>
+        <div className="mt-8">
+            {listings.length == 0 ?
+                <p className="text-center p2">"No listings"</p> :
+                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-9">
+                    {
+                        listings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}
+                </div>
+            }
             <CustomPagination className="mt-14 mb-20" page_control={[page, set_page]} total_pages={12} />
         </div>
     )

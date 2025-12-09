@@ -10,7 +10,6 @@ export function BuyerLayout() {
                 <BuyerHeader />
                 <Outlet />
                 <footer className="mt-20">
-                    .
                 </footer>
             </MessagingProvider>
         </ListingProvider>

@@ -34,6 +34,7 @@ import AuditLog from "../pages/AuditLog.jsx";
 import LeadMessages from "../pages/LeadMessages.jsx";
 import Navbar from "../components/Navbar.jsx";
 import NavbarAdmin from "../components/NavbarAdmin.jsx";
+import MyListings from '@/pages/my_listings/page';
 
 function AppRouter() {
   return (
@@ -71,6 +72,7 @@ function AppRouter() {
           <Route path="search" element={<SearchResults />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="interests" element={<Interests />} />
+          <Route path="my-listings" element={<MyListings />} />
         </Route>
 
         {/* Forms and Tables Routes */}

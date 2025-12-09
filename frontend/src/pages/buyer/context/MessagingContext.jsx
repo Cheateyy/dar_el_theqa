@@ -16,7 +16,6 @@ export function MessagingProvider({ children }) {
     return (
         <MessagingContext.Provider value={{ is_login_dlg_open, set_is_login_dlg_open }}>
             {children}
-            <Outlet />
             <LoginDialog state_control={[is_login_dlg_open, set_is_login_dlg_open]} />
         </MessagingContext.Provider>
     )
