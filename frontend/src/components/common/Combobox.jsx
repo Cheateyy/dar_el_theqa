@@ -37,7 +37,7 @@ export function Combobox({ className, options, state_control, label, variant }) 
     }
     else {
         return <UncontrolledCombobox className={className} options={options}
-            label={label} variant={variant}/>
+            label={label} variant={variant} />
     }
 }
 
@@ -47,7 +47,7 @@ export function Combobox({ className, options, state_control, label, variant }) 
  * @param {Array<Option>} props.options - The list of available options.
  * @param {StateControl<string>} props.state_control
  */
-function ControlledCombobox({ className, options, state_control, label , variant}) {
+function ControlledCombobox({ className, options, state_control, label, variant }) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = state_control
 
@@ -108,7 +108,7 @@ function ControlledCombobox({ className, options, state_control, label , variant
  * @param {Array<Option>} props.options - The list of available options.
  * @param {StateControl<string>} props.state_control
  */
-function UncontrolledCombobox({ className, options, label , variant}) {
+function UncontrolledCombobox({ className, options, label, variant }) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
 
