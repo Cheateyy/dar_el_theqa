@@ -90,7 +90,7 @@ export function SearchFilters({ className, page }) {
                     lg:max-w-4xl 
 
                     max-h-[90vh] overflow-y-auto
-                  rounded-xl shadow-xl p-4
+                    rounded-xl shadow-xl p-4
                     z-50
                 "
                 ariaHideApp={false}
