@@ -4,7 +4,7 @@ import { api } from "@/lib/api_client";
 
 /**@returns {Prmose<Listing[]>} */
 export async function get_listings() {
-    const res = await api.get("/api/listings/featured");
+    const res = await api.get("/api/listings/featured/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -20,7 +20,7 @@ export async function get_listings() {
  */
 
 export async function toggle_like(listing_id) {
-    const res = await api.post(`/api/listings/${listing_id}/favorite`);
+    const res = await api.post(`/api/listings/${listing_id}/favorite/`);
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -35,7 +35,7 @@ export async function toggle_like(listing_id) {
 
 /**@returns {Promise<Option[]>} */
 export async function get_property_types() {
-    const res = await api.get("/api/choices/property-types");
+    const res = await api.get("/api/choices/property-types/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -47,7 +47,7 @@ export async function get_property_types() {
 
 /**@returns {Promise<Wilaya[]>} */
 export async function get_wilayas() {
-    const res = await api.get("/api/choices/wilayas");
+    const res = await api.get("/api/choices/wilayas/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -61,7 +61,7 @@ export async function get_wilayas() {
  * @returns {Promise<SearchResponse>}
  */
 export async function search(search_payload) {
-    const res = await api.post("/api/listings/search", search_payload);
+    const res = await api.post("/api/listings/search/", search_payload);
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -73,7 +73,7 @@ export async function search(search_payload) {
 /**@type {import('@/types/PartnerModel')} */
 /**@returns {Promise<Partner[]>} */
 export async function get_partners() {
-    const res = await api.get("/api/partners")
+    const res = await api.get("/api/partners/")
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -84,7 +84,7 @@ export async function get_partners() {
 
 /**@returns {Promise<Region[]>} */
 export async function get_regions() {
-    const res = await api.get("/api/choices/regions")
+    const res = await api.get("/api/choices/regions/")
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -95,7 +95,7 @@ export async function get_regions() {
 
 /**@returns {Promise<Paginated<Listing>>} */
 export async function get_favorites() {
-    const res = await api.get("/api/listings/favorites");
+    const res = await api.get("/api/listings/favorites/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
