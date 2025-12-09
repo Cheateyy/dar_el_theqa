@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Check, ChevronsDown } from "lucide-react"
+import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -24,12 +24,20 @@ import {
  * @property {string} label - The human-readable label displayed to the user.
  */
 
-export function Combobox({ className, options, state_control }) {
+/**
+ * @param {Object} props
+ * @param {Array<Option>} props.options - The list of available options.
+ * @param {StateControl<string>} props.state_control 
+ */
+export function Combobox({ className, options, state_control, label, variant }) {
     if (state_control) {
-        return <ControlledCombobox className={className} options={options} state_control={state_control} />
+        return <ControlledCombobox className={className} options={options}
+            state_control={state_control} label={label} variant={variant}
+        />
     }
     else {
-        return
+        return <UncontrolledCombobox className={className} options={options}
+            label={label} variant={variant}/>
     }
 }
 
@@ -39,7 +47,7 @@ export function Combobox({ className, options, state_control }) {
  * @param {Array<Option>} props.options - The list of available options.
  * @param {StateControl<string>} props.state_control
  */
-function ControlledCombobox({ className, options, state_control }) {
+function ControlledCombobox({ className, options, state_control, label , variant}) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = state_control
 
@@ -47,15 +55,14 @@ function ControlledCombobox({ className, options, state_control }) {
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
-                    variant="outline"
+                    variant={variant ?? "outline"}
                     role="combobox"
                     aria-expanded={open}
                     className={cn("w-[200px] justify-between", className)}
                 >
                     {value
                         ? options.find((options) => options.value === value)?.label
-                        : "Select options..."}
-                    <ChevronsDown className="opacity-50" />
+                        : label ? label : "Select options..."}
                 </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -101,7 +108,7 @@ function ControlledCombobox({ className, options, state_control }) {
  * @param {Array<Option>} props.options - The list of available options.
  * @param {StateControl<string>} props.state_control
  */
-function UncontrolledCombobox({ className, options }) {
+function UncontrolledCombobox({ className, options, label , variant}) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
 
@@ -109,15 +116,14 @@ function UncontrolledCombobox({ className, options }) {
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
-                    variant="outline"
+                    variant={variant ?? "outline"}
                     role="combobox"
                     aria-expanded={open}
                     className={cn("w-[200px] justify-between", className)}
                 >
                     {value
                         ? options.find((options) => options.value === value)?.label
-                        : "Select options..."}
-                    <ChevronsDown className="opacity-50" />
+                        : label ? label : "Select options..."}
                 </Button>
             </PopoverTrigger>
             <PopoverContent

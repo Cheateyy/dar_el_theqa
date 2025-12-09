@@ -11,14 +11,21 @@ import searchSvg from '../assets/search.svg'
 import menuHeartSvg from '../assets/menuHeart.svg'
 import messageSvg from '../assets/message.svg'
 import logoutSvg from '../assets/logout.svg'
+import { useState } from "react"
+import { Combobox } from "@/components/common/Combobox"
 
 function LanguageSelector({ className }) {
     const langs = ["arabic", "english", "language"];
+    const [language, set_language] = useState(langs[0])
+
     return (
-        <CustomDropdownMenu className={className} options={langs.map(lang => ({ label: lang }))}>
+        <div className="flex items-center">
             <GlobeIcon className="w-5 h-5" />
-            <span className="hidden md:inline ml-2">Language</span>
-        </CustomDropdownMenu>
+            <Combobox
+            className={className} options={langs.map(lang => ({ label: lang, value: lang }))}
+            label="language" state_control={[language, set_language]} variant='ghost'
+            />
+        </div>
     )
 }
 
