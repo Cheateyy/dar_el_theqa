@@ -99,24 +99,28 @@ const authApi = {
  * Helper to handle API responses consistently
  */
 const handleResponse = async (response) => {
-  // Handle 204 No Content
-  if (response.status === 204) {
-    return { status: 'success' };
-  }
-
   const data = await response.json();
 
   if (!response.ok) {
-    // Handle error responses
-    throw {
-      status: response.status,
-      message: data.detail || data.message || 'An error occurred',
-      data
-    };
+    let errorMessage = 'An error occurred';
+
+    // Handle DRF validation errors (e.g., field-specific)
+    if (typeof data === 'object') {
+      // If dict like {email: ["already exists"], password: ["too short"], ...}
+      if (!data.detail && !data.message) {
+        errorMessage = Object.values(data)[0][0]; // extract first message
+      } 
+      else {
+        errorMessage = data.detail || data.message;
+      }
+    }
+
+    throw { status: response.status, message: errorMessage, data };
   }
 
   return data;
 };
+
 
 /**
  * Authentication Service
@@ -240,46 +244,51 @@ const AuthService = {
     }
   },
 
-  /**
-   * Activate user account with code
-   */
-  activateAccount: async (payload) => {
-    try {
-      const response = await authApi.post('/api/auth/activation/', payload);
-      const data = await handleResponse(response);
+ /**
+ * Activate user account with code
+ */
+activateAccount: async (payload) => {
+  try {
+    const response = await authApi.post('/api/auth/activation/', payload);
+    const data = await handleResponse(response);
+    
+    // Backend returns 'token' not 'access' for activation
+    // Check for both 'access' and 'token' to handle different responses
+    const token = data.access || data.token;
+    
+    if (token) {
+      TokenManager.setToken(token);
       
-      // Backend might return access token after activation
-      if (data.access) {
-        TokenManager.setToken(data.access);
-        if (data.refresh) {
-          TokenManager.setRefreshToken(data.refresh);
-        }
-        
-        // Fetch user info
-        try {
-          const userResponse = await authApi.get('/api/auth/user/');
-          const userData = await handleResponse(userResponse);
-          
-          if (userData.isAuthenticated && userData.user) {
-            TokenManager.setUser(userData.user);
-            return {
-              token: data.access,
-              user: userData.user,
-              status: 'success',
-              message: data.message || 'Account activated'
-            };
-          }
-        } catch (err) {
-          console.error('Failed to fetch user after activation:', err);
-        }
+      // Handle refresh token if provided
+      if (data.refresh) {
+        TokenManager.setRefreshToken(data.refresh);
       }
       
-      return data;
-    } catch (error) {
-      console.error('Account activation error:', error);
-      throw error;
+      // Fetch user info
+      try {
+        const userResponse = await authApi.get('/api/auth/user/');
+        const userData = await handleResponse(userResponse);
+        
+        if (userData.isAuthenticated && userData.user) {
+          TokenManager.setUser(userData.user);
+          return {
+            token: token,
+            user: userData.user,
+            status: 'success',
+            message: data.message || 'Account activated'
+          };
+        }
+      } catch (err) {
+        console.error('Failed to fetch user after activation:', err);
+      }
     }
-  },
+    
+    return data;
+  } catch (error) {
+    console.error('Account activation error:', error);
+    throw error;
+  }
+},
 
   /**
    * Resend activation code

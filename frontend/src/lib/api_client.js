@@ -1,7 +1,7 @@
 // Made by Chatgpt
 // DO NOT MODIFY - Shared by multiple developers
 
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL } from "@/config/env";
 
 /**
  * Single configured api client to be used across the application

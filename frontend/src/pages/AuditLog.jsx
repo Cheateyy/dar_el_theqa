@@ -12,7 +12,6 @@ import actionIcon from "../assets/icons/AuditAction.svg";
 
 import Section from "../components/common/Section.jsx";
 
-// 🔧 SWITCH: true = localStorage mock; false = real /admin/audit-logs/ backend
 const USE_MOCK_AUDIT = true;
 
 function AuditLog() {
@@ -26,7 +25,7 @@ function AuditLog() {
         return [];
       }
     }
-    // backend mode: start empty, will be filled by fetch
+    
     return [];
   });
 
@@ -35,13 +34,13 @@ function AuditLog() {
   const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE || 1));
   const [loading, setLoading] = useState(!USE_MOCK_AUDIT);
 
-  // -------- MOCK MODE: persist to localStorage --------
+  
   useEffect(() => {
     if (!USE_MOCK_AUDIT) return;
     localStorage.setItem("auditLog", JSON.stringify(entries));
   }, [entries]);
 
-  // -------- BACKEND MODE: fetch /admin/audit-logs/ --------
+  
   useEffect(() => {
     if (USE_MOCK_AUDIT) return;
 
@@ -51,10 +50,9 @@ function AuditLog() {
           credentials: "include",
         });
         const data = await res.json();
-        // Spec shows array; but if it's paginated {count, results}, handle both. [attached_file:1]
+        
         const list = Array.isArray(data) ? data : data.results || [];
 
-        // Map backend fields to the shape used in the table
         const mapped = list.map((e) => {
           const created = e.created_at ? new Date(e.created_at) : null;
           const date =
@@ -86,12 +84,12 @@ function AuditLog() {
     fetchAuditLogs();
   }, []);
 
-  // -------- DERIVED: sort + paginate --------
+  
   const currentPageItems = useMemo(() => {
     const sorted = [...entries].sort((a, b) => {
       const aTs = new Date(`${a.date} ${a.time}`).getTime();
       const bTs = new Date(`${b.date} ${b.time}`).getTime();
-      return bTs - aTs; // newest first
+      return bTs - aTs; 
     });
 
     const start = (currentPage - 1) * PAGE_SIZE;
@@ -149,7 +147,7 @@ function AuditLog() {
 
   const pageItems = getPageNumbers();
 
-  // -------- RENDER --------
+  
   return (
     <div className="audit-page-wrapper">
       <div className="audit-container">

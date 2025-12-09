@@ -8,12 +8,8 @@ import BackIcon from "@/assets/icons/back.svg";
 import DocumentIcon from "@/assets/icons/document.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 
-// 🔧 ADDED FOR BACKEND – We load the Step 1 + Step 2 data from localStorage
-// Step 1 saved as "listing_step1"
-// Step 2 saved as "listing_step2"
-const DRAFT_KEY = "createListingDraft"; // same as step 1 & 2
+const DRAFT_KEY = "createListingDraft";
 
-// Load Step 1 + Step 2 + images from shared draft + window memory
 const loadStepData = () => {
   const raw = localStorage.getItem(DRAFT_KEY);
   let step1 = {};
@@ -24,12 +20,9 @@ const loadStepData = () => {
       const parsed = JSON.parse(raw);
       step1 = parsed.stepData?.step1 || {};
       step2 = parsed.stepData?.step2 || {};
-    } catch (e) {
-      // ignore parse error; keep empty objects
-    }
+    } catch (e) {}
   }
 
-  // Files are kept only in memory between step 2 and 3
   const images = Array.isArray(window.__CREATE_LISTING_IMAGES)
     ? window.__CREATE_LISTING_IMAGES
     : [];
@@ -37,7 +30,6 @@ const loadStepData = () => {
   return { step1, step2, images };
 };
 
-// 🔧 REAL BACKEND DOCUMENT TYPES (UI labels unchanged)
 const DOCUMENT_TYPES = [
   { label: "Identity Document", key: "docidentity" },
   { label: "Assurance Document", key: "docassurance" },
@@ -56,7 +48,6 @@ function AddListingPage3() {
 
   const fileInputRefs = useRef({});
 
-  // Each document has: file + notes
   const [documents, setDocuments] = useState(
     DOCUMENT_TYPES.map(() => ({
       file: null,
@@ -64,7 +55,6 @@ function AddListingPage3() {
     }))
   );
 
-  // Handles selecting a file
   const handleAddFileClick = (idx) => {
     if (fileInputRefs.current[idx]) {
       fileInputRefs.current[idx].value = "";
@@ -92,7 +82,6 @@ function AddListingPage3() {
     );
   };
 
-  // 🔧 ADDED FUNCTION: Convert wilaya/region NAME → ID using backend endpoints
   const fetchWilayaId = async (name) => {
     const res = await fetch("/api/choices/wilayas/");
     const list = await res.json();
@@ -107,55 +96,51 @@ function AddListingPage3() {
     return found ? found.id : null;
   };
 
-  // 🔧 ADDED: Build final backend payload
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // 1) Convert wilaya/region names into IDs
       const wilaya_id = await fetchWilayaId(step1.wilaya);
       const region_id = await fetchRegionId(wilaya_id, step1.region);
 
-      // 2) Build FormData payload
       const payload = new FormData();
 
-      // =============== BASIC INFO (STEP 1) ===============
       payload.append("title", step1.title);
       payload.append("description", step1.description);
       payload.append("price", Number(step1.price));
+
       payload.append(
-        "transactiontype",
+        "transaction_type",
         step1.purpose === "sale" ? "BUY" : "RENT"
       );
+
       if (step1.purpose === "rent") {
-        payload.append("rentunit", step1.paymentUnit.toUpperCase());
+        payload.append("rent_unit", step1.paymentUnit);
       }
 
-      payload.append("streetaddress", step1.address);
-      payload.append("wilayaid", wilaya_id);
-      payload.append("regionid", region_id);
+      payload.append("street_address", step1.address);
+      payload.append("wilaya_id", wilaya_id);
+      payload.append("region_id", region_id);
 
-      // =============== ADDITIONAL INFO (STEP 2) ===============
-      payload.append("propertytype", step2.propertyTypeBackend);
+      payload.append("property_type", step2.propertyTypeBackend);
       payload.append("area", Number(step2.area));
       payload.append("floors", Number(step2.floors || 0));
       payload.append("bedrooms", Number(step2.bedrooms || 0));
       payload.append("bathrooms", Number(step2.bathrooms || 0));
 
-      // =============== IMAGES (STEP 2) ===============
       const labelsObject = {};
       images.forEach((img, index) => {
-        // Keys File1, File2, ...
-        payload.append(`File${index + 1}`, img.file);
-        labelsObject[index] = img.label || "";
+        if (img.file) {
+          payload.append("images", img.file);
+          labelsObject[index] = img.label || "";
+        }
       });
 
-      // Contract uses "imagelabels" (no underscore)
-      payload.append("imagelabels", JSON.stringify(labelsObject));
+      payload.append("image_labels", JSON.stringify(labelsObject));
 
       DOCUMENT_TYPES.forEach((docType, idx) => {
         if (documents[idx].file) {
-          payload.append(docType.key, documents[idx].file); // 🔧 REAL backend key
+          payload.append(docType.key, documents[idx].file);
         }
       });
 
@@ -172,7 +157,6 @@ function AddListingPage3() {
         return;
       }
 
-      // Clear draft and in-memory images
       localStorage.removeItem("createListingDraft");
       window.__CREATE_LISTING_IMAGES = undefined;
       window.__CREATE_LISTING_IMAGES_PROPERTYTYPE = undefined;
@@ -228,8 +212,9 @@ function AddListingPage3() {
 
                   <button
                     type="button"
-                    className={`add-document-btn ${documents[idx].file ? "added" : ""
-                      }`}
+                    className={`add-document-btn ${
+                      documents[idx].file ? "added" : ""
+                    }`}
                     disabled={!!documents[idx].file}
                     onClick={() => handleAddFileClick(idx)}
                   >
@@ -254,7 +239,11 @@ function AddListingPage3() {
                         className="remove-document-btn"
                         onClick={() => handleRemoveFile(idx)}
                       >
-                        <img src={removeIcon} className="remove-icon" alt="Remove file" />
+                        <img
+                          src={removeIcon}
+                          className="remove-icon"
+                          alt="Remove file"
+                        />
                       </button>
                     </div>
                   </div>

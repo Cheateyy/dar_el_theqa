@@ -10,7 +10,7 @@ export default function RightSection({
     propertyType,
     area,
     bedrooms,
-    bathrooms
+    bathrooms,
 }) {
     return (
         <div className="sell-listingRight card">

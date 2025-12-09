@@ -98,6 +98,85 @@
   box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
 }
 
+.seller-sell-listingCard-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.seller-sell-listingCard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.seller-sell-listingCard-header h3 {
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  color: #0f0f0f;
+}
+
+.seller-status-badge {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background-color: #e7e7e7;
+  color: #555;
+}
+
+.seller-status-approved {
+  background-color: #ecfeef;
+  color: #166534;
+}
+
+.seller-status-approved-pending {
+  background-color: #e5efff;
+  color: #0f405e;
+}
+
+.seller-status-pending {
+  background-color: #fff2d6;
+  color: #b45309;
+}
+
+.seller-status-rejected {
+  background-color: #ffe0e0;
+  color: #b91c1c;
+}
+
+.seller-status-inactive {
+  background-color: #e7e7e7;
+  color: #4b5563;
+}
+
+.seller-sell-listingCard-meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.seller-sell-listingCard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #0f405e;
+  font-weight: 600;
+}
+
+.seller-sell-listingCard-reason {
+  font-size: 0.8rem;
+  color: #b91c1c;
+  margin: 0;
+}
+
 .seller-sell-listingRight.card {
   width: 40%;
   background-color: #fff;
@@ -117,9 +196,8 @@
 
 .seller-sell-upper {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: start;
   justify-content: space-between;
-  align-items: center;
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -152,10 +230,53 @@
   transform: scale(1.2);
 }
 
+.seller-sell-listingPrice {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.seller-sell-priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .seller-sell-listingPrice h1 {
   font-family: 'Poppins', sans-serif;
   color: #222;
   font-size: 2rem;
+  margin: 0;
+}
+
+.seller-sell-statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.seller-sell-statusBadge.approved {
+  background-color: #ecfeef;
+  color: #0f8c3a;
+  border-color: #b4f1c2;
+}
+
+.seller-sell-statusBadge.pending {
+  background-color: #fff4e5;
+  color: #b76100;
+  border-color: #ffd6a8;
+}
+
+.seller-sell-statusBadge.rejected {
+  background-color: #ffe0e0;
+  color: #c20d0d;
+  border-color: #ffb3b3;
 }
 
 .seller-sell-listingInfo {
@@ -504,6 +625,12 @@
     display: flex;
     justify-self: start;
     align-self: flex-start;
+  }
+
+  .seller-sell-listingPrice{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
 
 }

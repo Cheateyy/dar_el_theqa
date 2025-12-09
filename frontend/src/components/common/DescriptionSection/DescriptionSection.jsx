@@ -1,25 +1,44 @@
+const VERIFIED_STATES = new Set(["VERIFIED", "FULLY_VERIFIED", "APPROVED"]);
 
-export default function DescriptionSection({ certifiedIcon }) {
-    return (
-        <div className="sell-ListingInfo">
-            <h1>
-                Property Title
-                <span className="sell-certifiedWrapper">
-                    <img src={certifiedIcon} alt="Certified" className="sell-certifiedIcon" />
-                    <span className="sell-certifiedTooltip">All required paperwork is available</span>
-                </span>
-            </h1>
+const getVerificationMeta = (status) => {
+  const normalized = (status || "").toUpperCase();
+  if (VERIFIED_STATES.has(normalized)) {
+    return { label: "Verified", color: "#0f8c3a" };
+  }
+  return { label: "Partially Verified", color: "#d97706" };
+};
 
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam volutpat, magna vitae
-                feugiat convallis, purus sapien dapibus turpis, id pharetra velit justo a velit...
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam volutpat, magna vitae
-                feugiat convallis, purus sapien dapibus turpis, id pharetra velit justo a velit...
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam volutpat, magna vitae
-                feugiat convallis, purus sapien dapibus turpis, id pharetra velit justo a velit...
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam volutpat, magna vitae
-                feugiat convallis, purus sapien dapibus turpis, id pharetra velit justo a velit...
-            </p>
-        </div>
-    );
+export default function DescriptionSection({
+  status_icon,
+  certifiedIcon,
+  description,
+  title,
+  verificationStatus,
+}) {
+  const iconSrc = status_icon || certifiedIcon;
+  const { label, color } = getVerificationMeta(verificationStatus);
+
+  return (
+    <div className="sell-ListingInfo">
+      <h1>
+        {title || "Property Title"}
+        <span className="sell-certifiedWrapper">
+          {iconSrc && (
+            <img
+              src={iconSrc}
+              alt="Certification"
+              className="sell-certifiedIcon"
+            />
+          )}
+          <span className="sell-certifiedTooltip" style={{ color }}>
+            {label}
+          </span>
+        </span>
+      </h1>
+
+      <p>
+        {description || "No description available for this property."}
+      </p>
+    </div>
+  );
 }
