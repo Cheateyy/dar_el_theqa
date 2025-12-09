@@ -17,33 +17,6 @@
 }
 
 
-.admin-rent-legal-documents {
-  width: 86.5%;
-  margin-top: 1.5rem;
-  background-color: #ffffff;
-  border-radius: 15px;
-  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
-  padding: 2rem;
-  font-family: 'Roboto', sans-serif;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.admin-rent-legal-documents h3 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 2rem;
-  margin-top: 0;
-}
-
-.admin-rent-legal-documents ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
 .admin-sell-imageScroller {
   width: 90%;
   margin: 0 auto;
@@ -121,6 +94,12 @@
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
+.admin-sell-listingPrice h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  font-size: 2rem;
+}
+
 .admin-sell-listingCard:hover {
   transform: translateY(-5px);
   box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
@@ -145,7 +124,7 @@
 .admin-sell-upper {
   display: flex;
   flex-direction: row-reverse;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
@@ -179,11 +158,16 @@
   transform: scale(1.2);
 }
 
-.admin-sell-listingPrice h1 {
-  font-family: 'Poppins', sans-serif;
-  color: #222;
-  font-size: 2rem;
+.admin-sell-listingPrice{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
+
+
+
 
 .admin-sell-listingInfo {
   display: flex;
@@ -221,10 +205,11 @@
 
 .pendingListing{
   display: flex;
-  flex-direction: row;
-  gap: 5%;
-  justify-content: start;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .admin-sell-interestButton.Reject{
@@ -500,6 +485,45 @@
   transform: scale(0.95);
 }
 
+.acceptRejectDoc input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.acceptRejectDoc input:focus {
+  border-color: #0F405E;
+}
+
+.admin-doc-status {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background-color: #e7e7e7;
+  color: #374151;
+  align-self: center;
+}
+
+.admin-doc-status.accepted {
+  background-color: #ecfeef;
+  color: #15803d;
+}
+
+.admin-doc-status.rejected {
+  background-color: #ffe0e0;
+  color: #b91c1c;
+}
+
+.admin-doc-status.pending {
+  background-color: #fff2d6;
+  color: #b45309;
+}
+
 
 .documentAccReject{
   display: flex;
@@ -513,12 +537,65 @@
   color: #555;
 }
 
+
+
+.admin-sell-legal-documents {
+  width: 90%;
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-sell-legal-documents h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 5%;
+}
+
+
+
+.admin-sell-docHeader a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-sell-legal-documents ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-sell-legal-doc-item a {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.3s, transform 0.2s;
+}
+
 @media (max-width: 1600px) {
 
   .admin-sell-ListingDetails {
     flex-direction: column;
-    padding-left: 2%;
-    padding-right: 2%;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
   .admin-sell-listingLeft,
@@ -558,7 +635,7 @@
     position: relative;
     max-height: none;
     overflow: visible;
-    padding: 1rem;
+    padding: 2rem;
     margin-top: 2rem;
   }
 
@@ -585,4 +662,24 @@
     display: flex;
     justify-content: start;
   }
+
+  .admin-sell-legal-documents {
+  width: 100%;
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-sell-listingPrice h1{
+  font-size: 2rem;
+}
+
+.admin-sell-interestButton.Reject{
+  margin-top: 2rem;
+}
+
 }

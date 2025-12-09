@@ -8,23 +8,32 @@ export default function RightSection({
     region,
     price,
     status,
+    rentUnit,
     propertyType,
     area,
     bedrooms,
-    bathrooms
+    bathrooms,
+    onApprove,
+    onDelete,
+    isApproving,
+    isDeleting,
 }) {
     return (
         <div className="admin-rent-listingRight card">
 
-            <UpperSection address={address} region={region} />
+            <UpperSection address={address} region={region} onDelete={onDelete} isDeleting={isDeleting} />
 
-            <PriceSection status={status} price={price} />
+            <PriceSection status={status} price={price} rentUnit={rentUnit} />
 
             <InfoCards
                 propertyType={propertyType}
                 area={area}
                 bedrooms={bedrooms}
                 bathrooms={bathrooms}
+                onApprove={onApprove}
+                onReject={onDelete}
+                isApproving={isApproving}
+                isRejecting={isDeleting}
             />
         </div>
     );
