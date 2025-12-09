@@ -1,16 +1,64 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import AuthLayout from '../components/common/AuthLayout';
 import backIcon from '../assets/icons/back.svg';
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const { requestPasswordReset } = useAuth();
+  
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Reset password for:', email);
-    navigate('/confirm-email', { state: { email } });
+    setError('');
+
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await requestPasswordReset(email);
+
+      if (result.success) {
+        setSuccess(true);
+        // Show success message for 2 seconds, then navigate
+        setTimeout(() => {
+          navigate('/confirm-email', { 
+            state: { 
+              email,
+              isPasswordReset: true,
+              message: 'We have sent a password reset code to your email'
+            } 
+          });
+        }, 2000);
+      } else {
+        // Backend returns success even if email doesn't exist (security)
+        // So we still show success
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/confirm-email', { 
+            state: { 
+              email,
+              isPasswordReset: true,
+              message: 'We have sent a password reset code to your email'
+            } 
+          });
+        }, 2000);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Password reset error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -31,13 +79,15 @@ function ForgotPasswordPage() {
           }}>
             <button 
               onClick={handleBack}
+              disabled={loading}
               style={{
                 background: 'none',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: loading ? 'not-allowed' : 'pointer',
                 padding: 0,
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                opacity: loading ? 0.6 : 1
               }}
             >
               <img src={backIcon} alt="Back" style={{ width: '24px', height: '24px' }} />
@@ -63,6 +113,36 @@ function ForgotPasswordPage() {
             Enter the email you used to create your account
           </p>
 
+          {/* Error Message */}
+          {error && (
+            <div style={{
+              padding: '12px 16px',
+              backgroundColor: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '8px',
+              color: '#c33',
+              fontSize: '14px',
+              marginBottom: '16px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div style={{
+              padding: '12px 16px',
+              backgroundColor: '#efe',
+              border: '1px solid #cfc',
+              borderRadius: '8px',
+              color: '#3c3',
+              fontSize: '14px',
+              marginBottom: '16px'
+            }}>
+              Check your email for the reset code
+            </div>
+          )}
+
           {/* Email Field */}
           <div style={{ marginBottom: '24px' }}>
             <label style={{ 
@@ -79,18 +159,20 @@ function ForgotPasswordPage() {
               placeholder="user@mail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading || success}
               style={{
-                  width: '100%',
-                  height: '43px',
-                  padding: '0px 20px',
-                  border: '1px solid #DADADA',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: '400',
-                  color: '#000000',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
+                width: '100%',
+                height: '43px',
+                padding: '0px 20px',
+                border: '1px solid #DADADA',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '400',
+                color: '#000000',
+                outline: 'none',
+                boxSizing: 'border-box',
+                opacity: (loading || success) ? 0.6 : 1
+              }}
               onFocus={(e) => e.target.style.borderColor = '#0E4466'}
               onBlur={(e) => e.target.style.borderColor = '#DADADA'}
             />
@@ -101,19 +183,20 @@ function ForgotPasswordPage() {
         <div>
           <button
             onClick={handleSubmit}
+            disabled={loading || success}
             style={{
               width: '100%',
               height: '60px',
-              backgroundColor: '#0E4466',
+              backgroundColor: (loading || success) ? '#6b8da3' : '#0E4466',
               color: '#DADADA',
               border: 'none',
               borderRadius: '50px',
               fontSize: '20px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: (loading || success) ? 'not-allowed' : 'pointer'
             }}
           >
-            Next
+            {loading ? 'Sending...' : success ? 'Code Sent!' : 'Next'}
           </button>
         </div>
       </div>

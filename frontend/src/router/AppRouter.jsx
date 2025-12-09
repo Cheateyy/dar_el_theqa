@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 // Auth pages imports
 import LoginPage from '../pages/LoginPage';
@@ -35,52 +35,50 @@ import Navbar from "../components/Navbar.jsx";
 
 function AppRouter() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Auth Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+    <Routes>
+      {/* Auth Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/confirm-email" element={<ConfirmEmailPage />} />
 
-        {/* Property Details Routes */}
-        <Route path="/details" element={<Outlet />}>
-          <Route path="property-details-sell" element={<ListingDetails_sell />} />
-          <Route path="property-details-rent" element={<ListingDetails_rent />} />
-          <Route path="sellerListing-sell" element={<SellerListingSell />} />
-          <Route path="sellerListing-rent" element={<SellerListingRent />} />
-          <Route path="admingListing" element={<AdmingListing />} />
-          <Route path="sellerUpdateListing" element={<UpdateListing />} />
-          <Route path="adminReviewSell" element={<AdminReviewSell />} />
-          <Route path="adminReviewRent" element={<AdminReviewRent />} />
-        </Route>
+      {/* Property Details Routes */}
+      <Route path="/details" element={<Outlet />}>
+        <Route path="property-details-sell" element={<ListingDetails_sell />} />
+        <Route path="property-details-rent" element={<ListingDetails_rent />} />
+        <Route path="sellerListing-sell" element={<SellerListingSell />} />
+        <Route path="sellerListing-rent" element={<SellerListingRent />} />
+        <Route path="admingListing" element={<AdmingListing />} />
+        <Route path="sellerUpdateListing" element={<UpdateListing />} />
+        <Route path="adminReviewSell" element={<AdminReviewSell />} />
+        <Route path="adminReviewRent" element={<AdminReviewRent />} />
+      </Route>
 
-        {/* Buyer Routes */}
-        <Route path="/" element={<BuyerLayout />}>
-          <Route index element={<LandingPage />} />
-          <Route path="search-results" element={<SearchResults />} />
-          <Route path="favorites" element={<Favorites />} />
-          <Route path="interests" element={<Interests />} />
-        </Route>
+      {/* Buyer Routes */}
+      <Route path="/" element={<BuyerLayout />}>
+        <Route index element={<LandingPage />} />
+        <Route path="search-results" element={<SearchResults />} />
+        <Route path="favorites" element={<Favorites />} />
+        <Route path="interests" element={<Interests />} />
+      </Route>
 
-        {/* Forms and Tables Routes */}
-        <Route path="/forms-tables">
-          <Route index={true} element={<><Navbar /><AddListingPage /></>} />
-          <Route path="add-listing" element={<><Navbar /><AddListingPage /></>} />
-          <Route path="add-listing/step-2" element={<><Navbar /><AddListingPage2 /></>} />
-          <Route path="add-listing/step-2/step-3" element={<><Navbar /><AddListingPage3 /></>} />
-          <Route path="add-partner" element={<><Navbar /><Addpartner /></>} />
-          <Route path="partner-accounts" element={<><Navbar /><PartnerAccounts /></>} />
-          <Route path="user-accounts" element={<><Navbar /><UserAccounts /></>} />
-          <Route path="audit-log" element={<><Navbar /><AuditLog /></>} />
-          <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
-        </Route>
+      {/* Forms and Tables Routes */}
+      <Route path="/forms-tables">
+        <Route index={true} element={<><Navbar /><AddListingPage /></>} />
+        <Route path="add-listing" element={<><Navbar /><AddListingPage /></>} />
+        <Route path="add-listing/step-2" element={<><Navbar /><AddListingPage2 /></>} />
+        <Route path="add-listing/step-2/step-3" element={<><Navbar /><AddListingPage3 /></>} />
+        <Route path="add-partner" element={<><Navbar /><Addpartner /></>} />
+        <Route path="partner-accounts" element={<><Navbar /><PartnerAccounts /></>} />
+        <Route path="user-accounts" element={<><Navbar /><UserAccounts /></>} />
+        <Route path="audit-log" element={<><Navbar /><AuditLog /></>} />
+        <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
+      </Route>
 
-        {/* 404 - Catch all unknown routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+      {/* 404 - Catch all unknown routes */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
