@@ -5,15 +5,29 @@ import { ArrowRight } from "lucide-react";
 import MainSearchFilters from "./components/MainSearchFilters";
 import { PartnerCard } from "./components/PartnerCard";
 import { ListingGrid } from "@/components/common/ListingGrid";
-import { useNavigate } from "react-router-dom";
-import { useListings } from "./context/ListingsContext";
+import { useListings } from "../context/ListingsContext";
+import { useEffect, useState } from "react";
+import { get_partners } from "../lib/api";
+
+/**@type {import('@/types/PartnerModel')} */
+/**@type {import('@/types/common')} */
 
 export default function LandingPage() {
     const { listings } = useListings()
-    const navigate = useNavigate()
+    /**@type {StateControl<Partner[]>} */
+    const [partners, set_partners] = useState([])
+
+    const [page, set_page] = useState(1)
+    useEffect(() => {
+        async function fetch_data() {
+            set_partners(await get_partners())
+        }
+        fetch_data()
+    }, [])
+
     return (
         <>
-            <main className="px-4 sm:px-8 md:-px-20">
+            <main className="px-4 sm:px-8">
                 <section role="hero">
                     <div className="relative">
                         <div
@@ -42,15 +56,6 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                <section role="Search Listings" className="mt-8 sm:mt-16 md:mt-20">
-                    <div className="flex justify-center items-center">
-                        <Button onClick={() => navigate("/search-results")}>
-                            <span>Search Listings</span>
-                            <ArrowRight />
-                        </Button>
-                    </div>
-                </section>
-
                 <section role="suggested listings" className="mt-8 sm:mt-16 md:mt-20">
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
@@ -62,16 +67,17 @@ export default function LandingPage() {
                                 <ArrowRight />
                             </Button>
                         </div>
-                        <ListingGrid listings={listings} />
+                        <ListingGrid listings={listings} page_control={[page, set_page]} />
                     </div>
                 </section>
                 <section className="partners mt-12 sm:mt-24 md:mt-36">
                     <div className="flex justify-center items-center">
                         <h1 className="h1">Our Partners</h1>
                     </div>
+
                     <div role="partners grid" className="mt-10 sm:mt-15 md:mt-25 grid grid-cols-2 md:grid-cols-4 gap-10">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15]
-                            .map((value, index) => <PartnerCard key={index} />
+                        {partners
+                            .map((partner) => <PartnerCard key={partner.id} partner={partner} />
                             )}
 
                     </div>

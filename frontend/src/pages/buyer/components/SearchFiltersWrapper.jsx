@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
-import { OFFER_TYPE } from "../types"
+import { OFFER_TYPE } from "../enum"
 
 /**
  * contains Buy/Rent options

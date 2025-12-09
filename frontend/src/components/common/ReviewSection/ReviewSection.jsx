@@ -1,51 +1,34 @@
 import deleteImg from '../../../assets/images/delete-btn-icon.png';
 
-const reviews = [
-  {
-    name: "John Doe",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed neque id libero pretium varius non et risus.",
-    date: "Jun 24, 2025",
-    stars: 5,
-  },
-  {
-    name: "Jane Smith",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed neque id libero pretium varius non et risus.",
-    date: "Jun 24, 2025",
-    stars: 4,
-  },
-  {
-    name: "Alice Johnson",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed neque id libero pretium varius non et risus.",
-    date: "Jun 24, 2025",
-    stars: 5,
-  },
-  {
-    name: "Bob Williams",
-    text: "Extra review, should not appear in top 3",
-    date: "Jun 25, 2025",
-    stars: 3,
-  },
-];
+export default function Reviews({ allow_Delete = false, reviews = [], limit = 3 }) {
+  if (!reviews.length) return null;
 
-export default function Reviews({ allow_Delete }) {
   return (
     <div className="rent-reviewsSection cardWrapper">
       <h2>Top Reviews</h2>
       <div className="rent-reviewsCardsContainer">
-        {reviews.slice(0, 3).map((review, idx) => (
-          <div className="rent-reviewCard" key={idx}>
+        {reviews.slice(0, limit).map((review) => (
+          <div className="rent-reviewCard" key={review.id}>
             <div className="rent-reviewContent">
-              <div className="reviewTop">
-                <h3>{review.name}</h3>
+              <div className="reviewTop" style={{ marginBottom: '5%' }}>
+                <img 
+                  src={review.user_avatar} 
+                  alt={review.user_name} 
+                  className="review-avatar" 
+                  style={{ width: 40, height: 40, borderRadius: '50%', marginRight: 10 }}
+                />
+                <h3>{review.user_name}</h3>
                 {allow_Delete && (
-                  <button className="deleteReviewButton"><img src={deleteImg} alt="" /></button>
+                  <button className="deleteReviewButton">
+                    <img src={deleteImg} alt="Delete review" />
+                  </button>
                 )}
               </div>
-              
-              <p>{review.text}</p>
+
+              <p>{review.comment}</p>
               <span className="rent-reviewDate">{review.date}</span>
               <div className="rent-reviewStars">
-                {"★".repeat(review.stars) + "☆".repeat(5 - review.stars)}
+                {"★".repeat(review.rating) + "☆".repeat(5 - review.rating)}
               </div>
             </div>
           </div>

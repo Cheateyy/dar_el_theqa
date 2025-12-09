@@ -1,4 +1,4 @@
-import * as React from "react"
+import { useState } from "react"
 import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/popover"
 
 import arrowDown from '../assets/arrowDown.svg'
+/**@type {import('@/types/common')} */
 
 /**
  * @typedef {object} Option
@@ -29,13 +30,13 @@ import arrowDown from '../assets/arrowDown.svg'
  * A custom combobox component for selecting an option from a list.
  * * @param {object} props - The component props.
  * @param {Array<Option>} props.options - The list of available options.
- * 
+ * @param {InputControl<string>} props.input_control
  * **NOTE**:
  * This differ from Combobox by PopoverTrigger>Button styling
  */
-export function FilterCombobox({ className, options, filtername }) {
-    const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
+export function FilterCombobox({ className, options, filtername, input_control }) {
+    const [open, setOpen] = useState(false)
+    const [value, setValue] = input_control
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

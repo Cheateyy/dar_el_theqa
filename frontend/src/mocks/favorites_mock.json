@@ -1,0 +1,122 @@
+[
+    {
+        "id": 29,
+        "slug": "f3-bab-ezzouar-universite",
+        "title": "Appartement F3 – Bab Ezzouar Université",
+        "transaction_type": "RENT",
+        "price": 45000,
+        "rent_unit": "month",
+        "wilaya": "Alger",
+        "cover_image": "https://example.com/img/app29.jpg",
+        "verification_status": "PARTIAL",
+        "is_liked": true
+    },
+    {
+        "id": 30,
+        "slug": "villa-f4-blida-beni-mered",
+        "title": "Villa F4 – Blida Beni Mered",
+        "transaction_type": "BUY",
+        "price": 22500000,
+        "rent_unit": null,
+        "wilaya": "Blida",
+        "cover_image": "https://example.com/img/app30.jpg",
+        "verification_status": "VERIFIED",
+        "is_liked": false
+    },
+    {
+        "id": 31,
+        "slug": "studio-oran-akid-lotfi",
+        "title": "Studio – Oran Akid Lotfi",
+        "transaction_type": "RENT",
+        "price": 30000,
+        "rent_unit": "month",
+        "wilaya": "Oran",
+        "cover_image": "https://example.com/img/app31.jpg",
+        "verification_status": "NONE",
+        "is_liked": true
+    },
+    {
+        "id": 32,
+        "slug": "f2-annaba-sidi-salem",
+        "title": "Appartement F2 – Annaba Sidi Salem",
+        "transaction_type": "BUY",
+        "price": 5300000,
+        "rent_unit": null,
+        "wilaya": "Annaba",
+        "cover_image": "https://example.com/img/app32.jpg",
+        "verification_status": "VERIFIED",
+        "is_liked": false
+    },
+    {
+        "id": 33,
+        "slug": "duplex-f5-tizi-ouzou-centre",
+        "title": "Duplex F5 – Tizi Ouzou Centre",
+        "transaction_type": "BUY",
+        "price": 16800000,
+        "rent_unit": null,
+        "wilaya": "Tizi Ouzou",
+        "cover_image": "https://example.com/img/app33.jpg",
+        "verification_status": "PARTIAL",
+        "is_liked": true
+    },
+    {
+        "id": 34,
+        "slug": "f4-mostaganem-kharrouba",
+        "title": "Appartement F4 – Mostaganem Kharrouba",
+        "transaction_type": "RENT",
+        "price": 39000,
+        "rent_unit": "month",
+        "wilaya": "Mostaganem",
+        "cover_image": "https://example.com/img/app34.jpg",
+        "verification_status": "VERIFIED",
+        "is_liked": false
+    },
+    {
+        "id": 35,
+        "slug": "villa-f6-jijel-ouled-yahia",
+        "title": "Villa F6 – Jijel Ouled Yahia",
+        "transaction_type": "BUY",
+        "price": 28900000,
+        "rent_unit": null,
+        "wilaya": "Jijel",
+        "cover_image": "https://example.com/img/app35.jpg",
+        "verification_status": "VERIFIED",
+        "is_liked": true
+    },
+    {
+        "id": 36,
+        "slug": "f3-relizane-hay-elnasr",
+        "title": "Appartement F3 – Relizane Hay El Nasr",
+        "transaction_type": "BUY",
+        "price": 6100000,
+        "rent_unit": null,
+        "wilaya": "Relizane",
+        "cover_image": "https://example.com/img/app36.jpg",
+        "verification_status": "NONE",
+        "is_liked": false
+    },
+    {
+        "id": 37,
+        "slug": "studio-ouargla-ville",
+        "title": "Studio – Ouargla Ville",
+        "transaction_type": "RENT",
+        "price": 28000,
+        "rent_unit": "month",
+        "wilaya": "Ouargla",
+        "cover_image": "https://example.com/img/app37.jpg",
+        "verification_status": "PARTIAL",
+        "is_liked": true
+    },
+    {
+        "id": 38,
+        "slug": "f4-msila-bousaada",
+        "title": "Appartement F4 – M'Sila Bousaâda",
+        "transaction_type": "BUY",
+        "price": 8800000,
+        "rent_unit": null,
+        "wilaya": "M'Sila",
+        "cover_image": "https://example.com/img/app38.jpg",
+        "verification_status": "VERIFIED",
+        "is_liked": false
+    }
+]

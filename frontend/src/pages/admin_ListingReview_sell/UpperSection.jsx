@@ -1,10 +1,15 @@
 import deleteBtnIcon from "../../assets/images/delete-btn-icon.png";
 
-export default function UpperSection({ address, region }) {
+export default function UpperSection({ address, region, onDelete, isDeleting }) {
     return (
         <div className="admin-sell-UpperRightSection">
             <div className="admin-sell-updateButtons">
-                <button className="admin-sell-deleteButton">
+                <button
+                    className="admin-sell-deleteButton"
+                    type="button"
+                    onClick={onDelete}
+                    disabled={isDeleting}
+                >
                     <img src={deleteBtnIcon} alt="Delete" />
                 </button>
             </div>
