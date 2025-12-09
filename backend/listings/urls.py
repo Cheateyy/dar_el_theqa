@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     FeaturedListingsView, SearchListingsView, ListingCreateView, ListingDetailView,
     MyListingsView, ListingPauseView, ListingDocumentUpdateView,
-    AdminListingListView, AdminListingApproveView, AdminListingRejectView
+    AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed, ListingViewDocuments
 )
 
 urlpatterns = [
@@ -18,4 +18,10 @@ urlpatterns = [
     path('admin/listings/', AdminListingListView.as_view(), name='admin-listing-list'),
     path('admin/listings/<int:id>/approve/', AdminListingApproveView.as_view(), name='admin-approve-listing'),
     path('admin/listings/<int:id>/reject-anyways/', AdminListingRejectView.as_view(), name='admin-reject-listing'),
+    #The get admin listing by detail!! I dont think it is implemented (10.2 in primary contract)
+    path('admin/listings/<int:id>/', AdminListingViewDetailed.as_view(), name="admin-listing-detail"),
+
+    #Gets you the id's documents
+    path('listings/documents/<int:id>/fetch', ListingViewDocuments.as_view(), name="get-listing-document"),
+
 ]

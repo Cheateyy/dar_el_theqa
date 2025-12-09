@@ -109,6 +109,13 @@ class AdminListingListView(generics.ListAPIView):
     serializer_class = ListingSerializer
     permission_classes = [permissions.IsAdminUser]
 
+#10.2
+class AdminListingViewDetailed(generics.RetrieveAPIView):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.IsAdminUser]
+    lookup_field = "id"
+
 class AdminListingApproveView(views.APIView):
     permission_classes = [permissions.IsAdminUser]
 
@@ -133,3 +140,12 @@ class AdminListingRejectView(views.APIView):
             return Response({"status": "REJECTED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+#used by both admins and users
+class ListingViewDocuments(generics.ListAPIView):
+    serializer_class = ListingDocumentSerializer
+    permission_classes = [permissions.AllowAny]   # or IsAdminUser 3lahseb.. but notyet
+
+    def get_queryset(self):
+        listing_id = self.kwargs.get('id')
+        return ListingDocument.objects.filter(listing_id=listing_id)
