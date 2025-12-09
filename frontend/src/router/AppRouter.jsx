@@ -33,6 +33,7 @@ import UserAccounts from "../pages/UserAccounts.jsx";
 import AuditLog from "../pages/AuditLog.jsx";
 import LeadMessages from "../pages/LeadMessages.jsx";
 import Navbar from "../components/Navbar.jsx";
+import NavbarAdmin from "../components/NavbarAdmin.jsx";
 
 function AppRouter() {
   return (
@@ -78,10 +79,10 @@ function AppRouter() {
           <Route path="add-listing" element={<><Navbar /><AddListingPage /></>} />
           <Route path="add-listing/step-2" element={<><Navbar /><AddListingPage2 /></>} />
           <Route path="add-listing/step-2/step-3" element={<><Navbar /><AddListingPage3 /></>} />
-          <Route path="add-partner" element={<><Navbar /><Addpartner /></>} />
-          <Route path="partner-accounts" element={<><Navbar /><PartnerAccounts /></>} />
-          <Route path="user-accounts" element={<><Navbar /><UserAccounts /></>} />
-          <Route path="audit-log" element={<><Navbar /><AuditLog /></>} />
+          <Route path="add-partner" element={<><NavbarAdmin /><Addpartner /></>} />
+          <Route path="partner-accounts" element={<><NavbarAdmin /><PartnerAccounts /></>} />
+          <Route path="user-accounts" element={<><NavbarAdmin /><UserAccounts /></>} />
+          <Route path="audit-log" element={<><NavbarAdmin /><AuditLog /></>} />
           <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
         </Route>
 

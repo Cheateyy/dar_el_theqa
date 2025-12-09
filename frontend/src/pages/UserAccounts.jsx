@@ -1,10 +1,10 @@
 // src/pages/UserAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "../assets/styles/UserAccounts.css";
 
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
+
 import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
 import deleteIcon from "../assets/icons/Delete.svg";
@@ -16,42 +16,54 @@ import actionsIcon from "../assets/icons/Actions.svg";
 
 import Section from "../components/common/Section.jsx";
 
-// 🔧 SWITCH: true = localStorage mock; false = real /api/admin/users/ backend
 const USE_MOCK_USERS = true;
 
 function UserAccounts() {
-  const navigate = useNavigate();
+  const PAGE_SIZE = 10;
 
-  // -------- STATE --------
+  // ------------------------------------------------------------
+  // LOAD USERS (Mock or Backend)
+  // ------------------------------------------------------------
   const [users, setUsers] = useState(() => {
-    if (USE_MOCK_USERS) {
-      const stored = localStorage.getItem("users");
-      try {
-        const parsed = stored ? JSON.parse(stored) : [];
-        return parsed.map((u) => ({
-          status: u.status || "active",
-          ...u,
-        }));
-      } catch {
-        return [];
-      }
+    if (!USE_MOCK_USERS) return [];
+
+    try {
+      const stored = JSON.parse(localStorage.getItem("users") || "[]");
+      return stored.map((u) => ({
+        id: u.id,
+        full_name: u.full_name,
+        phone_number: u.phone_number,
+        email: u.email,
+        status: u.status || "active",
+      }));
+    } catch {
+      return [];
     }
-    // backend mode: start empty; will be filled by fetch
-    return [];
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE || 1));
   const [loading, setLoading] = useState(!USE_MOCK_USERS);
 
-  // -------- MOCK MODE: persist to localStorage --------
+  // ------------------------------------------------------------
+  // SAVE MOCK USERS
+  // ------------------------------------------------------------
   useEffect(() => {
     if (!USE_MOCK_USERS) return;
-    localStorage.setItem("users", JSON.stringify(users));
+
+    const normalized = users.map((u) => ({
+      id: u.id,
+      full_name: u.full_name,
+      phone_number: u.phone_number,
+      email: u.email,
+      status: u.status,
+    }));
+
+    localStorage.setItem("users", JSON.stringify(normalized));
   }, [users]);
 
-  // -------- BACKEND MODE: fetch /api/admin/users/ --------
+  // ------------------------------------------------------------
+  // FETCH USERS FROM BACKEND
+  // ------------------------------------------------------------
   useEffect(() => {
     if (USE_MOCK_USERS) return;
 
@@ -60,17 +72,17 @@ function UserAccounts() {
         const res = await fetch("/api/admin/users/", {
           credentials: "include",
         });
+
         const data = await res.json();
-        // If backend returns {count, results}, handle it
         const list = Array.isArray(data) ? data : data.results || [];
+
         setUsers(
           list.map((u) => ({
-            // map backend fields to UI shape
             id: u.id,
-            fullName: u.full_name,
-            phoneNumber: u.phone_number,
+            full_name: u.full_name,
+            phone_number: u.phone_number,
             email: u.email,
-            status: u.status || (u.is_active ? "active" : "suspended"),
+            status: u.is_active ? "active" : "suspended",
           }))
         );
       } catch (err) {
@@ -83,67 +95,69 @@ function UserAccounts() {
     fetchUsers();
   }, []);
 
-  // -------- DERIVED: sort + paginate --------
-  const currentPageItems = useMemo(() => {
-    const sorted = [...users].sort((a, b) => {
+  // ------------------------------------------------------------
+  // PAGINATION + SORTING (Suspended on top)
+  // ------------------------------------------------------------
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) => {
       const aSusp = a.status === "suspended" ? 1 : 0;
       const bSusp = b.status === "suspended" ? 1 : 0;
       return bSusp - aSusp;
     });
+  }, [users]);
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedUsers.length / PAGE_SIZE || 1)
+  );
+
+  const currentPageItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return sorted.slice(start, start + PAGE_SIZE);
-  }, [users, currentPage]);
+    return sortedUsers.slice(start, start + PAGE_SIZE);
+  }, [sortedUsers, currentPage]);
 
-  // -------- HANDLERS --------
+  // ------------------------------------------------------------
+  // ACTION: Toggle Active/Suspended
+  // ------------------------------------------------------------
   const toggleStatus = (id) => {
-    // NOTE: backend has no status toggle endpoint in the doc yet,
-    // so this is UI-only for now in both modes. [attached_file:1]
-    setUsers((prev) => {
-      const user = prev.find((u) => u.id === id);
-      if (!user) return prev;
-
-      const isSuspended = user.status === "suspended";
-      const message = isSuspended
-        ? "Activate this user account?"
-        : "Suspend this user account? The user will not be able to log in.";
-
-      const ok = window.confirm(message);
-      if (!ok) return prev;
-
-      return prev.map((u) =>
+    setUsers((prev) =>
+      prev.map((u) =>
         u.id === id
-          ? { ...u, status: isSuspended ? "active" : "suspended" }
+          ? {
+              ...u,
+              status: u.status === "active" ? "suspended" : "active",
+            }
           : u
-      );
-    });
+      )
+    );
   };
 
+  // ------------------------------------------------------------
+  // ACTION: DELETE USER
+  // ------------------------------------------------------------
   const handleDelete = async (id) => {
     const ok = window.confirm(
-      "Are you sure you want to permanently delete this user account and all associated data?"
+      "Are you sure you want to permanently delete this user?"
     );
     if (!ok) return;
 
-    // optimistic UI
     setUsers((prev) => prev.filter((u) => u.id !== id));
 
-    if (USE_MOCK_USERS) {
-      // localStorage will be updated by the effect above
-      return;
-    }
-
-    try {
-      await fetch(`/api/admin/users/${id}/`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      // Contract says DELETE returns status + userid + message. [attached_file:1]
-    } catch (err) {
-      console.error("Failed to delete user:", err);
+    if (!USE_MOCK_USERS) {
+      try {
+        await fetch(`/api/admin/users/${id}/`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      } catch (err) {
+        console.error("Failed to delete user:", err);
+      }
     }
   };
 
+  // ------------------------------------------------------------
+  // Pagination buttons
+  // ------------------------------------------------------------
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -158,44 +172,35 @@ function UserAccounts() {
       return pages;
     }
 
-    const firstPage = 1;
-    const lastPage = totalPages;
-
+    const first = 1;
+    const last = totalPages;
     let start = currentPage - 1;
     let end = currentPage + 1;
 
     if (start < 2) {
       start = 2;
-      end = start + (maxVisible - 2);
+      end = start + 2;
     }
-    if (end > lastPage - 1) {
-      end = lastPage - 1;
-      start = end - (maxVisible - 2);
+    if (end > last - 1) {
+      end = last - 1;
+      start = end - 2;
       if (start < 2) start = 2;
     }
 
-    pages.push(firstPage);
-
-    if (start > 2) {
-      pages.push("left-ellipsis");
-    }
-
-    for (let i = start; i <= end && i < lastPage; i++) {
-      pages.push(i);
-    }
-
-    if (end < lastPage - 1) {
-      pages.push("right-ellipsis");
-    }
-
-    pages.push(lastPage);
+    pages.push(first);
+    if (start > 2) pages.push("left");
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (end < last - 1) pages.push("right");
+    pages.push(last);
 
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
-  // -------- RENDER --------
+  // ------------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------------
   return (
     <div className="user-page-wrapper">
       <div className="user-accounts-container">
@@ -213,25 +218,25 @@ function UserAccounts() {
                   <tr>
                     <th>
                       <span className="th-with-icon">
-                        <img src={fullnameIcon} alt="" className="th-icon" />
+                        <img src={fullnameIcon} className="th-icon" alt="" />
                         Full Name
                       </span>
                     </th>
                     <th>
                       <span className="th-with-icon">
-                        <img src={phoneIcon} alt="" className="th-icon" />
+                        <img src={phoneIcon} className="th-icon" alt="" />
                         Phone Number
                       </span>
                     </th>
                     <th>
                       <span className="th-with-icon">
-                        <img src={emailIcon} alt="" className="th-icon" />
+                        <img src={emailIcon} className="th-icon" alt="" />
                         Email
                       </span>
                     </th>
                     <th className="actions-col-header">
                       <span className="th-with-icon">
-                        <img src={actionsIcon} alt="" className="th-icon" />
+                        <img src={actionsIcon} className="th-icon" alt="" />
                         Actions
                       </span>
                     </th>
@@ -242,9 +247,10 @@ function UserAccounts() {
                   {currentPageItems.length > 0 ? (
                     currentPageItems.map((user) => (
                       <tr key={user.id}>
-                        <td>{user.fullName || user.full_name}</td>
-                        <td>{user.phoneNumber || user.phone_number}</td>
+                        <td>{user.full_name}</td>
+                        <td>{user.phone_number}</td>
                         <td>{user.email}</td>
+
                         <td className="actions-col">
                           <button
                             type="button"
@@ -259,8 +265,8 @@ function UserAccounts() {
                               }
                               alt={
                                 user.status === "suspended"
-                                  ? "Activate account"
-                                  : "Suspend account"
+                                  ? "Activate"
+                                  : "Suspend"
                               }
                             />
                           </button>
@@ -270,7 +276,7 @@ function UserAccounts() {
                             className="row-action-btn row-action-delete"
                             onClick={() => handleDelete(user.id)}
                           >
-                            <img src={deleteIcon} alt="Delete account" />
+                            <img src={deleteIcon} alt="Delete" />
                           </button>
                         </td>
                       </tr>
@@ -292,48 +298,34 @@ function UserAccounts() {
       <div className="user-pagination">
         <button
           className="paging-button"
-          type="button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <img src={backButton} alt="back" />
+          <img src={backButton} alt="" />
         </button>
 
-        {pageItems.map((item, idx) => {
-          if (typeof item === "string") {
-            return (
-              <button
-                key={item + idx}
-                type="button"
-                className="page-dot"
-                disabled
-              >
-                ...
-              </button>
-            );
-          }
-          const page = item;
-          return (
-            <button
-              key={page}
-              type="button"
-              className={`page-dot ${
-                page === currentPage ? "active" : ""
-              }`}
-              onClick={() => goToPage(page)}
-            >
-              {page}
+        {pageItems.map((item, idx) =>
+          typeof item === "string" ? (
+            <button key={idx} className="page-dot" disabled>
+              ...
             </button>
-          );
-        })}
+          ) : (
+            <button
+              key={item}
+              className={`page-dot ${item === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(item)}
+            >
+              {item}
+            </button>
+          )
+        )}
 
         <button
-          type="button"
           className="paging-button"
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <img src={nextPage} alt="next" />
+          <img src={nextPage} alt="" />
         </button>
       </div>
     </div>

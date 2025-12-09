@@ -9,10 +9,6 @@ import NotifIcon from "@/assets/icons/notif.svg";
 import ProfileIcon from "@/assets/icons/profile.svg";
 import MenuIcon from "@/assets/icons/Menu.svg";
 
-
-import MyListingIcon from "@/assets/icons/mylistingsoption.svg";
-import MessagesIcon from "@/assets/icons/navmessagesoption.svg";
-
 function Navbar() {
   const navigate = useNavigate();
 
@@ -31,7 +27,6 @@ function Navbar() {
         setShowMenu(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -60,7 +55,6 @@ function Navbar() {
         <div className="navbar-lang-wrapper" ref={langRef}>
           <button
             className="navbar-link"
-            type="button"
             onClick={() => setShowLangMenu((p) => !p)}
           >
             <img src={LanguageIcon} alt="Language" className="navbar-icon" />
@@ -81,20 +75,19 @@ function Navbar() {
         </button>
 
         {/* NOTIFICATIONS */}
-        <button className="navbar-icon-btn" type="button">
+        <button className="navbar-icon-btn">
           <img src={NotifIcon} alt="notification" />
         </button>
 
         {/* PROFILE */}
-        <button className="navbar-icon-btn" type="button">
+        <button className="navbar-icon-btn">
           <img src={ProfileIcon} alt="Profile" />
         </button>
 
-        {/* MAIN MENU */}
+        {/* MAIN MENU DROPDOWN */}
         <div className="navbar-menu-wrapper" ref={menuRef}>
           <button
             className="navbar-icon-btn"
-            type="button"
             onClick={() => setShowMenu((p) => !p)}
           >
             <img src={MenuIcon} alt="Menu" />
@@ -102,52 +95,51 @@ function Navbar() {
 
           {showMenu && (
             <div className="menu-dropdown">
-              {/* ADD LISTING */}
+
               <button
                 className="menu-item"
                 onClick={() => {
-                  navigate("/forms-tables/add-listing");
+                  navigate("/forms-tables/user-accounts");
                   closeMenu();
                 }}
               >
-                <span className="menu-icon-text">
-                  <span className="menu-plus">+</span>
-                  Add a Listing
-                </span>
+                User Accounts
               </button>
 
-              {/* MY LISTINGS */}
               <button
                 className="menu-item"
                 onClick={() => {
-                  navigate("/seller/listings");
+                  navigate("/forms-tables/partner-accounts");
                   closeMenu();
                 }}
               >
-                <span className="menu-icon-text">
-                  <img src={MyListingIcon} alt="" className="menu-icon" />
-                  My Listings
-                </span>
+                Partner Accounts
               </button>
 
-              {/* LEAD MESSAGES */}
               <button
                 className="menu-item"
                 onClick={() => {
-                  navigate("/forms-tables/lead-messages");
+                  navigate("/forms-tables/audit-log");
                   closeMenu();
                 }}
               >
-                <span className="menu-icon-text">
-                  <img src={MessagesIcon} alt="" className="menu-icon" />
-                  Lead Messages
-                </span>
+                Audit Log
               </button>
 
-              {/* LOG OUT */}
+              <button
+                className="menu-item"
+                onClick={() => {
+                  navigate("/");
+                  closeMenu();
+                }}
+              >
+                All Listings
+              </button>
+
               <button className="menu-item logout" onClick={handleLogout}>
                 Log Out
               </button>
+
             </div>
           )}
         </div>
