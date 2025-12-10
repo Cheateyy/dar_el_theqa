@@ -1,12 +1,14 @@
-from rest_framework import generics, views, permissions, status, filters
+from rest_framework import generics, views, permissions, status, filters, serializers
 from rest_framework.response import Response
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
 
+from drf_spectacular.utils import extend_schema, inline_serializer
 
 class FeaturedListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
@@ -16,6 +18,27 @@ class FeaturedListingsView(generics.ListAPIView):
 class SearchListingsView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingSearchRequest",
+            fields={
+                "wilaya_id": serializers.IntegerField(required=False),
+                "transaction_type": serializers.CharField(required=False),
+                "property_type": serializers.CharField(required=False),
+                "price_min": serializers.DecimalField(max_digits=14, decimal_places=2, required=False),
+                "price_max": serializers.DecimalField(max_digits=14, decimal_places=2, required=False),
+                "is_verified_only": serializers.BooleanField(required=False),
+                "page": serializers.IntegerField(required=False),
+            },
+        ),
+        responses=inline_serializer(
+            name="ListingSearchResponse",
+            fields={
+                "count": serializers.IntegerField(),
+                "results": ListingSerializer(many=True),
+            },
+        ),
+    )
     def post(self, request):
         data = request.data
         queryset = Listing.objects.filter(status=Listing.Status.APPROVED)
@@ -81,6 +104,19 @@ class ListingPauseView(views.APIView):
     #permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingPauseRequest",
+            fields={"reason": serializers.CharField()},
+        ),
+        responses=inline_serializer(
+            name="ListingPauseResponse",
+            fields={
+                "status": serializers.CharField(),
+                "new_status": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id, owner=request.user)
@@ -99,12 +135,21 @@ class ListingActivateView(views.APIView):
     #permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="ListingActivateResponse",
+            fields={
+                "status": serializers.CharField(required=False),
+            },
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id, owner=request.user)
             listing.status = Listing.Status.APPROVED
             listing.save()
-            return Response(status=200)
+            return Response({"status": "APPROVED"}, status=200)
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -115,6 +160,16 @@ class ListingDocumentUpdateView(views.APIView):
     permission_classes = [permissions.AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="ListingDocumentUpdateResponse",
+            fields={
+                "status": serializers.CharField(),
+                "new_listing_status": serializers.CharField(),
+            },
+        ),
+    )
     def patch(self, request, id):
         try:
             listing = Listing.objects.get(id=id, owner=request.user)
@@ -125,6 +180,18 @@ class ListingDocumentUpdateView(views.APIView):
             return Response({"status": "success", "new_listing_status": "PENDING"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class SimilarListingsView(generics.ListAPIView):
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        base_listing = get_object_or_404(Listing, id=self.kwargs.get('id'))
+        queryset = Listing.objects.filter(status=Listing.Status.APPROVED).exclude(id=base_listing.id)
+        if base_listing.property_type:
+            queryset = queryset.filter(property_type=base_listing.property_type)
+        return queryset.order_by('?')[:3]
+
 
 # Admin Views
 class AdminListingListView(generics.ListAPIView):
@@ -141,17 +208,30 @@ class AdminListingViewDetailed(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
 
-#10.2
-class AdminListingViewDetailed(generics.RetrieveAPIView):
+
+class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = [permissions.IsAdminUser]
     lookup_field = "id"
 
+    def delete(self, request, *args, **kwargs):
+        listing = self.get_object()
+        listing.delete()
+        return Response({"status": "DELETED"}, status=status.HTTP_200_OK)
+
+
 class AdminListingApproveView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="AdminListingApproveResponse",
+            fields={"status": serializers.CharField()},
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id)
@@ -165,6 +245,16 @@ class AdminListingRejectView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="AdminListingRejectRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="AdminListingRejectResponse",
+            fields={"status": serializers.CharField()},
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id)
@@ -178,7 +268,7 @@ class AdminListingRejectView(views.APIView):
 #used by both admins and users
 class ListingViewDocuments(generics.ListAPIView):
     serializer_class = ListingDocumentSerializer
-    permission_classes = [permissions.AllowAny]   # or IsAdminUser 3lahseb.. but notyet
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         listing_id = self.kwargs.get('id')

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FavoriteToggleView, FavoriteListView, LeadCreateView, ReviewCreateView, ReviewListView, AdminDeleteReviewView, AdminReviewListView, OwnerLeadListView, LeadDetailView
+from .views import FavoriteToggleView, FavoriteListView, LeadCreateView, ReviewListView, AdminDeleteReviewView, AdminReviewListView, OwnerLeadListView, LeadDetailView
 
 urlpatterns = [
     path('listings/<int:id>/favorite/', FavoriteToggleView.as_view(), name='favorite-toggle'),
@@ -13,9 +13,7 @@ urlpatterns = [
 
     path('listings/<int:id>/reviews/', ReviewListView.as_view(), name='review-list'),
     #admin doesnt get just three, admins get to see all of the reviews
-    path('listings/admin/<int:id>/reviews/', AdminReviewListView.as_view(), name='review-list'),
-
-    path('listings/<int:id>/reviews/create/', ReviewCreateView.as_view(), name='review-create'),
+    path('admin/listings/<int:id>/reviews/', AdminReviewListView.as_view(), name='admin-review-list'),
 
     #Admin can Delete Review (10.7 DELETE) "I do not think it is implemented"
     path('admin/reviews/<int:id>/delete', AdminDeleteReviewView.as_view(), name='review-delete'),
