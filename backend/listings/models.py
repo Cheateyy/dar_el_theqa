@@ -89,9 +89,13 @@ class ListingDocument(TimeStampedModel):
     class Status(models.TextChoices):
         APPROVED = 'APPROVED', 'Approved'
         REJECTED = 'REJECTED', 'Rejected'
+        #added the pending status which would be the default before any review
+        PENDING = 'PENDING', 'Pending'
 
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='documents')
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     file = models.FileField(upload_to='listings/documents/')
-    status = models.CharField(max_length=10, choices=Status.choices, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING ,null=True, blank=True)
     admin_note = models.TextField(null=True, blank=True)
+    #added owner note to justify and stuff
+    owner_note = models.TextField(null=True, blank=True)

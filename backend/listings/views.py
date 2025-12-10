@@ -4,6 +4,9 @@ from django.db.models import Q
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
+
+
 
 class FeaturedListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
@@ -173,3 +176,61 @@ class ListingViewDocuments(generics.ListAPIView):
     def get_queryset(self):
         listing_id = self.kwargs.get('id')
         return ListingDocument.objects.filter(listing_id=listing_id)
+
+
+
+class RejectDocumentView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, listing_id, document_id):
+        document = get_object_or_404(
+            ListingDocument,
+            id=document_id,
+            listing_id=listing_id
+        )
+
+        document.status = ListingDocument.STATUS_REJECTED
+
+        admin_message = request.data.get("reason", "Document rejected.")
+        document.admin_message = admin_message
+
+        document.save()
+
+        return Response(
+            {
+                "reason": admin_message,
+                "status": "REJECTED",
+                "message": "Document rejected",
+                "doc_id": document_id,
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+class ListingDocumentApproveView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, listing_id, document_id):
+        document = get_object_or_404(
+            ListingDocument,
+            id=document_id,
+            listing_id=listing_id
+        )
+
+        document.status = ListingDocument.STATUS_APPROVED
+        admin_message = request.data.get("reason", "doc approved")
+
+        if admin_message:
+            document.admin_message = admin_message
+
+        document.save()
+
+        return Response(
+            {
+                "message": "Document approved successfully.",
+                "doc_id": ListingDocumentSerializer(document).data["id"],
+                "status": "APPROVED"
+            },
+            status=status.HTTP_200_OK
+        )
+
