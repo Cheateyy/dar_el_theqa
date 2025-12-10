@@ -27,7 +27,7 @@ export default function Listing() {
   const [formData, setFormData] = useState({
     wilaya: "",
     region: "",
-    street_address: "",
+    address: "",
     transaction_type: "", // RENT / BUY
     price: "",
     rent_unit: "",        // MONTH / DAY / etc.
@@ -107,7 +107,7 @@ export default function Listing() {
         setFormData({
           wilaya: data.wilaya || "",
           region: data.region || "",
-          street_address: data.street_address || "",
+          address: data.address || "",
           transaction_type: data.transaction_type || "", // RENT / BUY
           price: data.price ? String(data.price) : "",
           rent_unit: data.rent_unit || "",
@@ -156,7 +156,7 @@ export default function Listing() {
         transaction_type: formData.transaction_type || null, // RENT / BUY
         wilaya: formData.wilaya || null,
         region: formData.region || null,
-        street_address: formData.street_address || null,
+        address: formData.address || null,
         price: formData.price ? Number(formData.price) : null,
         rent_unit: formData.rent_unit || null,
         property_type: formData.property_type || null,
@@ -169,8 +169,9 @@ export default function Listing() {
       };
 
       const response = await updateSellerListing(listingId, payload);
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Changes saved. Waiting for Admin approval.");
     } catch (err) {
@@ -185,8 +186,9 @@ export default function Listing() {
     try {
       setPausing(true);
       const response = await pauseSellerListing(listingId, { reason: "OTHER" });
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Listing paused.");
     } catch (err) {
@@ -201,8 +203,9 @@ export default function Listing() {
     try {
       setActivating(true);
       const response = await activateSellerListing(listingId);
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Listing activated.");
     } catch (err) {
