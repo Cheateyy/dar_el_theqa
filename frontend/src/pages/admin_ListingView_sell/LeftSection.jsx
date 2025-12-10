@@ -10,6 +10,8 @@ export default function LeftSection({
     documents,
     status_icon,
     verificationStatus,
+    reviews = [],
+    onDeleteReview,
 }) {
     return (
         <div className="admin-listingLeft">
@@ -22,7 +24,11 @@ export default function LeftSection({
             />
             <LegalDocumentsSection documents={documents} />
             <div className="LeftSectionReviewMoreListings">
-                <ReviewsSection allow_Delete={true} />
+                <ReviewsSection
+                    allow_Delete={Boolean(onDeleteReview)}
+                    reviews={reviews}
+                    onDeleteReview={onDeleteReview}
+                />
             </div>
         </div>
     );

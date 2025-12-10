@@ -1,8 +1,27 @@
 import { useState } from "react";
 import ShowInterestModal from "../../components/common/showInterestModal/ShowInterestModal";
 
-export default function InfoCards({ propertyType, area, bedrooms, bathrooms }) {
+export default function InfoCards({
+    propertyType,
+    area,
+    bedrooms,
+    bathrooms,
+    onShowInterest,
+    isSendingInterest = false,
+}) {
     const [showModal, setShowModal] = useState(false);
+
+    const handleSendInterest = async (message) => {
+        if (!onShowInterest) {
+            return;
+        }
+        try {
+            await onShowInterest(message);
+            setShowModal(false);
+        } catch (error) {
+            console.error("Failed to send interest", error);
+        }
+    };
 
     return (
         <div className="rent-listingInfo">
@@ -35,10 +54,8 @@ export default function InfoCards({ propertyType, area, bedrooms, bathrooms }) {
             {showModal && (
                 <ShowInterestModal
                     onClose={() => setShowModal(false)}
-                    onSend={() => {
-                        alert("Message sent!");
-                        setShowModal(false);
-                    }}
+                    onSend={handleSendInterest}
+                    isSending={isSendingInterest}
                 />
             )}
         </div>

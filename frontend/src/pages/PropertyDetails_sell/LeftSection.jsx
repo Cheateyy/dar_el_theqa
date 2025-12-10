@@ -8,6 +8,7 @@ export default function LeftSection({
     title,
     description,
     verificationStatus,
+    similarListings = [],
 }) {
     return (
         <div className="sell-listingLeft">
@@ -19,7 +20,7 @@ export default function LeftSection({
                 verificationStatus={verificationStatus}
             />
             <div className="LeftSectionReviewMoreListings">
-                <MoreListings />
+                <MoreListings listings={similarListings} />
             </div>
         </div>
     );

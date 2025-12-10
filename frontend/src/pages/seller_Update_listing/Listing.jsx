@@ -94,11 +94,14 @@ export default function Listing() {
             "", // last resort
         });
 
-        // Documents – backend doesn’t send them in your sample; keep placeholders
-        setDocuments([
-          { name: "Document.pdf", url: "", icon: legalDocIcon },
-          { name: "Document.pdf", url: "", icon: legalDocIcon },
-        ]);
+        const mappedDocs = (data.documents || []).map((doc, index) => ({
+          name: doc.document_type || doc.label || `Document ${index + 1}`,
+          url: doc.file || doc.url || "",
+          icon: legalDocIcon,
+          status: doc.status || "PENDING",
+          id: doc.id || index,
+        }));
+        setDocuments(mappedDocs);
 
         // Right section fields mapped from API response
         setFormData({

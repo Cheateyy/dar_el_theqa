@@ -17,7 +17,14 @@ import legalDocIcon from "../../assets/images/legal_doc.png";
 
 import "./ListingDetails.css";
 
-import { getListingDetails, getMyListings } from "../../lib/api_3.js";
+import {
+  getListingDetails,
+  getMyListings,
+  getListingReviews,
+  activateSellerListing,
+  pauseSellerListing,
+  deleteSellerListing,
+} from "../../lib/api_3.js";
 
 export default function ListingDetails_sell() {
   const { listingId } = useParams(); // must match :listingId in route
@@ -25,11 +32,29 @@ export default function ListingDetails_sell() {
 
   const [listing, setListing] = useState(null);
   const [moreListings, setMoreListings] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isActivating, setIsActivating] = useState(false);
+  const [isPausing, setIsPausing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLoginClick = () => setShowLogin(true);
   const handleCloseModal = () => setShowLogin(false);
+
+  const updateListingStatus = (nextStatus) => {
+    setListing((prev) => {
+      if (!prev) return prev;
+      const safeStatus = (nextStatus || prev?.property?.status || "").toUpperCase();
+      return {
+        ...prev,
+        property: {
+          ...prev.property,
+          status: safeStatus,
+        },
+      };
+    });
+  };
 
   useEffect(() => {
     let isCancelled = false;
@@ -56,13 +81,18 @@ export default function ListingDetails_sell() {
 
         const documents = (data.documents || data.legal_documents || []).map(
           (doc) => ({
-            name: doc.name || doc.file_name || "Document",
-            url: doc.url || doc.file_url || "",
+            name: doc.name || doc.file_name || doc.document_type || "Document",
+            url: doc.url || doc.file_url || doc.file || "",
             icon: legalDocIcon,
           })
         );
 
-        const listingStatus = (data.verification_status || "PENDING").toUpperCase();
+        const listingStatus = (
+          data.status_label ||
+          data.status ||
+          data.verification_status ||
+          "PENDING"
+        ).toUpperCase();
         const property = {
           type: data.property_type || "Apartment",
           area: data.area ? `${data.area} m²` : "0 m²",
@@ -128,11 +158,98 @@ export default function ListingDetails_sell() {
     }
 
     fetchSellerListings();
+    async function fetchReviews() {
+      try {
+        const data = await getListingReviews(listingId);
+        if (isCancelled) return;
+        const normalized = Array.isArray(data?.results)
+          ? data.results
+          : Array.isArray(data)
+            ? data
+            : [];
+        setReviews(normalized);
+      } catch (err) {
+        if (!isCancelled) {
+          console.error("Failed to load listing reviews", err);
+          setReviews([]);
+        }
+      }
+    }
+
+    fetchReviews();
 
     return () => {
       isCancelled = true;
     };
   }, [listingId]);
+
+  const handleActivateListing = async () => {
+    if (!listingId) return;
+    try {
+      setIsActivating(true);
+      const response = await activateSellerListing(listingId);
+      if (response?.new_status) {
+        updateListingStatus(response.new_status);
+      }
+      window.alert(response?.message || "Listing activated.");
+    } catch (err) {
+      console.error("Failed to activate listing", err);
+      window.alert("Impossible d'activer l'annonce pour le moment.");
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const handlePauseListing = async () => {
+    if (!listingId) return;
+    try {
+      setIsPausing(true);
+      const response = await pauseSellerListing(listingId, { reason: "OTHER" });
+      if (response?.new_status) {
+        updateListingStatus(response.new_status);
+      }
+      window.alert(response?.message || "Listing paused.");
+    } catch (err) {
+      console.error("Failed to pause listing", err);
+      window.alert("Impossible de mettre l'annonce en pause.");
+    } finally {
+      setIsPausing(false);
+    }
+  };
+
+  const handleDeleteListing = async () => {
+    if (!listingId) return;
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this listing?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteSellerListing(listingId, "SOLD");
+      updateListingStatus("DELETED");
+      window.alert("Listing deleted.");
+    } catch (err) {
+      console.error("Failed to delete listing", err);
+      window.alert("Impossible de supprimer l'annonce.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const normalizedStatus = (listing?.property?.status || "").toUpperCase();
+  const shouldActivateStatus =
+    normalizedStatus === "" ||
+    normalizedStatus === "PAUSED" ||
+    normalizedStatus === "INACTIVE" ||
+    normalizedStatus === "REJECTED" ||
+    normalizedStatus === "PENDING" ||
+    normalizedStatus === "DELETED";
+  const statusActionLabel = shouldActivateStatus ? "Activate" : "Pause";
+  const statusActionHandler = shouldActivateStatus
+    ? handleActivateListing
+    : handlePauseListing;
+  const statusActionLoading = shouldActivateStatus ? isActivating : isPausing;
 
   return (
     <>
@@ -154,8 +271,18 @@ export default function ListingDetails_sell() {
               documents={listing.documents}
               title={listing.title}
               verificationStatus={listing.verificationStatus}
+              reviews={reviews}
             />
-            <RightSection property={listing.property} moreListings={moreListings} ListingId={listingId} />
+            <RightSection
+              property={listing.property}
+              moreListings={moreListings}
+              ListingId={listingId}
+              onToggleStatus={statusActionHandler}
+              statusActionLabel={statusActionLabel}
+              isStatusLoading={statusActionLoading}
+              onDeleteListing={handleDeleteListing}
+              isDeletingListing={isDeleting}
+            />
           </>
         )}
       </div>
