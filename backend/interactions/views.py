@@ -1,15 +1,28 @@
-from backend.core import serializers
-from rest_framework import generics, views, permissions, status
+from rest_framework import generics, views, permissions, status, serializers
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from .models import Favorite, Lead, Review
 from .serializers import FavoriteSerializer, LeadSerializer, ReviewSerializer, OwnerLeadListSerializer, LeadDetailSerializer
 from listings.models import Listing
 from listings.serializers import ListingSerializer
+from drf_spectacular.utils import extend_schema, inline_serializer
+from django.db.models import Avg, Count
+from django.shortcuts import get_object_or_404
 
 class FavoriteToggleView(views.APIView):
     #permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="FavoriteToggleResponse",
+            fields={
+                "status": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id)
@@ -68,44 +81,55 @@ class LeadDetailView(generics.RetrieveAPIView):
 
 
 
-class ReviewCreateView(generics.CreateAPIView):
+class ReviewListView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
+
+    def get_queryset(self):
+        listing_id = self.kwargs.get('id')
+        return Review.objects.filter(listing_id=listing_id).order_by('-created_at')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        aggregates = queryset.aggregate(avg=Avg('rating'), total=Count('id'))
+        return Response({
+            "average_rating": round(aggregates['avg'], 2) if aggregates['avg'] else 0.0,
+            "total_reviews": aggregates['total'],
+            "reviews": serializer.data,
+        })
 
     def perform_create(self, serializer):
         listing_id = self.kwargs.get('id')
-        listing = Listing.objects.get(id=listing_id)
-        
-        # Check if user contacted the listing
+        listing = get_object_or_404(Listing, id=listing_id)
+
         if not Lead.objects.filter(user=self.request.user, listing=listing).exists():
             raise serializers.ValidationError("You must contact the owner before reviewing.")
-            
+
         serializer.save(user=self.request.user, listing=listing)
 
-class ReviewListView(generics.ListAPIView):
-    serializer_class = ReviewSerializer
-    permission_classes = [permissions.AllowAny]
 
-    def get_queryset(self):
-        listing_id = self.kwargs.get('id')
-        return Review.objects.filter(listing_id=listing_id)[0:3] ## just like setting the limit to 3 "as garamida requested"
-    
 class AdminReviewListView(generics.ListAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
         listing_id = self.kwargs.get('id')
-        return Review.objects.filter(listing_id=listing_id)
-    
-    
-    ##(10.7 deletes and returns as the contract)
+        return Review.objects.filter(listing_id=listing_id).order_by('-created_at')
+
+
 class AdminDeleteReviewView(generics.DestroyAPIView):
     queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAdminUser]
-    lookup_url_kwarg = "review_id"
+    lookup_url_kwarg = "id"
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
-        return Response({"review_id":kwargs["review_id"],"status": "Deleted"}, status=status.HTTP_200_OK)
+        return Response({"review_id": kwargs["id"], "status": "Deleted"}, status=status.HTTP_200_OK)

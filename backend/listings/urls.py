@@ -1,8 +1,9 @@
 from django.urls import path
 from .views import (
-    FeaturedListingsView, ListingActivateView, ListingDocumentApproveView, RejectDocumentView, SearchListingsView, ListingCreateView, ListingDetailView,
-    MyListingsView, ListingPauseView, ListingDocumentUpdateView,
-    AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed, ListingViewDocuments
+    FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
+    MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
+    AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
+    ListingViewDocuments, ListingDocumentRejectView,
 )
 
 urlpatterns = [
@@ -13,6 +14,7 @@ urlpatterns = [
     path('listings/my-listings/', MyListingsView.as_view(), name='my-listings'),
     path('listings/<int:id>/pause/', ListingPauseView.as_view(), name='pause-listing'),
     path('listings/<int:id>/activate/', ListingActivateView.as_view(), name='activate-listing'),
+    path('listings/<int:id>/similar/', SimilarListingsView.as_view(), name='similar-listings'),
     path('listings/<int:id>/documents/', ListingDocumentUpdateView.as_view(), name='update-documents'),
 
     # Admin URLs
