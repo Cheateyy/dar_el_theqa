@@ -1,0 +1,42 @@
+{
+  "count": 3,
+  "next": null,
+  "results": [
+    {
+      "id": 305,
+      "title": "Villa Zeralda",
+      "price": 45000000,
+      "cover_image": "/media/listings/305/cover.jpg",
+      "transaction_type": "BUY",
+      "created_at": "2023-10-25",
+      "status_label": "APPROVED_AND_PENDING",
+      "rejection_reason": "The deed document is blurry...",
+      "views_count": 120,
+      "leads_count": 5
+    },
+    {
+      "id": 402,
+      "title": "F3 Appartement Centre Alger",
+      "price": 40000,
+      "cover_image": "/media/listings/402/cover.jpg",
+      "transaction_type": "RENT",
+      "created_at": "2023-11-10",
+      "status_label": "APPROVED",
+      "rejection_reason": null,
+      "views_count": 87,
+      "leads_count": 12
+    },
+    {
+      "id": 511,
+      "title": "Studio Hydra",
+      "price": 28000,
+      "cover_image": "/media/listings/511/cover.jpg",
+      "transaction_type": "RENT",
+      "created_at": "2023-12-01",
+      "status_label": "INACTIVE",
+      "rejection_reason": null,
+      "views_count": 43,
+      "leads_count": 3
+    }
+  ]
+}

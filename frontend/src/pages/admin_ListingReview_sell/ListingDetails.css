@@ -1,0 +1,685 @@
+.admin-sell-ListingDetails {
+  display: flex;
+  flex-direction: row;
+  padding-left: 5%;
+  padding-right: 8%;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+  margin-top: 1%;
+}
+
+.admin-sell-listingLeft {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.admin-sell-imageScroller {
+  width: 90%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding-top: 1.5rem;
+  padding-bottom: 0.7rem;
+  padding-left: 0rem;
+  overflow: hidden;
+}
+
+.admin-sell-ListingInfo {
+  width: 87%;
+  margin-top: 1rem;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.admin-sell-ListingInfo h1 {
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 0.1rem;
+}
+
+.admin-sell-ListingInfo h1 span {
+  padding: 0.3rem;
+}
+
+.admin-sell-ListingInfo p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.admin-sell-moreListings.card {
+  width: 87%;
+  margin: 1.2rem auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.admin-sell-moreListings.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.admin-sell-moreListingsCards {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-sell-listingCard {
+  flex: 0 0 32%;
+  height: 150px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 3px 6px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-sell-listingPrice h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  font-size: 2rem;
+}
+
+.admin-sell-listingCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
+}
+
+.admin-sell-listingRight.card {
+  width: 40%;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 10px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  position: sticky;
+  top: 2rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.admin-sell-upper {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-sell-upperRight h3 {
+  font-size: 1.2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.admin-sell-upperRight h3 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-sell-upperLeft .admin-sell-likeButton {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.admin-sell-upperLeft .admin-sell-likeButton.liked {
+  color: red;
+}
+
+.admin-sell-upperLeft .admin-sell-likeButton:hover {
+  transform: scale(1.2);
+}
+
+.admin-sell-listingPrice{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+
+
+
+.admin-sell-listingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-sell-infoCard {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 4px 4px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-sell-infoCard h3 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.3rem;
+}
+
+.admin-sell-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  color: #555;
+  margin: 0;
+}
+
+.admin-sell-showInterest {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+
+.pendingListing{
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-sell-interestButton.Reject{
+  background-color: #FFE0E0;
+  color: #DC1919;
+}
+
+.admin-sell-interestButton {
+  margin-top: 10%;
+  width: 70%;
+  padding: 1rem;
+  background-color: #E7E7E7;
+  color: #8F8F8F;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+
+.admin-sell-listingRight.card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sell-listingRight.card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.admin-sell-listingRight.card h1,
+.admin-sell-listingRight.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #222;
+  margin: 0.2rem 0;
+}
+
+.admin-sell-listingRight.card p,
+.admin-sell-listingRight.card span,
+.admin-sell-listingRight.card .admin-sell-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.admin-sell-certifiedWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.admin-sell-certifiedTooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #ffffff;
+  color: #09ff00;
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.admin-sell-certifiedWrapper:hover .admin-sell-certifiedTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.admin-sell-modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem; 
+}
+
+.admin-sell-modalContent {
+  background: #fff;
+  padding: 2.5rem 3rem;
+  border-radius: 15px; 
+  width: 60%;
+  max-width: 95%;
+  box-shadow: 5px 9px 12px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.admin-sell-modalContent h2 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+.admin-sell-modalContent p {
+  margin: 0.2rem 0 1rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-sell-modalContent label {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.admin-sell-modalContent input {
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-sell-modalLinks {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column-reverse;
+  justify-content:space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.admin-sell-modalLinks a {
+  color: #0F405E;
+  text-decoration: none;
+}
+
+.admin-sell-modalLinks p {
+  margin: 0;
+}
+
+.admin-sell-modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.admin-sell-cancelButton {
+  padding: 1rem 3rem;
+  background-color: #ffffff;
+  color: #0F405E;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: 1px solid grey;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-sell-cancelButton:hover {
+  background: #aaa;
+}
+
+.admin-sell-loginButton {
+  padding: 1rem 3rem;
+  background-color: #0F405E;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-sell-loginButton:hover {
+  background-color: #0056b3;
+}
+
+.phoneMoreList{
+  display: none;
+}
+
+.LeftSectMoreListings{
+  display: flex;
+  width: 100%;
+}
+
+
+
+
+
+
+.admin-sell-updateButtons {
+  display: flex;
+  justify-content: end;
+  gap: 10px; 
+}
+
+.admin-sell-updateButtons button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.admin-sell-updateButtons button img {
+  width: 60px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s; 
+}
+
+.admin-sell-updateButtons button:hover img {
+  transform: scale(1.1); 
+}
+
+.admin-sell-UpperRightSection{
+  display: flex;
+  flex-direction: column;
+}
+
+
+.acceptRejectDoc{
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  margin-right: 2%;
+  gap: 1%;
+}
+
+.acceptRejectDoc {
+  display: flex;
+  gap: 12px;       
+}
+
+.acceptRejectDoc button {
+  background: transparent;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acceptRejectDoc button img {
+  width: 22px;         
+  height: 22px;
+}
+
+.acceptRejectDoc button:hover {
+  transform: scale(1.05);
+}
+
+.acceptRejectDoc button:active {
+  transform: scale(0.95);
+}
+
+.acceptRejectDoc input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.acceptRejectDoc input:focus {
+  border-color: #0F405E;
+}
+
+.admin-doc-status {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background-color: #e7e7e7;
+  color: #374151;
+  align-self: center;
+}
+
+.admin-doc-status.accepted {
+  background-color: #ecfeef;
+  color: #15803d;
+}
+
+.admin-doc-status.rejected {
+  background-color: #ffe0e0;
+  color: #b91c1c;
+}
+
+.admin-doc-status.pending {
+  background-color: #fff2d6;
+  color: #b45309;
+}
+
+
+.documentAccReject{
+  display: flex;
+  flex-direction: row;
+}
+
+
+.admin-sell-upperRight h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+
+
+.admin-sell-legal-documents {
+  width: 90%;
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-sell-legal-documents h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 5%;
+}
+
+
+
+.admin-sell-docHeader a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-sell-legal-documents ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-sell-legal-doc-item a {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.3s, transform 0.2s;
+}
+
+@media (max-width: 1600px) {
+
+  .admin-sell-ListingDetails {
+    flex-direction: column;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+
+  .admin-sell-listingLeft,
+  .admin-sell-listingRight.card {
+    width: 100%;
+  }
+
+  .admin-sell-listingLeft {
+    align-items: center;
+  }
+
+  .admin-sell-imageScroller {
+    width: 95%;
+  }
+
+  .admin-sell-ListingInfo {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .admin-sell-moreListings.card {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .admin-sell-moreListingsCards {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .admin-sell-listingCard {
+    flex: 0 0 100%;
+    height: 120px;
+  }
+
+  .admin-sell-listingRight.card {
+    position: relative;
+    max-height: none;
+    overflow: visible;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .admin-sell-listingRight.card h1,
+  .admin-sell-listingRight.card h2,
+  .admin-sell-listingRight.card p {
+    font-size: 1rem;
+  }
+
+  .admin-sell-interestButton {
+    width: 90%;
+  }
+
+  .phoneMoreList{
+    display: block;
+    margin-top: 5%;
+  }
+
+  .LeftSectMoreListings{
+    display: none;
+  }
+
+  .admin-sell-upper{
+    display: flex;
+    justify-content: start;
+  }
+
+  .admin-sell-legal-documents {
+  width: 100%;
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-sell-listingPrice h1{
+  font-size: 2rem;
+}
+
+.admin-sell-interestButton.Reject{
+  margin-top: 2rem;
+}
+
+}

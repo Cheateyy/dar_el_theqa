@@ -1,0 +1,31 @@
+{
+  "id": 101,
+  "slug": "residence-les-pins-f4",
+  "description": "Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence... Long textual description of the residence...",
+  "transaction_type": "RENT",
+  "appartement_type" : "F4",
+  "price": 50000,
+  "rent_unit": "MONTH",
+  "wilaya": "Alger",
+  "address": "123 Main Street",
+  "area_m2": 125,
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "images": [
+    "/images/dummyPropertyImages/image1.jpg",
+    "/images/dummyPropertyImages/image2.jpg",
+    "/images/dummyPropertyImages/image3.jpg",
+    "/images/dummyPropertyImages/image4.jpg",
+    "/images/dummyPropertyImages/image5.jpg",
+    "/images/dummyPropertyImages/image6.jpg"
+  ],
+  "status": "PENDING",
+  "verification_status": "PARTIAL",
+  "documents_summary": {
+    "total": 4,
+    "accepted": 1,
+    "rejected": 1,
+    "pending": 2
+  }
+}
+

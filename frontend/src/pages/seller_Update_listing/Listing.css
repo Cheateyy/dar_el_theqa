@@ -1,0 +1,511 @@
+.seller-update-Listing {
+    padding-left: 5%;
+    padding-right: 5%;
+    display: flex;
+    flex-direction: row;
+}
+
+
+.seller-update-listing-card {
+    border-radius: 12px;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 -4px 16px rgba(0, 0, 0, 0.10),
+        6px 0 20px rgba(0, 0, 0, 0.12),
+        -6px 0 20px rgba(0, 0, 0, 0.12);
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
+    padding: 2rem;
+}
+
+.seller-update-upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.seller-update-instructions h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.seller-update-instructions p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.seller-update-add-image button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: #0E4466;
+    color: #ffffff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.seller-update-add-image button:hover {
+    background-color: #45a049;
+}
+
+.seller-update-listing-images {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.seller-update-listing-item {
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seller-update-listing-item label {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.seller-update-listing-item input[type="text"] {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+
+.seller-update-image-preview {
+    position: relative;
+    height: 10%;
+    border-radius: 10px;
+    display: flex;
+    justify-content: start;
+    overflow: hidden;
+    background-color: #fff;
+    transition: border-color 0.3s;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    align-items: center;
+    padding: 0.6rem;
+}
+
+.seller-update-image-preview img {
+    width: 15%;
+    height: auto;
+    margin-left: 5%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+
+.seller-update-remove-image {
+    position: absolute;
+    top: 40%;
+    right: 5%;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #757575;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 18px;
+    text-align: center;
+    padding: 0;
+    transition: background 0.3s;
+}
+
+
+.seller-update-listing-description {
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #fff;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 -4px 16px rgba(0, 0, 0, 0.10),
+        6px 0 20px rgba(0, 0, 0, 0.12),
+        -6px 0 20px rgba(0, 0, 0, 0.12);
+
+    font-family: 'Arial', sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.seller-update-listing-description h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.seller-update-listing-description input,
+.seller-update-listing-description textarea {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    background: #fafafa;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.seller-update-listing-description input:focus,
+.seller-update-listing-description textarea:focus {
+    border-color: #0E4466;
+    box-shadow: 0 0 0 2px rgba(14, 68, 102, 0.15);
+}
+
+.seller-update-listing-legal-documents {
+    margin-top: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+    padding: 2rem;
+    font-family: 'Roboto', sans-serif;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.seller-update-listing-legal-documents h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    margin-top: 0;
+}
+
+.seller-update-isting-legal-documents ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.seller-update-listing-legal-doc-item a {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.15);
+    background-color: #ffffff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.seller-update-listing-legal-doc-item a:hover {
+    background-color: #e6f0ff;
+    transform: translateX(3px);
+}
+
+.seller-update-listing-doc-note-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 4px;
+    box-sizing: border-box;
+}
+
+.seller-update-listing-doc-note-input:focus {
+    border-color: #0F405E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(15, 64, 94, 0.2);
+}
+
+.seller-update-listing-doc-note-input::placeholder {
+    color: #888;
+    font-style: italic;
+}
+
+
+.seller-update-infoBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.seller-update-leftListingSection {
+    width: 70%;
+}
+
+
+.seller-update-addDocument {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s, transform 0.2s;
+    position: relative;
+
+}
+
+
+.seller-update-docHeader {
+    display: flex;
+    flex-direction: row;
+    gap: 1%;
+    align-items: center;
+}
+
+.seller-update-docHeader img {
+    display: flex;
+    align-items: center;
+}
+
+.seller-update-upperLegalDoc {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seller-update-sellerListingAddUpdateBTNS {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.seller-update-rightListingSection {
+    width: 30%;
+    margin-left: 1%;
+    border-radius: 12px;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 -4px 16px rgba(0, 0, 0, 0.10),
+        6px 0 20px rgba(0, 0, 0, 0.12),
+        -6px 0 20px rgba(0, 0, 0, 0.12);
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
+    padding: 2rem;
+}
+
+
+.seller-update-seller-updateButtons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.seller-updateButtons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.seller-update-InfoSection h1 {
+    font-style: 'Roboto', sans-serif;
+    margin: 15px 0 10px;
+    color: #333;
+}
+
+.seller-update-fieldGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.seller-update-fieldGroup label {
+    margin-top: 1;
+    margin-bottom: 6px;
+}
+
+.seller-update-fieldGroup input {
+    margin-top: 2%;
+    padding: 5% 5%;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.seller-update-fieldGroup input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.seller-update-additionalFields {
+    margin-top: 2%;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.seller-update-saveButton {
+    background-color: #0E4466;
+    color: white;
+    padding: 5%;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.seller-update-savebtn {
+    display: flex;
+    justify-content: center;
+}
+
+.seller-update-InfoSection label {
+    font-family: 'Roboto', sans-serif;
+}
+
+.seller-update-edit-rightListingSection {
+    margin-left: 2%;
+}
+
+.seller-updateButtons{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.seller-updateButtons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.seller-update-statusWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.seller-update-statusBadge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background-color: #e7e7e7;
+    color: #374151;
+}
+
+.seller-update-status-approved {
+    background-color: #ecfeef;
+    color: #15803d;
+}
+
+.seller-update-status-approved-pending {
+    background-color: #e5efff;
+    color: #0f405e;
+}
+
+.seller-update-status-pending {
+    background-color: #fff2d6;
+    color: #b45309;
+}
+
+.seller-update-status-inactive {
+    background-color: #e7e7e7;
+    color: #4b5563;
+}
+
+.seller-update-status-paused {
+    background-color: #e0e7ff;
+    color: #312e81;
+}
+
+.seller-update-status-rented {
+    background-color: #e0f7f4;
+    color: #0f766e;
+}
+
+.seller-update-status-deleted {
+    background-color: #ffe0e0;
+    color: #b91c1c;
+}
+
+.seller-update-statusNote {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+
+
+@media (max-width: 1600px) {
+    .seller-update-Listing {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .seller-update-leftListingSection {
+        width: 100%;
+    }
+
+    .seller-update-rightListingSection {
+        width: 100%;
+    }
+
+    .seller-update-rightListingSection {
+        margin-top: 2%;
+        border-radius: 12px;
+        padding: 0rem;
+    }
+
+    .seller-update-listing-legal-documents {
+        padding: 1.2rem;
+    }
+
+    .seller-update-listing-legal-documents h3 {
+        padding: 0.5rem;
+        font-size: 1.9rem;
+    }
+
+    .seller-update-InfoSection{
+        padding: 2%;
+    }
+
+    .seller-update-InfoSection h1{
+        font-size: 1.8rem;
+    }
+
+    .seller-update-savebtn{
+        margin-bottom: 5%;
+    }
+
+
+}
+
+
+@media (max-width: 800px) {
+    .seller-update-remove-image {
+        top: 20%;
+    }
+
+    .seller-update-listing-legal-documents ul{
+        padding: 1rem;
+    }
+
+    .seller-update-docHeader{
+        gap: 3%;
+    }
+
+
+
+
+}

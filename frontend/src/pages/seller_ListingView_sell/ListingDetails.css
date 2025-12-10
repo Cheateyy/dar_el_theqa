@@ -1,0 +1,637 @@
+.seller-sell-ListingDetails {
+  display: flex;
+  flex-direction: row;
+  padding-left: 5%;
+  padding-right: 8%;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+  margin-top: 1%;
+}
+
+.seller-sell-listingLeft {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seller-sell-imageScroller {
+  width: 90%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding-top: 1.5rem;
+  padding-bottom: 0.7rem;
+  padding-left: 0rem;
+  overflow: hidden;
+}
+
+.seller-sell-ListingInfo {
+  width: 87%;
+  margin-top: 1rem;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.seller-sell-ListingInfo h1 {
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 0.1rem;
+}
+
+.seller-sell-ListingInfo h1 span {
+  padding: 0.3rem;
+}
+
+.seller-sell-ListingInfo p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.seller-sell-moreListings.card {
+  width: 87%;
+  margin: 1.2rem auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.seller-sell-moreListings.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.seller-sell-moreListingsCards {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.seller-sell-listingCard {
+  flex: 0 0 32%;
+  height: 150px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 3px 6px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.seller-sell-listingCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
+}
+
+.seller-sell-listingCard-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.seller-sell-listingCard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.seller-sell-listingCard-header h3 {
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  color: #0f0f0f;
+}
+
+.seller-status-badge {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background-color: #e7e7e7;
+  color: #555;
+}
+
+.seller-status-approved {
+  background-color: #ecfeef;
+  color: #166534;
+}
+
+.seller-status-approved-pending {
+  background-color: #e5efff;
+  color: #0f405e;
+}
+
+.seller-status-pending {
+  background-color: #fff2d6;
+  color: #b45309;
+}
+
+.seller-status-rejected {
+  background-color: #ffe0e0;
+  color: #b91c1c;
+}
+
+.seller-status-inactive {
+  background-color: #e7e7e7;
+  color: #4b5563;
+}
+
+.seller-sell-listingCard-meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.seller-sell-listingCard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #0f405e;
+  font-weight: 600;
+}
+
+.seller-sell-listingCard-reason {
+  font-size: 0.8rem;
+  color: #b91c1c;
+  margin: 0;
+}
+
+.seller-sell-listingRight.card {
+  width: 40%;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 10px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.seller-sell-upper {
+  display: flex;
+  flex-direction: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.seller-sell-upperRight h3 {
+  font-size: 1.2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.seller-sell-upperRight h3 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+}
+
+.seller-sell-upperLeft .seller-sell-likeButton {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.seller-sell-upperLeft .seller-sell-likeButton.liked {
+  color: red;
+}
+
+.seller-sell-upperLeft .seller-sell-likeButton:hover {
+  transform: scale(1.2);
+}
+
+.seller-sell-listingPrice {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.seller-sell-priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.seller-sell-listingPrice h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.seller-sell-statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.seller-sell-statusBadge.approved {
+  background-color: #ecfeef;
+  color: #0f8c3a;
+  border-color: #b4f1c2;
+}
+
+.seller-sell-statusBadge.pending {
+  background-color: #fff4e5;
+  color: #b76100;
+  border-color: #ffd6a8;
+}
+
+.seller-sell-statusBadge.rejected {
+  background-color: #ffe0e0;
+  color: #c20d0d;
+  border-color: #ffb3b3;
+}
+
+.seller-sell-listingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.seller-sell-infoCard {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 4px 4px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.seller-sell-infoCard h3 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.3rem;
+}
+
+.seller-sell-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  color: #555;
+  margin: 0;
+}
+
+.seller-sell-showInterest {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.seller-sell-interestButton {
+  margin-top: 10%;
+  width: 70%;
+  padding: 1rem;
+  background-color: #0F405E;
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-sell-interestButton:hover {
+  background-color: #0056b3;
+}
+
+.seller-sell-listingRight.card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.seller-sell-listingRight.card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.seller-sell-listingRight.card h1,
+.seller-sell-listingRight.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #222;
+  margin: 0.2rem 0;
+}
+
+.seller-sell-listingRight.card p,
+.seller-sell-listingRight.card span,
+.seller-sell-listingRight.card .seller-sell-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.seller-sell-certifiedWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.seller-sell-certifiedTooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #ffffff;
+  color: #09ff00;
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.seller-sell-certifiedWrapper:hover .seller-sell-certifiedTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.seller-sell-modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem; 
+}
+
+.seller-sell-modalContent {
+  background: #fff;
+  padding: 2.5rem 3rem;
+  border-radius: 15px; 
+  width: 60%;
+  max-width: 95%;
+  box-shadow: 5px 9px 12px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.seller-sell-modalContent h2 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+.seller-sell-modalContent p {
+  margin: 0.2rem 0 1rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.seller-sell-modalContent label {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.seller-sell-modalContent input {
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.seller-sell-modalLinks {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column-reverse;
+  justify-content:space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.seller-sell-modalLinks a {
+  color: #0F405E;
+  text-decoration: none;
+}
+
+.seller-sell-modalLinks p {
+  margin: 0;
+}
+
+.seller-sell-modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.seller-sell-cancelButton {
+  padding: 1rem 3rem;
+  background-color: #ffffff;
+  color: #0F405E;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: 1px solid grey;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-sell-cancelButton:hover {
+  background: #aaa;
+}
+
+.seller-sell-loginButton {
+  padding: 1rem 3rem;
+  background-color: #0F405E;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-sell-loginButton:hover {
+  background-color: #0056b3;
+}
+
+.phoneMoreList{
+  display: none;
+}
+
+.LeftSectMoreListings{
+  display: flex;
+  width: 100%;
+}
+
+
+.seller-sell-upperRight h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+
+
+
+.seller-sell-updateButtons {
+  display: flex;
+  justify-content: end;
+  gap: 10px; 
+}
+
+.seller-sell-updateButtons button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.seller-sell-updateButtons button img {
+  width: 60px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s; 
+}
+
+.seller-sell-updateButtons button:hover img {
+  transform: scale(1.1); 
+}
+
+.seller-sell-UpperRightSection{
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1600px) {
+
+  .seller-sell-ListingDetails {
+    flex-direction: column;
+    padding-left: 2%;
+    padding-right: 2%;
+  }
+
+  .seller-sell-listingLeft,
+  .seller-sell-listingRight.card {
+    width: 100%;
+  }
+
+  .seller-sell-listingLeft {
+    align-items: center;
+  }
+
+  .seller-sell-imageScroller {
+    width: 95%;
+  }
+
+  .seller-sell-ListingInfo {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .seller-sell-moreListings.card {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .seller-sell-moreListingsCards {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .seller-sell-listingCard {
+    flex: 0 0 100%;
+    height: 120px;
+  }
+
+  .seller-sell-listingRight.card {
+    position: relative;
+    max-height: none;
+    overflow: visible;
+    padding: 1rem;
+    margin-top: 2rem;
+  }
+
+  .seller-sell-listingRight.card h1,
+  .seller-sell-listingRight.card h2,
+  .seller-sell-listingRight.card p {
+    font-size: 1rem;
+  }
+
+  .seller-sell-interestButton {
+    width: 90%;
+  }
+
+  .phoneMoreList{
+    display: block;
+    margin-top: 5%;
+  }
+
+  .LeftSectMoreListings{
+    display: none;
+  }
+
+  .seller-sell-UpperRightSection{
+    align-items: end;
+    justify-content: end;
+  }
+
+  .seller-sell-upper{
+    display: flex;
+    justify-self: start;
+    align-self: flex-start;
+  }
+
+  .seller-sell-listingPrice{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+}
+

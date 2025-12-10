@@ -1,0 +1,758 @@
+.seller-rent-reviewsSection.cardWrapper {
+  width: 87%;
+  margin: 1.5rem auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.seller-rent-reviewsSection.cardWrapper h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.seller-rent-reviewsCardsContainer {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.seller-rent-reviewCard {
+  flex: 0 0 32%;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 3px 6px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seller-rent-reviewCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
+}
+
+.seller-rent-reviewContent {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+  width: 90%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.seller-rent-reviewContent h3 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.3rem;
+}
+
+.seller-rent-reviewContent p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.seller-rent-reviewDate {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.seller-rent-reviewStars {
+  color: #FFD700;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+
+.seller-rent-submitReviewWrapper.cardWrapper {
+  width: 87%;
+  margin: 0.5rem auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+}
+
+.seller-rent-submitReviewWrapper h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #1a1919;
+  margin-bottom: 1rem;
+}
+
+.seller-rent-submitReviewContent {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.seller-rent-reviewInput {
+  flex: 2;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.seller-rent-reviewInput:focus {
+  border-color: #0F405E;
+  box-shadow: 0 0 5px rgba(15, 64, 94, 0.3);
+}
+
+.seller-rent-reviewStarsInput {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.seller-rent-ListingDetails {
+  display: flex;
+  flex-direction: row;
+  padding-left: 5%;
+  padding-right: 8%;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+  margin-top: 1%;
+}
+
+.seller-rent-listingLeft {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seller-rent-imageScroller {
+  width: 90%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding-top: 1.5rem;
+  padding-bottom: 0.7rem;
+  padding-left: 0rem;
+  overflow: hidden;
+}
+
+.seller-rent-ListingInfo {
+  width: 87%;
+  margin-top: 1rem;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.seller-rent-ListingInfo h1 {
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 0.1rem;
+}
+
+.seller-rent-ListingInfo h1 span {
+  padding: 0.3rem;
+}
+
+.seller-rent-ListingInfo p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+
+.seller-rent-moreListings.card {
+  width: 87%;
+  margin: 1.2rem auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.seller-rent-moreListings.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.seller-rent-moreListingsCards {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.seller-rent-listingCard {
+  flex: 0 0 32%;
+  height: 150px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 3px 6px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.seller-rent-listingCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+.seller-rent-listingRight.card {
+  width: 40%;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 5px 9px 12px 10px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  position: sticky;
+  top: 2rem;
+  max-height: calc(105vh);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.seller-rent-upper {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.seller-rent-upperRight{
+  display: flex;
+  flex-direction: column;
+
+}
+
+.seller-rent-upperRight h2 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.seller-rent-upperRight h3 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #555;
+}
+
+.seller-rent-upperLeft .seller-rent-likeButton {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.seller-rent-upperLeft .seller-rent-likeButton.liked {
+  color: red;
+}
+
+.seller-rent-upperLeft .seller-rent-likeButton:hover {
+  transform: scale(1.2);
+}
+
+.seller-rent-listingPrice h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  font-size: 3rem;
+}
+
+.seller-rent-listingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.seller-rent-infoCard {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 4px 4px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.infoCard h3 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.3rem;
+}
+
+.seller-rent-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  color: #555;
+  margin: 0;
+}
+
+.seller-rent-showInterest {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  margin-top: -0.5rem;
+}
+
+.seller-rent-interestButton {
+  margin-top: 10%;
+  width: 70%;
+  padding: 1rem;
+  background-color: #0F405E;
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-rent-interestButton:hover {
+  background-color: #0056b3;
+}
+
+.seller-rent-listingRight.card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.seller-rent-listingRight.card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.seller-rent-listingRight.card h1,
+.seller-rent-listingRight.card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #222;
+  margin: 0.2rem 0;
+}
+
+.seller-rent-listingRight.card p,
+.seller-rent-listingRight.card span,
+.seller-rent-listingRight.card .seller-rent-infoCard p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.seller-rent-certifiedWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.seller-rent-certifiedTooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #ffffff;
+  color: #09ff00;
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.seller-rent-certifiedWrapper:hover .seller-rent-certifiedTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.seller-rent-modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.seller-rent-modalContent {
+  background: #fff;
+  padding: 2.5rem 3rem;
+  border-radius: 15px;
+  width: 60%;
+  max-width: 95%;
+  box-shadow: 5px 9px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+
+  gap: 1rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.seller-rent-modalContent h2 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+.seller-rent-modalContent p {
+  margin: 0.2rem 0 1rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.seller-rent-modalContent label {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.seller-rent-modalContent input {
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.seller-rent-modalLinks {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.seller-rent-modalLinks a {
+  color: #0F405E;
+  text-decoration: none;
+}
+
+.seller-rent-modalLinks p {
+  margin: 0;
+}
+
+.seller-rent-modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.seller-rent-cancelButton {
+  padding: 1rem 3rem 1rem 3rem;
+  background-color: #ffffff;
+  color: #0F405E;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: 1px solid grey;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-rent-cancelButton:hover {
+  background: #aaa;
+}
+
+.seller-rent-loginButton {
+  padding: 1rem 3rem 1rem 3rem;
+  background-color: #0F405E;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-rent-loginButton:hover {
+  background-color: #0056b3;
+}
+
+
+.seller-rent-stars {
+  margin-top: 0.5rem;
+  color: #FFD700;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+
+.seller-rent-starsSelect {
+  display: flex;
+  gap: 0.3rem;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.seller-rent-star {
+  color: #ccc;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.seller-rent-star.filled {
+  color: #FFD700;
+}
+
+.seller-rent-star:hover {
+  transform: scale(1.2);
+}
+
+.seller-rent-submitReviewButton {
+  margin-top: 1rem;
+  width: 70%;
+  padding: 1rem;
+  background-color: #0F405E;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.seller-rent-submitReviewButton:hover {
+  background-color: #0056b3;
+}
+
+.LeftSectionReviewMoreListings {
+  width: 100%;
+}
+
+.RightSectionReviewMoreListings {
+  display: none;
+}
+
+
+.seller-rent-legal-documents {
+  width: 90.5%;
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 4px 6px 12px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.seller-rent-legal-documents h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+.seller-rent-legal-documents ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.seller-rent-legal-doc-item a {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  box-shadow: 5px 5px 10px 5px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.seller-rent-UpperRightSection{
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1600px) {
+
+  .seller-rent-imageScroller {
+    width: 100%;
+  }
+
+  .LeftSectionReviewMoreListings {
+    display: none;
+  }
+
+  .seller-rent-listingLeft {
+    width: 100%;
+    align-items: center;
+  }
+
+  .RightSectionReviewMoreListings {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .seller-rent-reviewsCardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .seller-rent-reviewsSection.cardWrapper {
+    padding: 5%;
+  }
+
+  .seller-rent-reviewCard {
+    flex: 0 0 100%;
+    width: 100%;
+    min-height: 160px;
+  }
+
+  .seller-rent-submitReviewWrapper.cardWrapper {
+    padding: 5%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .seller-rent-moreListingsCards {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .seller-rent-ListingDetails {
+    flex-direction: column;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+
+  .seller-rent-listingLeft,
+  .seller-rent-listingRight.card {
+    width: 100%;
+  }
+
+  .seller-rent-ListingInfo,
+  .seller-rent-moreListings.card {
+    width: 95%;
+    padding: 0.5rem;
+  }
+
+  .seller-rent-moreListings.card h2 {
+    font-size: 01rem;
+  }
+
+  .seller-rent-listingCard {
+    flex: 0 0 100%;
+    height: 120px;
+  }
+
+  .seller-rent-listingRight.card {
+    position: relative;
+    max-height: none;
+    overflow: visible;
+    padding: 1rem;
+  }
+
+  .seller-rent-interestButton {
+    width: 90%;
+  }
+
+  .seller-rent-priceRow,
+  .seller-rent-statusRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seller-rent-reviewStars {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+    pointer-events: auto;
+  }
+
+  .seller-rent-star {
+    font-size: 1.3rem;
+  }
+
+  .seller-rent-legal-documents {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .seller-rent-legal-doc-item a {
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+
+.seller-rent-updateButtons {
+  display: flex;
+  justify-content: end;
+  gap: 10px; 
+}
+
+.seller-rent-updateButtons button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.seller-rent-updateButtons button img {
+  width: 60px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s; 
+}
+
+.seller-rent-updateButtons button:hover img {
+  transform: scale(1.1); 
+}
+
