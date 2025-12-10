@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
-    MyListingsView, ListingPauseView, ListingDocumentUpdateView,
+    MyListingsView, ListingPauseView, ListingDocumentUpdateView, PropertyTypeChoicesView,
     AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed, ListingViewDocuments
 )
 
@@ -24,5 +24,8 @@ urlpatterns = [
 
     #Gets you the id's documents
     path('listings/documents/<int:id>/fetch', ListingViewDocuments.as_view(), name="get-listing-document"),
+
+    # Choices
+    path('choices/property-types/', PropertyTypeChoicesView.as_view(), name='property-type-choices'),
 
 ]

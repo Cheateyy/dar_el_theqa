@@ -177,6 +177,31 @@ class ListingDocumentUpdateView(views.APIView):
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+class PropertyTypeChoicesView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    PROPERTY_TYPES = [
+        {"value": "apartment", "label": "Appartement"},
+        {"value": "villa", "label": "Villa"},
+        {"value": "studio", "label": "Studio"},
+        {"value": "land", "label": "Terrain"},
+        {"value": "office", "label": "Bureau"},
+    ]
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="PropertyTypeChoice",
+            fields={
+                "value": serializers.CharField(),
+                "label": serializers.CharField(),
+            },
+            many=True,
+        )
+    )
+    def get(self, request):
+        return Response(self.PROPERTY_TYPES)
+
 # Admin Views
 class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
