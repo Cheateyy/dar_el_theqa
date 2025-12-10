@@ -156,3 +156,7 @@ body {
   color: #333333;
   min-height: 100%;
 }
+
+@source inline("bg-purple-500");
+@source inline("bg-red-500");
+@source inline("bg-green-500");

@@ -1,8 +1,11 @@
 import { Combobox } from "@/components/common/Combobox";
 import addSvg from "@/assets/icons/add.svg"
 import { ListingGrid } from "@/components/common/ListingGrid";
+import { useListings } from "../buyer/context/ListingsContext";
 
 export default function MyListings() {
+    const { listings } = useListings()
+
     return (
         <div className="px-20">
             <section>
@@ -14,7 +17,7 @@ export default function MyListings() {
                     </div>
                 </div>
             </section>
-            <ListingGrid listings={[]} />
+            <ListingGrid listings={listings} card_type="seller" />
         </div>
     )
 }

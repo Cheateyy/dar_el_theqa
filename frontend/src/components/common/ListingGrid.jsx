@@ -1,23 +1,33 @@
 import { useEffect, useState } from "react";
-import { ListingCard } from "./ListingCard"
+import { FeedListingCard } from "./FeedListingCard"
 import { CustomPagination } from "@/components/common/Pagination"
+import { SellerListingCard } from "./SellerListingCard";
 
 /**
  * 
  * @param {Object} props
  * @param {Listing[]} props.listings
  * @param {StateControl<int>} props.page_control
+ * @param {"feed" | "seller"} card_type
  */
-export function ListingGrid({ listings, page_control }) {
+export function ListingGrid({ listings, page_control, card_type = 'feed' }) {
     if (page_control) {
-        return <ControlledListingGrid listings={listings} page_control={page_control} />
+        return <ControlledListingGrid listings={listings} page_control={page_control}
+            card_type={card_type} />
     }
     else {
-        return <UncontrolledListingGrid listings={listings} />
+        return <UncontrolledListingGrid listings={listings} card_type={card_type} />
     }
 }
 
-function ControlledListingGrid({ listings, page_control }) {
+/**
+ * 
+ * @param {Object} props
+ * @param {Listing[]} props.listings
+ * @param {StateControl<int>} props.page_control
+ * @param {"feed" | "seller"} card_type
+ */
+function ControlledListingGrid({ listings, page_control, card_type }) {
     const [page, set_page] = page_control
     useEffect(() => {
         console.log("Page: ", page)
@@ -26,6 +36,8 @@ function ControlledListingGrid({ listings, page_control }) {
     if (!listings) {
         return null;
     }
+    const ListingCard = card_type == "feed" ? FeedListingCard : SellerListingCard;
+
     return (
         <div className="mt-8">
             {listings.length == 0 ?
@@ -41,7 +53,13 @@ function ControlledListingGrid({ listings, page_control }) {
     )
 }
 
-function UncontrolledListingGrid({ listings }) {
+/**
+ * 
+ * @param {Object} props
+ * @param {Listing[]} props.listings
+ * @param {"feed" | "seller"} card_type
+ */
+function UncontrolledListingGrid({ listings, card_type }) {
     const [page, set_page] = useState(1)
     useEffect(() => {
         console.log("Page: ", page)
@@ -50,6 +68,8 @@ function UncontrolledListingGrid({ listings }) {
     if (!listings) {
         return null;
     }
+    const ListingCard = card_type == "feed" ? FeedListingCard : SellerListingCard;
+
     return (
         <div className="mt-8">
             {listings.length == 0 ?
