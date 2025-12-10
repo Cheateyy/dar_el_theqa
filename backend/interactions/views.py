@@ -1,7 +1,8 @@
+from backend.core import serializers
 from rest_framework import generics, views, permissions, status
 from rest_framework.response import Response
 from .models import Favorite, Lead, Review
-from .serializers import FavoriteSerializer, LeadSerializer, ReviewSerializer
+from .serializers import FavoriteSerializer, LeadSerializer, ReviewSerializer, OwnerLeadListSerializer, LeadDetailSerializer
 from listings.models import Listing
 from listings.serializers import ListingSerializer
 
@@ -34,6 +35,34 @@ class LeadCreateView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
         # Email logic would go here
 
+# gets all the generic info about all the account's leads
+class OwnerLeadPagination(PageNumberPagination):
+    page_size = 10  # default items per page
+    page_size_query_param = 'page_size'
+
+# ----------------------------
+class OwnerLeadListView(generics.ListAPIView):
+    serializer_class = OwnerLeadListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = OwnerLeadPagination
+
+    def get_queryset(self):
+        # Only leads for listings owned by the current user
+        return Lead.objects.filter(listing__user=self.request.user).order_by('-created_at')
+
+# ----------------------------
+class LeadDetailView(generics.RetrieveAPIView):
+    serializer_class = LeadDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_url_kwarg = 'lead_id'
+
+    def get_queryset(self):
+        # Only allow leads for listings owned by current user
+        return Lead.objects.filter(listing__user=self.request.user)
+
+
+
+
 class ReviewCreateView(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -54,4 +83,24 @@ class ReviewListView(generics.ListAPIView):
 
     def get_queryset(self):
         listing_id = self.kwargs.get('id')
+        return Review.objects.filter(listing_id=listing_id)[0:3] ## just like setting the limit to 3 "as garamida requested"
+    
+class AdminReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        listing_id = self.kwargs.get('id')
         return Review.objects.filter(listing_id=listing_id)
+    
+    
+    ##(10.7 deletes and returns as the contract)
+class AdminDeleteReviewView(generics.DestroyAPIView):
+    queryset = Review.objects.all()
+    permission_classes = [permissions.IsAdminUser]
+    lookup_url_kwarg = "review_id"
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"review_id":kwargs["review_id"],"status": "Deleted"}, status=status.HTTP_200_OK)

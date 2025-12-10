@@ -87,6 +87,21 @@ class ListingPauseView(views.APIView):
             return Response({"status": "success", "new_status": listing.status})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
+class ListingActivateView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, id):
+        try:
+            listing = Listing.objects.get(id=id, owner=request.user)
+            listing.status = Listing.Status.APPROVED
+            listing.save()
+            return Response(status=200)
+        except Listing.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 class ListingDocumentUpdateView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -108,6 +123,13 @@ class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = [permissions.IsAdminUser]
+
+#10.2
+class AdminListingViewDetailed(generics.RetrieveAPIView):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.IsAdminUser]
+    lookup_field = "id"
 
 class AdminListingApproveView(views.APIView):
     permission_classes = [permissions.IsAdminUser]
@@ -133,3 +155,12 @@ class AdminListingRejectView(views.APIView):
             return Response({"status": "REJECTED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+#used by both admins and users
+class ListingViewDocuments(generics.ListAPIView):
+    serializer_class = ListingDocumentSerializer
+    permission_classes = [permissions.AllowAny]   # or IsAdminUser 3lahseb.. but notyet
+
+    def get_queryset(self):
+        listing_id = self.kwargs.get('id')
+        return ListingDocument.objects.filter(listing_id=listing_id)
