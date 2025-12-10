@@ -13,7 +13,6 @@ import removeIcon from "../assets/icons/removeimage.png";
 
 const DRAFT_KEY = "createListingDraft";
 
-
 const loadStepData = () => {
   const raw = localStorage.getItem(DRAFT_KEY);
   let step1 = {};
@@ -37,7 +36,6 @@ const loadStepData = () => {
 function AddListingPage3() {
   const navigate = useNavigate();
   const { auth } = useAuth();
-
 
   useEffect(() => {
     if (!auth.isAuthenticated) navigate("/login");
