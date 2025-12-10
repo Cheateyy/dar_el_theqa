@@ -1,6 +1,6 @@
 import ImageSection from "./ImageSection.jsx";
 import DescriptionSection from "../../components/common/DescriptionSection/DescriptionSection.jsx";
-import MoreListings from "./MoreListings.jsx";
+import ReviewsSection from "../../components/common/ReviewSection/ReviewSection.jsx";
 import LegalDocumentsSection from "./LegalDocumentsSection.jsx";
 
 export default function LeftSection({
@@ -10,8 +10,10 @@ export default function LeftSection({
   description,
   title,
   verificationStatus,
+  reviews = [],
 }) {
   const safeDocuments = Array.isArray(documents) ? documents : [];
+  const safeReviews = Array.isArray(reviews) ? reviews : [];
 
   return (
     <div className="seller-sell-listingLeft">
@@ -26,6 +28,10 @@ export default function LeftSection({
       />
 
       <LegalDocumentsSection documents={safeDocuments} />
+
+      <div className="LeftSectionReviewMoreListings">
+        <ReviewsSection reviews={safeReviews} limit={3} allow_Delete={false} />
+      </div>
 
     </div>
   );

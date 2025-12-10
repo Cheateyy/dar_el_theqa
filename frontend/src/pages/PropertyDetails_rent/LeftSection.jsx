@@ -11,6 +11,9 @@ export default function LeftSection({
   description,
   reviews,
   verificationStatus,
+  onSubmitReview,
+  isSubmittingReview = false,
+  similarListings = [],
 }) {
   return (
     <div className="rent-listingLeft">
@@ -23,8 +26,8 @@ export default function LeftSection({
       />
       <div className="LeftSectionReviewMoreListings">
         <ReviewsSection reviews={reviews} limit={3} allow_Delete={false} /> 
-        <AddReview />
-        <MoreListings />
+        <AddReview onSubmit={onSubmitReview} isSubmitting={isSubmittingReview} />
+        <MoreListings listings={similarListings} />
       </div>
     </div>
   );
