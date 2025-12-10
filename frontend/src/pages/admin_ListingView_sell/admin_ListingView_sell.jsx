@@ -9,8 +9,10 @@ import status_icon from "../../assets/icons/certified_button.png";
 import document_icon from "../../assets/images/legal_doc.png";
 
 import { 
-    getAdminListingDetails, 
-    getAdminListingDocuments 
+    getAdminListingDetails,
+    getListingDocuments,
+    getAdminListingTopReviews,
+    deleteAdminReview,
 } from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
@@ -22,6 +24,7 @@ export default function AdmingListing() {
     const [listing, setListing] = useState(null);
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [reviews, setReviews] = useState([]);
 
     const handleLoginClick = () => setShowLogin(true);
     const handleCloseModal = () => setShowLogin(false);
@@ -29,29 +32,42 @@ export default function AdmingListing() {
     useEffect(() => {
         async function fetchListing() {
             try {
-                const listingData = await getAdminListingDetails(listingId);
-                const docsData = await getAdminListingDocuments(listingId);
+                const [listingData, docsData, reviewsData] = await Promise.all([
+                    getAdminListingDetails(listingId),
+                    getListingDocuments(listingId),
+                    getAdminListingTopReviews(listingId),
+                ]);
 
                 setListing(listingData);
 
-                // 🔥 Convert API documents into usable format
-                const formattedDocs = docsData.map((doc) => ({
-                    name: doc.files?.[0]?.filename || doc.label || "Document",
-                    url: doc.files?.[0]?.url || "#",
+                const formattedDocs = (docsData || []).map((doc) => ({
+                    name: doc.document_type || doc.label || doc.type || "Document",
+                    url: doc.file || doc.url || "#",
                     icon: document_icon,
                     status: doc.status,
-                    docId: doc.doc_id,
-                    reviewComment: doc.review_comment || doc.comment || "",
+                    docId: doc.id,
+                    reviewComment: doc.admin_note || doc.comment || "",
                 }));
 
                 setDocuments(formattedDocs);
+                setReviews(Array.isArray(reviewsData) ? reviewsData : []);
 
             } catch (error) {
                 console.error("Failed to load admin listing:", error);
+                setReviews([]);
             } finally {
                 setLoading(false);
             }
         }
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            await deleteAdminReview(reviewId);
+            setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+        } catch (error) {
+            console.error("Failed to delete review:", error);
+        }
+    };
+
 
         fetchListing();
     }, [listingId]);
@@ -85,6 +101,8 @@ export default function AdmingListing() {
                     description={listing.description}
                     documents={documents}
                     verificationStatus={listing.verification_status || listing.status}
+                    reviews={reviews}
+                    onDeleteReview={handleDeleteReview}
                 />
 
                 <RightSection

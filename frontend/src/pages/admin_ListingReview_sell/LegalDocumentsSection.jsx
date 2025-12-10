@@ -57,7 +57,11 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
               <input
                 placeholder="Reviewer notes"
                 type="text"
-                value={notes[doc.docId] || ""}
+                value={
+                  Object.prototype.hasOwnProperty.call(notes, doc.docId)
+                    ? notes[doc.docId]
+                    : (doc.reviewComment || "")
+                }
                 onChange={(e) => handleNoteChange(doc.docId, e.target.value)}
               />
             </div>

@@ -1,7 +1,6 @@
 import UpperSection from "./UpperSection.jsx";
 import PriceSection from "./PriceSection.jsx";
 import InfoCards from "./InfoCards.jsx";
-import ReviewsSection from "../../components/common/ReviewSection/ReviewSection.jsx";
 
 export default function RightSection({
     address,
@@ -32,9 +31,6 @@ export default function RightSection({
                 bedrooms={bedrooms}
                 bathrooms={bathrooms}
             />
-            <div className="RightSectionReviewMoreListings">
-                <ReviewsSection allow_Delete={true} />
-            </div>
         </div>
     );
 }

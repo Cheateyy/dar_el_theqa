@@ -15,18 +15,95 @@ import certifiedIcon from "../../assets/icons/certified_button.png";
 
 import "./ListingDetails.css";
 
-import { getListingDetails } from "../../lib/api_3.js";
+import {
+  getListingDetails,
+  getListingReviews,
+  getMyListings,
+  activateSellerListing,
+  pauseSellerListing,
+  deleteSellerListing,
+} from "../../lib/api_3.js";
 
 export default function ListingDetails_rent() {
   const { listingId } = useParams(); 
   const [showLogin, setShowLogin] = useState(false);
 
   const [listing, setListing] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [moreListings, setMoreListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isActivating, setIsActivating] = useState(false);
+  const [isPausing, setIsPausing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const updateListingStatus = (nextStatus) => {
+    setListing((prev) => {
+      if (!prev) return prev;
+      const safeStatus = (nextStatus || prev.listingStatus || "").toUpperCase();
+      return {
+        ...prev,
+        listingStatus: safeStatus,
+      };
+    });
+  };
 
   const handleLoginClick = () => setShowLogin(true);
   const handleCloseModal = () => setShowLogin(false);
+
+  const handleActivateListing = async () => {
+    if (!listingId) return;
+    try {
+      setIsActivating(true);
+      const response = await activateSellerListing(listingId);
+      if (response?.new_status) {
+        updateListingStatus(response.new_status);
+      }
+      window.alert(response?.message || "Listing activated.");
+    } catch (err) {
+      console.error("Failed to activate listing", err);
+      window.alert("Impossible d'activer l'annonce pour le moment.");
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  const handlePauseListing = async () => {
+    if (!listingId) return;
+    try {
+      setIsPausing(true);
+      const response = await pauseSellerListing(listingId, { reason: "OTHER" });
+      if (response?.new_status) {
+        updateListingStatus(response.new_status);
+      }
+      window.alert(response?.message || "Listing paused.");
+    } catch (err) {
+      console.error("Failed to pause listing", err);
+      window.alert("Impossible de mettre l'annonce en pause.");
+    } finally {
+      setIsPausing(false);
+    }
+  };
+
+  const handleDeleteListing = async () => {
+    if (!listingId) return;
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this listing?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteSellerListing(listingId, "SOLD");
+      updateListingStatus("DELETED");
+      window.alert("Listing deleted.");
+    } catch (err) {
+      console.error("Failed to delete listing", err);
+      window.alert("Impossible de supprimer l'annonce.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     let isCancelled = false;
@@ -48,8 +125,14 @@ export default function ListingDetails_rent() {
           address: data.street_address || "No address provided",
           region: data.region || data.city || "Region, Wilaya",
           price: data.price || 0,
-          verificationStatus: data.verification_status || "PARTIAL",
-          listingStatus: (data.verification_status || "PENDING").toUpperCase(),
+          verificationStatus: data.verification_status || data.status || "PARTIAL",
+          listingStatus: (
+            data.status_label ||
+            data.status ||
+            data.rental_status ||
+            data.verification_status ||
+            "PENDING"
+          ).toUpperCase(),
           propertyType: data.property_type || "Apartment",
           area: data.area || data.surface || 0,
           bedrooms: data.bedrooms || data.rooms || 0,
@@ -93,6 +176,78 @@ export default function ListingDetails_rent() {
     };
   }, [listingId]);
 
+  const normalizedStatus = (listing?.listingStatus || "").toUpperCase();
+  const shouldActivateStatus =
+    normalizedStatus === "" ||
+    normalizedStatus === "PAUSED" ||
+    normalizedStatus === "INACTIVE" ||
+    normalizedStatus === "REJECTED" ||
+    normalizedStatus === "PENDING" ||
+    normalizedStatus === "DELETED";
+  const statusActionLabel = shouldActivateStatus ? "Activate" : "Pause";
+  const statusActionHandler = shouldActivateStatus
+    ? handleActivateListing
+    : handlePauseListing;
+  const statusActionLoading = shouldActivateStatus
+    ? isActivating
+    : isPausing;
+
+  useEffect(() => {
+    if (!listingId) {
+      setReviews([]);
+      setMoreListings([]);
+      return;
+    }
+
+    let isCancelled = false;
+
+    async function fetchReviews() {
+      try {
+        const data = await getListingReviews(listingId);
+        if (isCancelled) return;
+        const normalized = Array.isArray(data?.results)
+          ? data.results
+          : Array.isArray(data)
+            ? data
+            : [];
+        setReviews(normalized);
+      } catch (err) {
+        if (!isCancelled) {
+          console.error("Failed to fetch listing reviews", err);
+          setReviews([]);
+        }
+      }
+    }
+
+    async function fetchSellerListings() {
+      try {
+        const data = await getMyListings();
+        if (isCancelled) return;
+        const normalized = Array.isArray(data?.results)
+          ? data.results
+          : Array.isArray(data)
+            ? data
+            : [];
+        const filtered = normalized.filter(
+          (item) => String(item.id) !== String(listingId)
+        );
+        setMoreListings(filtered.slice(0, 3));
+      } catch (err) {
+        if (!isCancelled) {
+          console.error("Failed to fetch seller listings", err);
+          setMoreListings([]);
+        }
+      }
+    }
+
+    fetchReviews();
+    fetchSellerListings();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [listingId]);
+
   return (
     <>
       <nav>
@@ -113,6 +268,8 @@ export default function ListingDetails_rent() {
               title={listing.title}
               description={listing.description}
               verificationStatus={listing.verificationStatus}
+              reviews={reviews}
+              moreListings={moreListings}
             />
             <RightSection
               address={listing.address}
@@ -125,6 +282,11 @@ export default function ListingDetails_rent() {
               bedrooms={listing.bedrooms}
               bathrooms={listing.bathrooms}
               ListingId={listingId}
+              onToggleStatus={statusActionHandler}
+              statusActionLabel={statusActionLabel}
+              isStatusLoading={statusActionLoading}
+              onDeleteListing={handleDeleteListing}
+              isDeletingListing={isDeleting}
             />
           </>
         )}
