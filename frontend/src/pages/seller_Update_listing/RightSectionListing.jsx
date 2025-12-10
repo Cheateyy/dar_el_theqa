@@ -35,7 +35,7 @@ export default function ListingRightSection({
   const {
     wilaya,
     region,
-    street_address,
+    address,
     transaction_type,
     price,
     rent_unit,
@@ -48,13 +48,70 @@ export default function ListingRightSection({
   } = formData;
 
   const wilayaOptions = [
-    { value: "Alger", label: "Alger" },
-    { value: "Batna", label: "Batna" },
-  ];
+  { value: 1, label: "Adrar" },
+  { value: 2, label: "Chlef" },
+  { value: 3, label: "Laghouat" },
+  { value: 4, label: "Oum El Bouaghi" },
+  { value: 5, label: "Batna" },
+  { value: 6, label: "Béjaïa" },
+  { value: 7, label: "Biskra" },
+  { value: 8, label: "Béchar" },
+  { value: 9, label: "Blida" },
+  { value: 10, label: "Bouira" },
+  { value: 11, label: "Tamanrasset" },
+  { value: 12, label: "Tébessa" },
+  { value: 13, label: "Tlemcen" },
+  { value: 14, label: "Tiaret" },
+  { value: 15, label: "Tizi Ouzou" },
+  { value: 16, label: "Alger" },
+  { value: 17, label: "Djelfa" },
+  { value: 18, label: "Jijel" },
+  { value: 19, label: "Sétif" },
+  { value: 20, label: "Saïda" },
+  { value: 21, label: "Skikda" },
+  { value: 22, label: "Sidi Bel Abbès" },
+  { value: 23, label: "Annaba" },
+  { value: 24, label: "Guelma" },
+  { value: 25, label: "Constantine" },
+  { value: 26, label: "Médéa" },
+  { value: 27, label: "Mostaganem" },
+  { value: 28, label: "M’Sila" },
+  { value: 29, label: "Mascara" },
+  { value: 30, label: "Ouargla" },
+  { value: 31, label: "Oran" },
+  { value: 32, label: "El Bayadh" },
+  { value: 33, label: "Illizi" },
+  { value: 34, label: "Bordj Bou Arréridj" },
+  { value: 35, label: "Boumerdès" },
+  { value: 36, label: "El Tarf" },
+  { value: 37, label: "Tindouf" },
+  { value: 38, label: "Tissemsilt" },
+  { value: 39, label: "El Oued" },
+  { value: 40, label: "Khenchela" },
+  { value: 41, label: "Souk Ahras" },
+  { value: 42, label: "Tipaza" },
+  { value: 43, label: "Mila" },
+  { value: 44, label: "Aïn Defla" },
+  { value: 45, label: "Naâma" },
+  { value: 46, label: "Aïn Témouchent" },
+  { value: 47, label: "Ghardaïa" },
+  { value: 48, label: "Relizane" },
+  { value: 49, label: "Timimoun" },
+  { value: 50, label: "Bordj Badji Mokhtar" },
+  { value: 51, label: "Ouled Djellal" },
+  { value: 52, label: "Béni Abbès" },
+  { value: 53, label: "In Salah" },
+  { value: 54, label: "In Guezzam" },
+  { value: 55, label: "Touggourt" },
+  { value: 56, label: "Djanet" },
+  { value: 57, label: "El M’Ghair" },
+  { value: 58, label: "El Meniaa" },
+];
+
 
   const regionOptions = [
-    { value: "Hydra", label: "Hydra" },
-    { value: "Sidi Yahia", label: "Sidi Yahia" },
+    { value: 1, label: "Hydra" },
+    { value: 1, label: "Sidi Yahia" },
   ];
 
   const transactionTypeOptions = [
@@ -69,8 +126,8 @@ export default function ListingRightSection({
   ];
 
   const propertyTypeOptions = [
-    { value: "apartment", label: "Apartment" },
-    { value: "villa", label: "Villa" },
+    { value: "APARTMENT", label: "Apartment" },
+    { value: "VILLA", label: "Villa" },
     { value: "studio", label: "Studio" },
   ];
 
@@ -209,9 +266,9 @@ export default function ListingRightSection({
               type="text"
               id="listing-address"
               placeholder="Address"
-              value={street_address}
+              value={address}
               onChange={(e) =>
-                onFieldChange("street_address", e.target.value)
+                onFieldChange("address", e.target.value)
               }
             />
           </div>

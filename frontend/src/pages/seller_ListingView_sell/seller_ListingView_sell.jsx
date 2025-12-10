@@ -102,7 +102,7 @@ export default function ListingDetails_sell() {
             typeof data.price === "number"
               ? data.price
               : Number(data.price) || 0,
-          address: data.street_address || "No address provided",
+          address: data.address || "No address provided",
           region: data.region || data.city || "Region, Wilaya",
           description,
           status: listingStatus,
@@ -188,8 +188,9 @@ export default function ListingDetails_sell() {
     try {
       setIsActivating(true);
       const response = await activateSellerListing(listingId);
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing activated.");
     } catch (err) {
@@ -205,8 +206,9 @@ export default function ListingDetails_sell() {
     try {
       setIsPausing(true);
       const response = await pauseSellerListing(listingId, { reason: "OTHER" });
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing paused.");
     } catch (err) {
