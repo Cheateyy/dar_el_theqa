@@ -5,11 +5,22 @@ from .models import Favorite, Lead, Review
 from .serializers import FavoriteSerializer, LeadSerializer, ReviewSerializer, OwnerLeadListSerializer, LeadDetailSerializer
 from listings.models import Listing
 from listings.serializers import ListingSerializer
+from drf_spectacular.utils import extend_schema, inline_serializer
 
 class FavoriteToggleView(views.APIView):
     #permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="FavoriteToggleResponse",
+            fields={
+                "status": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request, id):
         try:
             listing = Listing.objects.get(id=id)
@@ -102,6 +113,7 @@ class AdminReviewListView(generics.ListAPIView):
     ##(10.7 deletes and returns as the contract)
 class AdminDeleteReviewView(generics.DestroyAPIView):
     queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAdminUser]
     lookup_url_kwarg = "review_id"
 

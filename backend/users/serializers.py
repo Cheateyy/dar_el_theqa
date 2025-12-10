@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from .models import Partner
 
 User = get_user_model()
@@ -46,6 +47,33 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.is_active = False # Require activation
         user.save()
         return user
+
+
+class ActivationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+
+class ActivationResendSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+    re_new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['re_new_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        validate_password(attrs['new_password'])
+        return attrs
+
 
 class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
