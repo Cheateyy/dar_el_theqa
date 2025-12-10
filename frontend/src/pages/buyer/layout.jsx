@@ -1,17 +1,20 @@
 import { Outlet } from "react-router-dom";
 import { BuyerHeader } from "./components/Header";
 import { ListingProvider } from "./context/ListingsContext";
-import { MessagingProvider } from "./context/MessagingContext";
+import { AuthMessagingProvider } from "./context/AuthMessagingContext";
+import { ListingsMessagingProvider } from "./context/ListingsMessagingContext";
 
 export function BuyerLayout() {
     return (
         <ListingProvider>
-            <MessagingProvider>
-                <BuyerHeader />
-                <Outlet />
-                <footer className="mt-20">
-                </footer>
-            </MessagingProvider>
+            <AuthMessagingProvider>
+                <ListingsMessagingProvider>
+                    <BuyerHeader />
+                    <Outlet />
+                    <footer className="mt-20">
+                    </footer>
+                </ListingsMessagingProvider>
+            </AuthMessagingProvider>
         </ListingProvider>
 
 

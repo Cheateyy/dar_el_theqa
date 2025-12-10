@@ -13,7 +13,7 @@ import messageSvg from '../assets/message.svg'
 import logoutSvg from '../assets/logout.svg'
 import { useState } from "react"
 import { Combobox } from "@/components/common/Combobox"
-import { useMessaging } from "../context/MessagingContext"
+import { useAuthMessaging } from "../context/AuthMessagingContext"
 
 function LanguageSelector({ className }) {
     const langs = ["arabic", "english", "language"];
@@ -50,7 +50,7 @@ function MenuButton() {
 }
 
 export function NotLoggedInActions() {
-    const { set_is_login_dlg_open } = useMessaging()
+    const { set_is_login_dlg_open } = useAuthMessaging()
     return (
         <div className="flex items-center gap-3">
             {/* show full language selector on md+, only icon on small */}
