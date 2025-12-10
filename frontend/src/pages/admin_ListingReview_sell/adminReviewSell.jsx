@@ -1,72 +1,162 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
-import LoginModal from "./LoginModal.jsx";
-
-import img1 from "../../assets/images/dummyPropertyImages/image1.jpg";
-import img2 from "../../assets/images/dummyPropertyImages/image2.jpg";
-import img3 from "../../assets/images/dummyPropertyImages/image3.jpg";
-import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
-import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
-import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
+import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
 import certifiedIcon from "../../assets/icons/certified_button.png";
+import document_icon from "../../assets/images/legal_doc.png";
+import status_icon from "../../assets/icons/certified_button.png";
+
+import {
+  getAdminListingDetails,
+  getAdminListingDocuments,
+  approveAdminListing,
+  rejectAdminListingDocument,
+  deleteAdminListing,
+} from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
 
-export default function ListingDetails_sell() {
-    const [showLogin, setShowLogin] = useState(false);
+export default function AdminReviewSell() {
+  const { listingId } = useParams();
+  const [showLogin, setShowLogin] = useState(false);
+  const [listing, setListing] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
 
-    const handleLoginClick = () => setShowLogin(true);
-    const handleCloseModal = () => setShowLogin(false);
+  const handleLoginClick = () => setShowLogin(true);
+  const handleCloseModal = () => setShowLogin(false);
 
-    // 🟦 Temporary static data (replace with backend later)
-    const listing = {
-        images: [img1, img2, img3, img4, img5, img6],
-        certifiedIcon: certifiedIcon,
-        description: "Beautiful apartment in the city center with great facilities.",
-        documents: [
-            { name: "DocumentA.pdf", url: "", icon: certifiedIcon },
-            { name: "DocumentB.pdf", url: "", icon: certifiedIcon },
-            { name: "DocumentC.pdf", url: "", icon: certifiedIcon },
-        ],
-        address: "2126 street Down town, next to the hospital .",
-        region: "Region, Wilaya",
-        price: 500000,
-        status: "Pending",
-        propertyType: "Apartment",
-        area: 120,
-        bedrooms: 3,
-        bathrooms: 2,
-    };
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const data = await getAdminListingDetails(listingId);
+        setListing(data || {});
+        const docs = await getAdminListingDocuments(listingId);
+        setDocuments(docs || []);
+      } catch (err) {
+        console.error("Error fetching listing data:", err);
+        setListing({});
+        setDocuments([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [listingId]);
 
-    return (
-        <>
-            <nav>
-                <NavBar onLoginClick={handleLoginClick} />
-            </nav>
+  const handleApproveListing = async () => {
+    try {
+      setIsApproving(true);
+      const res = await approveAdminListing(listingId);
+      console.log("Listing approved:", res);
+      setListing((prev) => ({ ...prev, status: "APPROVED" }));
+    } catch (err) {
+      console.error("Error approving listing:", err);
+    } finally {
+      setIsApproving(false);
+    }
+  };
 
-            <div className="admin-sell-ListingDetails">
-                <LeftSection
-                    images={listing.images}
-                    certifiedIcon={listing.certifiedIcon}
-                    description={listing.description}
-                    documents={listing.documents}
-                />
+  const handleRejectDocument = async (docId, reason) => {
+    if (!reason) {
+      return;
+    }
+    try {
+      const res = await rejectAdminListingDocument(listingId, docId, reason);
+      console.log("Document rejected:", res);
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc.doc_id === docId ? { ...doc, status: "REJECTED" } : doc
+        )
+      );
+    } catch (err) {
+      console.error("Error rejecting document:", err);
+    }
+  };
 
-                <RightSection
-                    address={listing.address}
-                    region={listing.region}
-                    price={listing.price}
-                    status={listing.status}
-                    propertyType={listing.propertyType}
-                    area={listing.area}
-                    bedrooms={listing.bedrooms}
-                    bathrooms={listing.bathrooms}
-                />
-            </div>
-
-            <LoginModal show={showLogin} onClose={handleCloseModal} />
-        </>
+  const handleAcceptDocument = (docId) => {
+    setDocuments((prev) =>
+      prev.map((doc) =>
+        doc.doc_id === docId ? { ...doc, status: "ACCEPTED" } : doc
+      )
     );
+  };
+
+  const handleDeleteListing = async () => {
+    if (!window.confirm("Delete this listing?")) return;
+    try {
+      setIsDeleting(true);
+      await deleteAdminListing(listingId);
+      setIsDeleted(true);
+    } catch (err) {
+      console.error("Error deleting listing:", err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (isDeleted) {
+    return (
+      <>
+        <nav>
+          <NavBar onLoginClick={handleLoginClick} />
+        </nav>
+        <div className="admin-feedback-message">Listing deleted successfully.</div>
+        <LoginModal show={showLogin} onClose={handleCloseModal} />
+      </>
+    );
+  }
+  if (!listing || Object.keys(listing).length === 0) return <div>Listing not found</div>;
+
+  return (
+    <>
+      <nav>
+        <NavBar onLoginClick={handleLoginClick} />
+      </nav>
+
+      <div className="admin-sell-ListingDetails">
+        <LeftSection
+          images={listing.images || []}
+          certifiedIcon={certifiedIcon}
+          status_icon={status_icon}
+          title={listing.slug || "Property Title"} 
+          description={listing.description || ""}
+          documents={documents.map((doc) => ({
+            name: doc.files?.[0]?.filename || doc.label || "Document",
+            url: doc.files?.[0]?.url || "#",
+            icon: document_icon,
+            status: doc.status || "PENDING",
+            docId: doc.doc_id,
+          }))}
+          onRejectDocument={handleRejectDocument}
+          onAcceptDocument={handleAcceptDocument}
+          verificationStatus={listing.verification_status || listing.status}
+        />
+
+        <RightSection
+          address={listing.address || "N/A"}
+          region={listing.wilaya || "N/A"}
+          price={listing.price || 0}
+          status={listing.status || "PENDING"}
+          propertyType={listing.appartement_type || "N/A"}
+          area={listing.area_m2 || 0}
+          bedrooms={listing.bedrooms || 0}
+          bathrooms={listing.bathrooms || 0}
+          onApprove={handleApproveListing}
+          onReject={handleDeleteListing}
+          isApproving={isApproving}
+          isRejecting={isDeleting}
+        />
+      </div>
+
+      <LoginModal show={showLogin} onClose={handleCloseModal} />
+    </>
+  );
 }

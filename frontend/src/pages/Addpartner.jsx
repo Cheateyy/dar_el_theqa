@@ -13,7 +13,7 @@ import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
 
-const USE_MOCK_PARTNERS = true; // change to false when backend is ready
+const USE_MOCK_PARTNERS = true; 
 
 function AddPartner() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ function AddPartner() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Single-field validator
+  
   const validateField = (name, value) => {
     switch (name) {
       case "companyName": {
@@ -74,7 +74,7 @@ function AddPartner() {
     }
   };
 
-  // Full-form validator
+
   const validateForm = () => {
     const newErrors = {};
     Object.entries(formData).forEach(([name, value]) => {
@@ -84,7 +84,7 @@ function AddPartner() {
     return newErrors;
   };
 
-  // Real-time validation
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -126,7 +126,7 @@ function AddPartner() {
     setErrors((prev) => ({ ...prev, logo: fieldError }));
   };
 
-  // Derive isFormValid
+  
   useEffect(() => {
     const hasErrors = Object.values(errors).some((msg) => msg);
 
@@ -152,7 +152,7 @@ function AddPartner() {
       return;
     }
 
-    // 1) MOCK MODE: use localStorage (NOW)
+   
     if (USE_MOCK_PARTNERS) {
       const newPartner = {
         id: Date.now(),
@@ -168,10 +168,10 @@ function AddPartner() {
       localStorage.setItem("partners", JSON.stringify(partners));
 
       navigate("/forms-tables/partner-accounts");
-      return; // stop here, no backend call
+      return; 
     }
 
-    // 2) REAL BACKEND MODE: when teammates finish API
+    
     const payload = new FormData();
     payload.append("name", formData.companyName);
     payload.append("email", formData.email);

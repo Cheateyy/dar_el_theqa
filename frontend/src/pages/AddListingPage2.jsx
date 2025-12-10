@@ -13,25 +13,25 @@ import AddImageIcon from "@/assets/icons/Addimage.svg";
 import ImageFileIcon from "@/assets/icons/imageicon.svg";
 import RemoveImageIcon from "@/assets/icons/removeimage.png";
 
-const DRAFT_KEY = "createListingDraft"; // 🔧 ADDED FOR BACKEND
+const DRAFT_KEY = "createListingDraft"; 
 
 const MAX_IMAGES = 20;
 
 function AddListingPage2() {
   const navigate = useNavigate();
 
-  // -------- FORM STATES (UI) --------
+  
   const [propertyType, setPropertyType] = useState("");
   const [listingPurpose, setListingPurpose] = useState("");
   const [area, setArea] = useState("");
   const [floors, setFloors] = useState("");
   const [bedrooms, setBedrooms] = useState("");
   const [bathrooms, setBathrooms] = useState("");
-  const [images, setImages] = useState([]); // each: { file, label, name }
+  const [images, setImages] = useState([]); 
 
   const fileInputRef = useRef(null);
 
-  // -------- VALIDATION --------
+  
   const [errors, setErrors] = useState({
     propertyType: "",
     area: "",
@@ -40,13 +40,13 @@ function AddListingPage2() {
     bathrooms: "",
   });
 
-  // Load draft if exists (so fields persist across steps)
+  
   useEffect(() => {
     const draft = localStorage.getItem(DRAFT_KEY);
     if (draft) {
       try {
         const parsed = JSON.parse(draft);
-        // read purpose chosen in step1 (sale/rent)
+       
         const purposeFromStep1 = parsed.stepData?.step1?.purpose || parsed.purpose || "";
         setListingPurpose(purposeFromStep1);
         const sd = parsed.stepData?.step2;
@@ -67,12 +67,12 @@ function AddListingPage2() {
           }
         }
       } catch (e) {
-        // ignore
+      
       }
     }
   }, []);
 
-  // Define property type lists for each purpose
+  
   const buyOptions = [
     "Apartment",
     "House/Villa",
@@ -154,7 +154,7 @@ function AddListingPage2() {
     propertyType &&
     area !== "";
 
-  // -------- IMAGES --------
+  
   const handleAddImageClick = () => {
     if (images.length < MAX_IMAGES) fileInputRef.current.click();
   };
@@ -183,8 +183,6 @@ function AddListingPage2() {
     setImages(images.filter((_, i) => i !== idx));
   };
 
-  // 🔧 ADDED FOR BACKEND: save step2 draft to localStorage before navigating to step3
-  // 🔧 ADDED FOR BACKEND: save step2 draft to localStorage before navigating to step3
   const saveDraftStep2 = () => {
     const existing = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
 
@@ -195,13 +193,11 @@ function AddListingPage2() {
         ...(existing.stepData || {}),
         step2: {
           propertyType,
-          // backend-friendly value used in Step 3 → payload.append("propertytype", ...)
           propertyTypeBackend: mapPropertyType(propertyType),
           area,
           floors,
           bedrooms,
           bathrooms,
-          // Store only metadata for images (name + label). File objects kept in memory.
           images: images.map((it) => ({
             name: it.file?.name || it.name || null,
             label: it.label,
@@ -213,9 +209,9 @@ function AddListingPage2() {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(merged));
   };
 
-  // 🔧 ADDED FOR BACKEND: keep File objects in-memory between steps (window store)
+
   const persistImagesInMemory = () => {
-    window.__CREATE_LISTING_IMAGES = images; // array of {file,label,name}
+    window.__CREATE_LISTING_IMAGES = images; 
     window.__CREATE_LISTING_IMAGES_PROPERTYTYPE = propertyType;
     window.__CREATE_LISTING_IMAGES_META = images.map((it) => ({
       name: it.name,
@@ -223,7 +219,7 @@ function AddListingPage2() {
     }));
   };
 
-  // 🔧 MAPPING: map UI property type to backend expected value (keeps UI labels)
+  
   const mapPropertyType = (label) => {
     const map = {
       Apartment: "apartment",
@@ -241,7 +237,7 @@ function AddListingPage2() {
 
   const handleSubmit = () => {
     if (!isFormValid) return;
-    // 🔧 ADDED FOR BACKEND: save draft for step 2 and persist files in-memory
+    
     saveDraftStep2();
     persistImagesInMemory();
     navigate("/forms-tables/add-listing/step-2/step-3");
@@ -265,12 +261,12 @@ function AddListingPage2() {
 
         <h1 className="page-title">Add a Listing</h1>
 
-        {/* PROPERTY DETAILS */}
+        
         <Section>
           <h2 className="section-title">Additional Information</h2>
 
           <div className="property-details-grid">
-            {/* FULL ROW — PROPERTY TYPE */}
+          
             <div
               className={`property-type-field property-type-row ${errors.propertyType
                 ? "input-error"
@@ -289,8 +285,6 @@ function AddListingPage2() {
               >
                 <option value="">Select property type</option>
 
-                {/* Render only the options that match the purpose selected in step 1.
-                    If purpose is missing, show both groups as a fallback. */}
                 {(!listingPurpose || listingPurpose === "sale") && (
                   <optgroup label="Sale">
                     {buyOptions.map((opt) => (
@@ -321,7 +315,7 @@ function AddListingPage2() {
               )}
             </div>
 
-            {/* AREA */}
+            
             <div
               className={`form-field inside-label ${errors.area ? "input-error" : area ? "input-valid" : ""
                 }`}
@@ -343,7 +337,7 @@ function AddListingPage2() {
               {errors.area && <p className="error-text">{errors.area}</p>}
             </div>
 
-            {/* FLOORS */}
+          
             {!isLandType && (
               <div
                 className={`form-field inside-label ${errors.floors ? "input-error" : floors ? "input-valid" : ""
@@ -367,7 +361,7 @@ function AddListingPage2() {
               </div>
             )}
 
-            {/* BEDROOMS */}
+            
             {!hideRooms && (
               <div
                 className={`form-field inside-label ${errors.bedrooms
@@ -397,7 +391,7 @@ function AddListingPage2() {
               </div>
             )}
 
-            {/* BATHROOMS */}
+           
             {!hideRooms && (
               <div
                 className={`form-field inside-label ${errors.bathrooms
@@ -429,8 +423,6 @@ function AddListingPage2() {
           </div>
         </Section>
 
-        {/* IMAGES SECTION */}
-        {/* IMAGES SECTION */}
         <Section>
           <div className="images-header-row">
             <div>
@@ -460,7 +452,7 @@ function AddListingPage2() {
 
           <div className="images-section">
             {images
-              .filter((img) => img.file) // ⬅️ only rows with a real File
+              .filter((img) => img.file) 
               .map((img, idx) => (
                 <div key={idx} className="image-row">
                   <Input
@@ -488,7 +480,7 @@ function AddListingPage2() {
                         onChange={(e) =>
                           handleImageChange(idx, e.target.files[0])
                         }
-                        style={{ display: "none" }} // hide since we already have a file
+                        style={{ display: "none" }} 
                       />
 
                       <button
@@ -508,7 +500,7 @@ function AddListingPage2() {
           </div>
         </Section>
 
-        {/* FOOTER */}
+        
         <div className="form-footer">
           <Button
             variant="primary"

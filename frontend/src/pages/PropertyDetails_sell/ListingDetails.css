@@ -29,13 +29,16 @@
 }
 
 .sell-ListingInfo {
-  width: 87%;
+  width: 90%;
   margin-top: 1rem;
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 15px;
   box-shadow: 5px 9px 12px 12px rgba(0, 0, 0, 0.15);
-  padding: 1.5rem;
+  padding: 2rem;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .sell-ListingInfo h1 {
@@ -93,6 +96,8 @@
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
+
+
 .sell-listingCard:hover {
   transform: translateY(-5px);
   box-shadow: 5px 9px 15px rgba(0, 0, 0, 0.15);
@@ -100,7 +105,7 @@
 
 .sell-listingRight.card {
   width: 40%;
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 15px;
   box-shadow: 5px 9px 12px 10px rgba(0, 0, 0, 0.15);
   padding: 1.5rem;
@@ -110,8 +115,7 @@
   gap: 1.5rem;
   position: sticky;
   top: 2rem;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
+  overflow-y: hidden;
   box-sizing: border-box;
 }
 
@@ -123,6 +127,7 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+
 
 .sell-upperRight h3 {
   font-size: 1.2rem;
@@ -158,17 +163,13 @@
   font-size: 2rem;
 }
 
-.sell-listingInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
 
 .sell-infoCard {
   background-color: #f9f9f9;
   border-radius: 10px;
   padding: 1rem;
   box-shadow: 4px 4px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 2%;
 }
 
 .sell-infoCard h3 {
@@ -416,8 +417,8 @@
   }
 
   .sell-ListingInfo {
-    width: 95%;
-    padding: 1rem;
+    width: 100%;
+    padding: 2rem;
   }
 
   .sell-moreListings.card {
@@ -461,4 +462,5 @@
   .LeftSectMoreListings{
     display: none;
   }
+
 }

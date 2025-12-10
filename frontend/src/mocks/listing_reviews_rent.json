@@ -1,0 +1,30 @@
+{
+  "average_rating": 4.5,
+  "total_reviews": 12,
+  "results": [
+    {
+      "id": 1,
+      "user_name": "Amine K.",
+      "user_avatar": "https://randomuser.me/api/portraits/men/1.jpg",
+      "rating": 5,
+      "comment": "Très bon appartement, bien situé et lumineux.",
+      "created_at": "2023-10-21"
+    },
+    {
+      "id": 2,
+      "user_name": "Sara L.",
+      "user_avatar": "https://randomuser.me/api/portraits/women/2.jpg",
+      "rating": 4,
+      "comment": "Appartement confortable mais un peu bruyant.",
+      "created_at": "2023-10-18"
+    },
+    {
+      "id": 3,
+      "user_name": "Youssef B.",
+      "user_avatar": "https://randomuser.me/api/portraits/men/3.jpg",
+      "rating": 4,
+      "comment": "Bonne expérience, propriétaire réactif.",
+      "created_at": "2023-10-15"
+    }
+  ]
+}

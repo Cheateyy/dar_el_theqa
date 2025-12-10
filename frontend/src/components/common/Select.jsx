@@ -13,7 +13,7 @@ function Select({ label, name, value, onChange, children }) {
           {children}
         </select>
         <span className="custom-select-arrow">
-          <img src="src/assets/icons/Down.svg" alt="dropdown arrow" />
+          <img src={DownIcon} alt="dropdown arrow" />
         </span>
       </div>
     </div>

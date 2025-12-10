@@ -15,147 +15,90 @@ import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
 import actionsIcon from "../assets/icons/Actions.svg";
 
-// 🔧 SWITCH: true = localStorage mock (no backend yet)
-//            false = real backend /api/admin/partners/ (when ready)
 const USE_MOCK_PARTNERS = true;
 
 function PartnerAccounts() {
   const navigate = useNavigate();
 
-  // -------- STATE --------
+  // ---------------------------
+  // LOAD PARTNERS
+  // ---------------------------
   const [partners, setPartners] = useState(() => {
-    if (USE_MOCK_PARTNERS) {
-      const stored = localStorage.getItem("partners");
-      try {
-        const parsed = stored ? JSON.parse(stored) : [];
-        return parsed.map((p) => ({
-          status: p.status || "active",
-          ...p,
-        }));
-      } catch {
-        return [];
-      }
+    if (!USE_MOCK_PARTNERS) return [];
+
+    try {
+      const stored = JSON.parse(localStorage.getItem("partners") || "[]");
+
+      return stored.map((p) => ({
+        id: p.id,
+        name: p.companyName,
+        email: p.email,
+        phone_number: p.phoneNumber,
+        address: p.address,
+        logo: null,
+        status: p.status || "active",
+      }));
+    } catch {
+      return [];
     }
-    // backend mode: start empty, will be filled by fetch
-    return [];
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(partners.length / PAGE_SIZE || 1));
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(partners.length / PAGE_SIZE));
 
-  const [loading, setLoading] = useState(!USE_MOCK_PARTNERS);
-
-  // -------- MOCK MODE: keep partners in localStorage & sync tabs --------
-  useEffect(() => {
-    if (!USE_MOCK_PARTNERS) return;
-    localStorage.setItem("partners", JSON.stringify(partners));
-  }, [partners]);
-
-  useEffect(() => {
-    if (!USE_MOCK_PARTNERS) return;
-
-    const reload = () => {
-      try {
-        const stored = localStorage.getItem("partners");
-        const parsed = stored ? JSON.parse(stored) : [];
-        setPartners(parsed.map((p) => ({ status: p.status || "active", ...p })));
-      } catch {
-        // ignore
-      }
-    };
-
-    reload();
-
-    const onStorage = (e) => {
-      if (e.key === "partners") reload();
-    };
-    const onVisibility = () => {
-      if (!document.hidden) reload();
-    };
-
-    window.addEventListener("storage", onStorage);
-    document.addEventListener("visibilitychange", onVisibility);
-
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, []);
-
-  // -------- BACKEND MODE: fetch partners from /api/admin/partners/ --------
-  useEffect(() => {
-    if (USE_MOCK_PARTNERS) return;
-
-    const fetchPartners = async () => {
-      try {
-        const res = await fetch("/api/admin/partners/", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        // If backend uses pagination {count, results}, handle it
-        const list = Array.isArray(data) ? data : data.results || [];
-        setPartners(
-          list.map((p) => ({
-            status: p.status || "active",
-            ...p,
-          }))
-        );
-      } catch (err) {
-        console.error("Failed to load partners:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPartners();
-  }, []);
-
-  // -------- DERIVED: current page items --------
   const currentPageItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return partners.slice(start, start + PAGE_SIZE);
   }, [partners, currentPage]);
 
-  // -------- HANDLERS --------
+  // Sync storage in mock mode
+  useEffect(() => {
+    if (!USE_MOCK_PARTNERS) return;
+
+    const normalized = partners.map((p) => ({
+      id: p.id,
+      companyName: p.name,
+      email: p.email,
+      phoneNumber: p.phone_number,
+      address: p.address,
+      status: p.status,
+    }));
+
+    localStorage.setItem("partners", JSON.stringify(normalized));
+  }, [partners]);
+
+  // ---------------------------
+  // ACTIONS
+  // ---------------------------
   const handleAddPartner = () => {
     navigate("/forms-tables/add-partner");
   };
 
   const toggleStatus = (id) => {
-    // purely UI state; backend has no status endpoint defined yet
     setPartners((prev) =>
       prev.map((p) =>
-        p.id === id
-          ? { ...p, status: p.status === "suspended" ? "active" : "suspended" }
-          : p
+        p.id === id ? { ...p, status: p.status === "active" ? "suspended" : "active" } : p
       )
     );
   };
 
   const handleDelete = async (id) => {
-    // optimistic UI in both modes
     setPartners((prev) => prev.filter((p) => p.id !== id));
 
-    if (USE_MOCK_PARTNERS) {
-      // localStorage will be updated by the effect above
-      return;
-    }
-
-    try {
+    if (!USE_MOCK_PARTNERS) {
       await fetch(`/api/admin/partners/${id}/`, {
         method: "DELETE",
         credentials: "include",
       });
-    } catch (err) {
-      console.error("Failed to delete partner:", err);
     }
   };
 
   const handleAddProperty = (id) => {
-    navigate(`/add-listing?partnerId=${id}`);
+    navigate(`/forms-tables/add-listing?partnerId=${id}`);
   };
 
+  // Pagination
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -170,9 +113,8 @@ function PartnerAccounts() {
       return pages;
     }
 
-    const firstPage = 1;
-    const lastPage = totalPages;
-
+    const first = 1;
+    const last = totalPages;
     let start = currentPage - 1;
     let end = currentPage + 1;
 
@@ -180,189 +122,156 @@ function PartnerAccounts() {
       start = 2;
       end = start + (maxVisible - 2);
     }
-    if (end > lastPage - 1) {
-      end = lastPage - 1;
+    if (end > last - 1) {
+      end = last - 1;
       start = end - (maxVisible - 2);
-      if (start < 2) start = 2;
     }
 
-    pages.push(firstPage);
+    pages.push(first);
+    if (start > 2) pages.push("left-ellipsis");
 
-    if (start > 2) {
-      pages.push("left-ellipsis");
-    }
-
-    for (let i = start; i <= end && i < lastPage; i++) {
+    for (let i = start; i <= end && i < last; i++) {
       pages.push(i);
     }
 
-    if (end < lastPage - 1) {
-      pages.push("right-ellipsis");
-    }
-
-    pages.push(lastPage);
+    if (end < last - 1) pages.push("right-ellipsis");
+    pages.push(last);
 
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
-  // -------- RENDER --------
+  // ---------------------------
+  // RENDER
+  // ---------------------------
   return (
     <div className="partner-page-wrapper">
       <div className="add-partner-container">
         <div className="partners-header">
           <h1 className="page-title">Partners</h1>
-
-          <button
-            type="button"
-            className="add-partner-main-btn"
-            onClick={handleAddPartner}
-          >
+          <button type="button" className="add-partner-main-btn" onClick={handleAddPartner}>
             +
           </button>
         </div>
 
         <Section>
           <div className="partners-table-wrapper">
-            {loading && !USE_MOCK_PARTNERS ? (
-              <p className="empty-row">Loading partners...</p>
-            ) : (
-              <table className="partners-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <span className="th-with-icon">
-                        <img src={companyIcon} alt="" className="th-icon" />
-                        Company Name
-                      </span>
-                    </th>
-                    <th>
-                      <span className="th-with-icon">
-                        <img src={addressIcon} alt="" className="th-icon" />
-                        Address
-                      </span>
-                    </th>
-                    <th>
-                      <span className="th-with-icon">
-                        <img src={phoneIcon} alt="" className="th-icon" />
-                        Phone Number
-                      </span>
-                    </th>
-                    <th>
-                      <span className="th-with-icon">
-                        <img src={emailIcon} alt="" className="th-icon" />
-                        Email
-                      </span>
-                    </th>
-                    <th className="actions-col-header">
-                      <span className="th-with-icon">
-                        <img src={actionsIcon} alt="" className="th-icon" />
-                        Actions
-                      </span>
-                    </th>
+            <table className="partners-table">
+              <thead>
+                <tr>
+                  <th>
+                    <span className="th-with-icon">
+                      <img src={companyIcon} alt="" className="th-icon" />
+                      Company Name
+                    </span>
+                  </th>
+                  <th>
+                    <span className="th-with-icon">
+                      <img src={addressIcon} alt="" className="th-icon" />
+                      Address
+                    </span>
+                  </th>
+                  <th>
+                    <span className="th-with-icon">
+                      <img src={phoneIcon} alt="" className="th-icon" />
+                      Phone
+                    </span>
+                  </th>
+                  <th>
+                    <span className="th-with-icon">
+                      <img src={emailIcon} alt="" className="th-icon" />
+                      Email
+                    </span>
+                  </th>
+                  <th className="actions-col-header">
+                    <span className="th-with-icon">
+                      <img src={actionsIcon} alt="" className="th-icon" />
+                      Actions
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {currentPageItems.map((partner) => (
+                  <tr key={partner.id}>
+                    <td>{partner.name}</td>
+                    <td>{partner.address}</td>
+                    <td>{partner.phone_number}</td>
+                    <td>{partner.email}</td>
+
+                    <td className="actions-col">
+                      <button
+                        type="button"
+                        className="row-action-btn row-action-add"
+                        onClick={() => handleAddProperty(partner.id)}
+                      >
+                        +
+                      </button>
+
+                      <button
+                        type="button"
+                        className="row-action-btn row-action-status"
+                        onClick={() => toggleStatus(partner.id)}
+                      >
+                        <img
+                          src={partner.status === "suspended" ? suspendIcon : activateIcon}
+                          alt={partner.status === "suspended" ? "Activate" : "Suspend"}
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        className="row-action-btn row-action-delete"
+                        onClick={() => handleDelete(partner.id)}
+                      >
+                        <img src={deleteIcon} alt="Delete" />
+                      </button>
+                    </td>
                   </tr>
-                </thead>
+                ))}
 
-                <tbody>
-                  {currentPageItems.length > 0 ? (
-                    currentPageItems.map((partner) => (
-                      <tr key={partner.id}>
-                        <td>{partner.companyName || partner.name}</td>
-                        <td>{partner.address}</td>
-                        <td>{partner.phoneNumber || partner.phone_number}</td>
-                        <td>{partner.email}</td>
-                        <td className="actions-col">
-                          <button
-                            type="button"
-                            className="row-action-btn row-action-add"
-                            onClick={() => handleAddProperty(partner.id)}
-                          >
-                            +
-                          </button>
-
-                          <button
-                            type="button"
-                            className="row-action-btn row-action-status"
-                            onClick={() => toggleStatus(partner.id)}
-                          >
-                            <img
-                              src={
-                                partner.status === "suspended"
-                                  ? suspendIcon
-                                  : activateIcon
-                              }
-                              alt={
-                                partner.status === "suspended"
-                                  ? "Activate account"
-                                  : "Suspend account"
-                              }
-                            />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="row-action-btn row-action-delete"
-                            onClick={() => handleDelete(partner.id)}
-                          >
-                            <img src={deleteIcon} alt="Delete account" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="empty-row">
-                        No partners found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            )}
+                {currentPageItems.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="empty-row">
+                      No partners found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </Section>
       </div>
 
+      {/* Pagination */}
       <div className="partners-pagination">
         <button
           className="paging-button"
-          type="button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <img src={backButton} alt="back" />
         </button>
 
-        {pageItems.map((item, idx) => {
-          if (typeof item === "string") {
-            return (
-              <button
-                key={item + idx}
-                type="button"
-                className="page-dot"
-                disabled
-              >
-                ...
-              </button>
-            );
-          }
-          const page = item;
-          return (
-            <button
-              key={page}
-              type="button"
-              className={`page-dot ${page === currentPage ? "active" : ""
-                }`}
-              onClick={() => goToPage(page)}
-            >
-              {page}
+        {pageItems.map((item, idx) =>
+          typeof item === "string" ? (
+            <button key={idx} className="page-dot" disabled>
+              ...
             </button>
-          );
-        })}
+          ) : (
+            <button
+              key={item}
+              className={`page-dot ${item === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(item)}
+            >
+              {item}
+            </button>
+          )
+        )}
 
         <button
-          type="button"
           className="paging-button"
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
