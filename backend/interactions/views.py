@@ -1,6 +1,6 @@
-from backend.core import serializers
-from rest_framework import generics, views, permissions, status
+from rest_framework import generics, views, permissions, status, serializers
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from .models import Favorite, Lead, Review
 from .serializers import FavoriteSerializer, LeadSerializer, ReviewSerializer, OwnerLeadListSerializer, LeadDetailSerializer
 from listings.models import Listing
