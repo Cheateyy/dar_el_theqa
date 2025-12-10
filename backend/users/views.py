@@ -1,8 +1,19 @@
 from rest_framework import generics, status, views, permissions
 from rest_framework.response import Response
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer, RegisterSerializer, PartnerSerializer
+from .serializers import (
+    UserSerializer,
+    RegisterSerializer,
+    PartnerSerializer,
+    ActivationResendSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
+)
 from .models import Partner
 import random
 
@@ -49,6 +60,28 @@ class ActivationView(views.APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+class ActivationResendView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = ActivationResendSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_active:
+                otp = random.randint(100000, 999999)
+                print(f"Activation resend OTP for {email}: {otp}")
+        except User.DoesNotExist:
+            pass
+
+        return Response({
+            "status": "success",
+            "message": "A new activation code has been sent to your email.",
+        })
+
 class UserDetailView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -65,6 +98,69 @@ class UserDetailView(views.APIView):
                 }
             })
         return Response({"isAuthenticated": False})
+
+
+class PasswordResetRequestView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({
+                "status": "success",
+                "message": "If an account exists with this email, a reset link has been sent.",
+            })
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        base_url = getattr(settings, 'FRONTEND_RESET_PASSWORD_URL', 'https://daretheqa.dz/reset-password')
+        reset_url = f"{base_url.rstrip('/')}/{uid}/{token}"
+        print(f"Password reset link for {email}: {reset_url}")
+
+        return Response({
+            "status": "success",
+            "message": "If an account exists with this email, a reset link has been sent.",
+        })
+
+
+class PasswordResetConfirmView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        uid = serializer.validated_data['uid']
+        token = serializer.validated_data['token']
+        new_password = serializer.validated_data['new_password']
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            return Response({
+                "status": "error",
+                "message": "Invalid reset link.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({
+                "status": "error",
+                "message": "Invalid or expired token.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({
+            "status": "success",
+            "message": "Password reset successfully. You can now login.",
+        })
 
 class PartnerListView(generics.ListAPIView):
     queryset = Partner.objects.all()
