@@ -44,7 +44,8 @@ class SearchListingsView(views.APIView):
 class ListingCreateView(generics.CreateAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
@@ -63,7 +64,8 @@ class ListingDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class MyListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         queryset = Listing.objects.filter(owner=self.request.user)
@@ -73,7 +75,8 @@ class MyListingsView(generics.ListAPIView):
         return queryset
 
 class ListingPauseView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, id):
         try:
@@ -90,7 +93,8 @@ class ListingPauseView(views.APIView):
         
         ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
 class ListingActivateView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, id):
         try:
@@ -104,7 +108,8 @@ class ListingActivateView(views.APIView):
 
 
 class ListingDocumentUpdateView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     parser_classes = [MultiPartParser, FormParser]
 
     def patch(self, request, id):
@@ -122,17 +127,20 @@ class ListingDocumentUpdateView(views.APIView):
 class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
 #10.2
 class AdminListingViewDetailed(generics.RetrieveAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
     lookup_field = "id"
 
 class AdminListingApproveView(views.APIView):
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, id):
         try:
@@ -144,7 +152,8 @@ class AdminListingApproveView(views.APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 class AdminListingRejectView(views.APIView):
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, id):
         try:
