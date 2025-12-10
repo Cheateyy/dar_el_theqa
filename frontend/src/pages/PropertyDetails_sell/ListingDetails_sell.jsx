@@ -7,7 +7,12 @@ import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
 import status_icon from "../../assets/icons/certified_button.png";
 
-import { getListingDetails } from "../../lib/api_3.js";
+import {
+    getListingDetails,
+    toggleListingFavorite,
+    sendListingInterest,
+    getSimilarListings,
+} from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
 
@@ -15,6 +20,9 @@ export default function ListingDetails_sell() {
     const { listingId } = useParams();
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [liked, setLiked] = useState(false);
+    const [interestLoading, setInterestLoading] = useState(false);
+    const [similarListings, setSimilarListings] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -22,15 +30,60 @@ export default function ListingDetails_sell() {
             try {
                 const data = await getListingDetails(listingId);
                 setListing(data);
+                setLiked(Boolean(data?.is_liked));
+
+                try {
+                    const similarData = await getSimilarListings(listingId);
+                    const normalized = Array.isArray(similarData)
+                        ? similarData
+                        : Array.isArray(similarData?.results)
+                            ? similarData.results
+                            : [];
+                    setSimilarListings(normalized);
+                } catch (similarError) {
+                    console.error("Failed to load similar listings:", similarError);
+                    setSimilarListings([]);
+                }
             } catch (err) {
                 console.error("Error fetching listing data:", err);
                 setListing(null);
+                setSimilarListings([]);
             } finally {
                 setLoading(false);
             }
         }
         fetchData();
     }, [listingId]);
+
+    const handleToggleFavorite = async (nextState) => {
+        const previous = liked;
+        setLiked(nextState);
+        try {
+            const response = await toggleListingFavorite(listingId);
+            if (response?.status === "removed") {
+                setLiked(false);
+            } else if (response?.status === "added") {
+                setLiked(true);
+            }
+        } catch (error) {
+            console.error("Failed to toggle favorite", error);
+            setLiked(previous);
+            window.alert("Unable to update favorites. Please try again.");
+        }
+    };
+
+    const handleSendInterest = async (message) => {
+        setInterestLoading(true);
+        try {
+            await sendListingInterest(listingId, message);
+            window.alert("Message sent to the owner.");
+        } catch (error) {
+            console.error("Failed to send interest", error);
+            window.alert("Unable to send your message right now. Please try again.");
+        } finally {
+            setInterestLoading(false);
+        }
+    };
 
     if (loading) return <p>Loading...</p>;
     if (!listing) return <p>Listing not found.</p>;
@@ -56,15 +109,24 @@ export default function ListingDetails_sell() {
                     title={listing.slug || ""}
                     description={listing.description || ""}
                     verificationStatus={listing.verification_status || listing.status}
+                    similarListings={similarListings}
                 />
                 <RightSection
-                    address={address}
-                    region={region}
-                    price={priceValue}
-                    propertyType={propertyType}
-                    area={areaValue}
-                    bedrooms={bedrooms}
-                    bathrooms={bathrooms}
+                    property={{
+                        address,
+                        region,
+                        price: priceValue,
+                        status: listing.verification_status || listing.status,
+                        type: propertyType,
+                        area: areaValue,
+                        bedrooms,
+                        bathrooms,
+                    }}
+                    liked={liked}
+                    onToggleLike={handleToggleFavorite}
+                    onShowInterest={handleSendInterest}
+                    isSendingInterest={interestLoading}
+                    similarListings={similarListings}
                 />
             </div>
 

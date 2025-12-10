@@ -3,10 +3,28 @@ import PriceSection from "./PriceSection.jsx";
 import InfoCards from "./InfoCards.jsx";
 import MoreListings from "./MoreListings.jsx";
 
-export default function RightSection({ property, moreListings = [], ListingId }) {
+export default function RightSection({
+    property,
+    moreListings = [],
+    ListingId,
+    onToggleStatus,
+    statusActionLabel,
+    isStatusLoading,
+    onDeleteListing,
+    isDeletingListing,
+}) {
     return (
         <div className="seller-sell-listingRight card">
-            <UpperSection address={property.address} region={property.region} ListingId={ListingId}/>
+            <UpperSection
+                address={property.address}
+                region={property.region}
+                ListingId={ListingId}
+                onToggleStatus={onToggleStatus}
+                statusActionLabel={statusActionLabel}
+                isStatusLoading={isStatusLoading}
+                onDeleteListing={onDeleteListing}
+                isDeletingListing={isDeletingListing}
+            />
             <PriceSection price={property.price} status={property.status} />
             <InfoCards
                 propertyType={property.type}

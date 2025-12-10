@@ -138,6 +138,13 @@ class AdminListingViewDetailed(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
 
+#10.2
+class AdminListingViewDetailed(generics.RetrieveAPIView):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.IsAdminUser]
+    lookup_field = "id"
+
 class AdminListingApproveView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
     permission_classes = [permissions.AllowAny]

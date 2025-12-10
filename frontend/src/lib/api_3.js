@@ -5,18 +5,25 @@ export async function getAdminListingDetails(id) {
   const res = await fetch(`${API_BASE_URL}/api/admin/listings/${id}/`, {
     headers: { "Content-Type": "application/json" },
   });
-  if (!res.ok) throw new Error("Failed to fetch listing details");
+  if (!res.ok) throw new Error("Failed to fetch admin listing details");
   return res.json();
 }
 
-export async function getAdminListingDocuments(id) {
-  const res = await fetch(`${API_BASE_URL}/api/admin/listings/${id}/documents/`, {
+async function fetchListingDocuments(id) {
+  const res = await fetch(`${API_BASE_URL}/api/listings/documents/${id}/fetch`, {
     headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) throw new Error("Failed to fetch listing documents");
   return res.json();
 }
 
+export function getListingDocuments(id) {
+  return fetchListingDocuments(id);
+}
+
+export function getAdminListingDocuments(id) {
+  return fetchListingDocuments(id);
+}
 // Reject a document
 export async function rejectAdminListingDocument(id, docId, reason) {
   const res = await fetch(`${API_BASE_URL}/api/admin/listings/${id}/documents/${docId}/reject`, {
@@ -50,6 +57,31 @@ export async function deleteAdminListing(id) {
   return res.status === 204 ? { status: "deleted" } : res.json();
 }
 
+export async function getAdminListingTopReviews(id) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/listings/${id}/reviews/`, {
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Failed to fetch admin listing reviews");
+  return res.json();
+}
+
+export async function getAdminListingAllReviews(id) {
+  const res = await fetch(`${API_BASE_URL}/api/listings/admin/${id}/reviews/`, {
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Failed to fetch complete admin reviews");
+  return res.json();
+}
+
+export async function deleteAdminReview(reviewId) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/reviews/${reviewId}/delete/`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Failed to delete review");
+  return res.json();
+}
+
 
 export async function getListingDetails(id) {
     const res = await fetch(`${API_BASE_URL}/api/listings/${id}/`, {
@@ -64,7 +96,87 @@ export async function getListingReviews(id) {
     headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) throw new Error("Failed to fetch listing reviews");
-  return res.json(); // returns {average_rating, total_reviews, results}
+
+  const payload = await res.json();
+
+  const computeStats = (items = []) => {
+    const total = items.length;
+    if (!total) return { total: 0, average: 0 };
+    const sum = items.reduce((acc, review) => acc + (Number(review?.rating) || 0), 0);
+    return { total, average: sum / total };
+  };
+
+  if (Array.isArray(payload)) {
+    const stats = computeStats(payload);
+    return {
+      average_rating: stats.average,
+      total_reviews: stats.total,
+      results: payload,
+    };
+  }
+
+  const results = Array.isArray(payload?.results) ? payload.results : [];
+  const stats = computeStats(results);
+  return {
+    average_rating: payload?.average_rating ?? stats.average,
+    total_reviews: payload?.total_reviews ?? stats.total,
+    results,
+  };
+}
+
+/**
+ * POST /api/listings/:id/reviews/
+ * body: { rating: number (1-5), comment: string }
+ */
+export async function submitListingReview(id, { rating, comment }) {
+  const payload = { rating, comment };
+  const res = await fetch(`${API_BASE_URL}/api/listings/${id}/reviews/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Failed to submit review");
+  return res.json(); // { status:"success", message:"Review posted." }
+}
+
+/**
+ * POST /api/listings/:id/interest/
+ */
+export async function sendListingInterest(id, message) {
+  const res = await fetch(`${API_BASE_URL}/api/listings/${id}/interest/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
+
+  if (!res.ok) throw new Error("Failed to send interest message");
+  return res.json(); // { status:"success", message:"Message sent..." }
+}
+
+/**
+ * POST /api/listings/:id/favorite/
+ */
+export async function toggleListingFavorite(id) {
+  const res = await fetch(`${API_BASE_URL}/api/listings/${id}/favorite/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) throw new Error("Failed to update favorite state");
+  return res.json(); // { status:"added"|"removed", message }
+}
+
+/**
+ * GET /api/listings/:id/similar/
+ */
+export async function getSimilarListings(id) {
+  const res = await fetch(`${API_BASE_URL}/api/listings/${id}/similar/`, {
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch similar listings");
+  return res.json(); // array of listing cards
 }
 
 
@@ -108,7 +220,11 @@ export async function pauseSellerListing(id, { reason, auto_activate_date } = {}
   );
 
   if (!res.ok) throw new Error("Failed to pause listing");
-  return res.json(); // {status: "success", message, new_status}
+  const payload = await res.json();
+  if (payload && !payload.new_status && payload.listing_status) {
+    payload.new_status = payload.listing_status;
+  }
+  return payload;
 }
 
 /**
@@ -124,7 +240,11 @@ export async function activateSellerListing(id) {
   );
 
   if (!res.ok) throw new Error("Failed to activate listing");
-  return res.json(); // 200 OK (we assume JSON status/message)
+  const payload = await res.json();
+  if (payload && !payload.new_status && payload.listing_status) {
+    payload.new_status = payload.listing_status;
+  }
+  return payload; // 200 OK (we assume JSON status/message)
 }
 
 /**
