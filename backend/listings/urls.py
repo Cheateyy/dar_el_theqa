@@ -25,8 +25,8 @@ urlpatterns = [
     #Gets you the id's documents
     path('listings/documents/<int:id>/fetch/', ListingViewDocuments.as_view(), name="get-listing-document"),
 
-    path('/admin/listings/:id/documents/:docid/reject/', RejectDocumentView.as_view(), name="reject-doc"),
-    path('/admin/listings/:id/documents/:docid/approve/', ListingDocumentApproveView.as_view(), name="reject-doc"),
+    path('/admin/listings/<int:id>/documents/<int:id>/reject/', RejectDocumentView.as_view(), name="reject-doc"),
+    path('/admin/listings/<int:id>/documents/<int:id>/approve/', ListingDocumentApproveView.as_view(), name="reject-doc"),
     
 
 ]
