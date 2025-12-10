@@ -49,6 +49,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class ActivationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+
 class ActivationResendSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

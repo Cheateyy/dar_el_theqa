@@ -1,4 +1,4 @@
-from rest_framework import generics, status, views, permissions
+from rest_framework import generics, status, views, permissions, serializers
 from rest_framework.response import Response
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -6,10 +6,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import extend_schema, inline_serializer
 from .serializers import (
     UserSerializer,
     RegisterSerializer,
     PartnerSerializer,
+    ActivationSerializer,
     ActivationResendSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
@@ -22,6 +24,18 @@ User = get_user_model()
 class RegisterView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=RegisterSerializer,
+        responses=inline_serializer(
+            name="RegisterResponse",
+            fields={
+                "id": serializers.IntegerField(),
+                "email": serializers.EmailField(),
+                "full_name": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -41,9 +55,31 @@ class RegisterView(views.APIView):
 class ActivationView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=ActivationSerializer,
+        responses=inline_serializer(
+            name="ActivationResponse",
+            fields={
+                "status": serializers.CharField(),
+                "message": serializers.CharField(),
+                "token": serializers.CharField(required=False),
+                "user": inline_serializer(
+                    name="ActivationUserPayload",
+                    fields={
+                        "id": serializers.IntegerField(),
+                        "name": serializers.CharField(),
+                    },
+                    many=False,
+                    allow_null=True,
+                ),
+            },
+        ),
+    )
     def post(self, request):
-        email = request.data.get('email')
-        code = request.data.get('code')
+        serializer = ActivationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        code = serializer.validated_data['code']
         # Mock verification
         try:
             user = User.objects.get(email=email)
@@ -64,6 +100,16 @@ class ActivationView(views.APIView):
 class ActivationResendView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=ActivationResendSerializer,
+        responses=inline_serializer(
+            name="ActivationResendResponse",
+            fields={
+                "status": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request):
         serializer = ActivationResendSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -85,6 +131,26 @@ class ActivationResendView(views.APIView):
 class UserDetailView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        responses=inline_serializer(
+            name="UserAuthStatus",
+            fields={
+                "isAuthenticated": serializers.BooleanField(),
+                "user": inline_serializer(
+                    name="UserSummary",
+                    fields={
+                        "id": serializers.IntegerField(),
+                        "name": serializers.CharField(),
+                        "email": serializers.EmailField(),
+                        "role": serializers.CharField(),
+                        "is_staff": serializers.BooleanField(),
+                    },
+                    many=False,
+                    allow_null=True,
+                ),
+            },
+        ),
+    )
     def get(self, request):
         if request.user.is_authenticated:
             return Response({
@@ -103,6 +169,16 @@ class UserDetailView(views.APIView):
 class PasswordResetRequestView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=PasswordResetRequestSerializer,
+        responses=inline_serializer(
+            name="PasswordResetRequestResponse",
+            fields={
+                "status": serializers.CharField(),
+                "message": serializers.CharField(),
+            },
+        ),
+    )
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -131,6 +207,25 @@ class PasswordResetRequestView(views.APIView):
 class PasswordResetConfirmView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=PasswordResetConfirmSerializer,
+        responses={
+            200: inline_serializer(
+                name="PasswordResetConfirmSuccess",
+                fields={
+                    "status": serializers.CharField(),
+                    "message": serializers.CharField(),
+                },
+            ),
+            400: inline_serializer(
+                name="PasswordResetConfirmError",
+                fields={
+                    "status": serializers.CharField(),
+                    "message": serializers.CharField(),
+                },
+            ),
+        },
+    )
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
