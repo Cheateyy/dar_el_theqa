@@ -87,6 +87,21 @@ class ListingPauseView(views.APIView):
             return Response({"status": "success", "new_status": listing.status})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
+class ListingActivateView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, id):
+        try:
+            listing = Listing.objects.get(id=id, owner=request.user)
+            listing.status = Listing.Status.APPROVED
+            listing.save()
+            return Response(status=200)
+        except Listing.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 class ListingDocumentUpdateView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
