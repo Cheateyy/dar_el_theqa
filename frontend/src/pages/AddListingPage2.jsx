@@ -1,6 +1,7 @@
 // src/pages/AddListingPage2.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";   
 
 import "../assets/styles/addListing2.css";
 
@@ -20,6 +21,14 @@ const MAX_IMAGES = 20;
 function AddListingPage2() {
   const navigate = useNavigate();
 
+    const { auth } = useAuth();   
+
+ 
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+    }
+  }, [auth]);
   
   const [propertyType, setPropertyType] = useState("");
   const [listingPurpose, setListingPurpose] = useState("");

@@ -1,6 +1,8 @@
 // src/pages/AddPartner.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+
 import "../assets/styles/Addpartner.css";
 import { wilayas, regions } from "../utils/algeria.js";
 
@@ -13,10 +15,25 @@ import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
 
-const USE_MOCK_PARTNERS = true; 
+const USE_MOCK_PARTNERS = false; 
 
 function AddPartner() {
   const navigate = useNavigate();
+
+  const { auth } = useAuth();
+
+  useEffect(() => {
+  if (!auth.isAuthenticated) {
+    navigate("/login");
+    return;
+  }
+
+  if (auth.user.role !== "ADMIN") {
+    navigate("/"); 
+  }
+}, [auth]);
+
+
   const logoInputRef = useRef(null);
 
 
@@ -332,7 +349,7 @@ function AddPartner() {
               <button
                 type="button"
                 onClick={openLogoPicker}
-                className={`add-document-btn ${logoFile ? "added" : ""}`}
+                className={`add-logo-btn ${logoFile ? "added" : ""}`}
                 disabled={!!logoFile}
               >
                 +
@@ -348,9 +365,9 @@ function AddPartner() {
             />
 
             {logoFile && (
-              <div className="document-card">
-                <div className="document-file-row">
-                  <span className="document-filename">
+              <div className="logo-card">
+                <div className="logo-file-row">
+                  <span className="logo-filename">
                     <img
                       src={imageIcon}
                       className="small-pdf-icon"
@@ -360,7 +377,7 @@ function AddPartner() {
                   </span>
                   <button
                     type="button"
-                    className="remove-document-btn"
+                    className="remove-logo-btn"
                     onClick={removeLogo}
                   >
                     <img

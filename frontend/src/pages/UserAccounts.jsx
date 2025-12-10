@@ -1,6 +1,9 @@
 // src/pages/UserAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import "../assets/styles/UserAccounts.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";  
+
 
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
@@ -16,14 +19,28 @@ import actionsIcon from "../assets/icons/Actions.svg";
 
 import Section from "../components/common/Section.jsx";
 
-const USE_MOCK_USERS = true;
+const USE_MOCK_USERS = false;
 
 function UserAccounts() {
+
+
+  const navigate = useNavigate();
+  const { auth } = useAuth();
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (auth.user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [auth]);
+
+
   const PAGE_SIZE = 10;
 
-  // ------------------------------------------------------------
-  // LOAD USERS (Mock or Backend)
-  // ------------------------------------------------------------
   const [users, setUsers] = useState(() => {
     if (!USE_MOCK_USERS) return [];
 
@@ -44,9 +61,6 @@ function UserAccounts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(!USE_MOCK_USERS);
 
-  // ------------------------------------------------------------
-  // SAVE MOCK USERS
-  // ------------------------------------------------------------
   useEffect(() => {
     if (!USE_MOCK_USERS) return;
 

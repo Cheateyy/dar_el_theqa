@@ -1,6 +1,8 @@
 // src/pages/AuditLog.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import "../assets/styles/AuditLog.css";
+import { useAuth } from "../contexts/AuthContext"; 
+import { useNavigate } from "react-router-dom";
 
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
@@ -12,9 +14,24 @@ import actionIcon from "../assets/icons/AuditAction.svg";
 
 import Section from "../components/common/Section.jsx";
 
-const USE_MOCK_AUDIT = true;
+const USE_MOCK_AUDIT = false;
 
 function AuditLog() {
+
+  const navigate = useNavigate();
+  const { auth } = useAuth();  
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    if (auth.user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [auth]);
+
+
   const [entries, setEntries] = useState(() => {
     if (USE_MOCK_AUDIT) {
       const stored = localStorage.getItem("auditLog");

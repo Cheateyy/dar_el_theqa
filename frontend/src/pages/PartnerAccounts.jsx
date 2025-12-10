@@ -1,6 +1,7 @@
 // src/pages/PartnerAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../assets/styles/PartnerAccounts.css";
 
 import nextPage from "../assets/icons/nextPage.svg";
@@ -15,10 +16,23 @@ import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
 import actionsIcon from "../assets/icons/Actions.svg";
 
-const USE_MOCK_PARTNERS = true;
+const USE_MOCK_PARTNERS = false;
 
 function PartnerAccounts() {
   const navigate = useNavigate();
+   const { auth } = useAuth();
+
+  // ADMIN ONLY PAGE
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (auth.user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [auth]);
 
   // ---------------------------
   // LOAD PARTNERS

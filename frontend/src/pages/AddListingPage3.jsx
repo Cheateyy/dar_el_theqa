@@ -1,14 +1,18 @@
 // src/pages/AddListingPage3.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+
 import "../assets/styles/addListing3.css";
 import Button from "../components/common/Button.jsx";
 import Section from "../components/common/Section.jsx";
+
 import BackIcon from "@/assets/icons/back.svg";
 import DocumentIcon from "@/assets/icons/document.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 
 const DRAFT_KEY = "createListingDraft";
+
 
 const loadStepData = () => {
   const raw = localStorage.getItem(DRAFT_KEY);
@@ -30,74 +34,90 @@ const loadStepData = () => {
   return { step1, step2, images };
 };
 
-const DOCUMENT_TYPES = [
-  { label: "Identity Document", key: "docidentity" },
-  { label: "Assurance Document", key: "docassurance" },
-  { label: "Ownership Document - Page 1", key: "docownership1" },
-  { label: "Ownership Document - Page 2", key: "docownership2" },
-  { label: "Ownership Document - Page 3", key: "docownership3" },
-  { label: "Ownership Document - Page 4", key: "docownership4" },
-  { label: "Ownership Document - Page 5", key: "docownership5" },
-  { label: "Register Certificate", key: "docregister" },
-  { label: "Silbiya Certificate", key: "docsilbiya" },
-];
-
 function AddListingPage3() {
   const navigate = useNavigate();
+  const { auth } = useAuth();
+
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) navigate("/login");
+  }, [auth]);
+
   const { step1, step2, images } = loadStepData();
+  const ownershipInputRef = useRef(null);
 
-  const fileInputRefs = useRef({});
+  // Each document structure: { file: File | null, notes: "" }
+  const [identity, setIdentity] = useState({ file: null, notes: "" });
+  const [certificate, setCertificate] = useState({ file: null, notes: "" });
+  const [assurance, setAssurance] = useState({ file: null, notes: "" });
 
-  const [documents, setDocuments] = useState(
-    DOCUMENT_TYPES.map(() => ({
-      file: null,
-      notes: "",
-    }))
-  );
+  // Ownership: up to 5 files + notes
+  const [ownershipFiles, setOwnershipFiles] = useState([]);
+  const [ownershipNotes, setOwnershipNotes] = useState("");
 
-  const handleAddFileClick = (idx) => {
-    if (fileInputRefs.current[idx]) {
-      fileInputRefs.current[idx].value = "";
-      fileInputRefs.current[idx].click();
+  const [errors, setErrors] = useState({
+    identity: false,
+    certificate: false,
+    assurance: false,
+    ownership: false,
+  });
+
+  // -------------------------------
+  // Validation Rule:
+  // Valid if: file exists OR notes entered
+  // -------------------------------
+  const validateDocuments = () => {
+    const newErrors = {
+      identity: !identity.file && identity.notes.trim().length === 0,
+      certificate: !certificate.file && certificate.notes.trim().length === 0,
+      assurance: !assurance.file && assurance.notes.trim().length === 0,
+      ownership:
+        ownershipFiles.length === 0 &&
+        ownershipNotes.trim().length === 0,
+    };
+
+    setErrors(newErrors);
+
+    return !Object.values(newErrors).some((e) => e === true);
+  };
+
+  // -------------------------------
+  // Ownership file upload handler (max 5)
+  // -------------------------------
+  const handleAddOwnership = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (ownershipFiles.length >= 5) {
+      alert("You can upload up to 5 ownership documents.");
+      return;
     }
+
+    setOwnershipFiles((prev) => [...prev, file]);
   };
 
-  const handleFileAdded = (idx, file) => {
-    if (file) {
-      setDocuments((prev) =>
-        prev.map((doc, i) => (i === idx ? { ...doc, file } : doc))
-      );
-    }
+  const removeOwnershipFile = (idx) => {
+    setOwnershipFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  const handleRemoveFile = (idx) => {
-    setDocuments((prev) =>
-      prev.map((doc, i) => (i === idx ? { ...doc, file: null } : doc))
-    );
+  // -------------------------------
+  // Handle Identity / Certificate / Assurance Upload
+  // -------------------------------
+  const handleSingleUpload = (e, setter) => {
+    const file = e.target.files?.[0];
+    if (file) setter((prev) => ({ ...prev, file }));
   };
 
-  const handleNotesChange = (idx, notes) => {
-    setDocuments((prev) =>
-      prev.map((doc, i) => (i === idx ? { ...doc, notes } : doc))
-    );
-  };
-
-  const fetchWilayaId = async (name) => {
-    const res = await fetch("/api/choices/wilayas/");
-    const list = await res.json();
-    const found = list.find((w) => w.name === name);
-    return found ? found.id : null;
-  };
-
-  const fetchRegionId = async (wilayaId, regionName) => {
-    const res = await fetch(`/api/choices/regions/?wilayaid=${wilayaId}`);
-    const list = await res.json();
-    const found = list.find((r) => r.name === regionName);
-    return found ? found.id : null;
-  };
-
+  // -------------------------------
+  // Submit Form
+  // -------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateDocuments()) {
+      alert("Please upload all required documents OR provide notes.");
+      return;
+    }
 
     try {
       const wilaya_id = await fetchWilayaId(step1.wilaya);
@@ -105,6 +125,7 @@ function AddListingPage3() {
 
       const payload = new FormData();
 
+      // Step 1
       payload.append("title", step1.title);
       payload.append("description", step1.description);
       payload.append("price", Number(step1.price));
@@ -122,12 +143,14 @@ function AddListingPage3() {
       payload.append("wilaya_id", wilaya_id);
       payload.append("region_id", region_id);
 
+      // Step 2
       payload.append("property_type", step2.propertyTypeBackend);
       payload.append("area", Number(step2.area));
       payload.append("floors", Number(step2.floors || 0));
       payload.append("bedrooms", Number(step2.bedrooms || 0));
       payload.append("bathrooms", Number(step2.bathrooms || 0));
 
+      // Images
       const labelsObject = {};
       images.forEach((img, index) => {
         if (img.file) {
@@ -135,15 +158,28 @@ function AddListingPage3() {
           labelsObject[index] = img.label || "";
         }
       });
-
       payload.append("image_labels", JSON.stringify(labelsObject));
 
-      DOCUMENT_TYPES.forEach((docType, idx) => {
-        if (documents[idx].file) {
-          payload.append(docType.key, documents[idx].file);
-        }
+      // Upload ownership files (if any)
+      ownershipFiles.forEach((file) => {
+        payload.append("docownership", file);
       });
+      payload.append("docownership_notes", ownershipNotes);
 
+      // Upload identity
+      if (identity.file) payload.append("docidentity", identity.file);
+      payload.append("docidentity_notes", identity.notes);
+
+      // Upload certificate
+      if (certificate.file)
+        payload.append("doccertificate", certificate.file);
+      payload.append("doccertificate_notes", certificate.notes);
+
+      // Upload assurance
+      if (assurance.file) payload.append("docassurance", assurance.file);
+      payload.append("docassurance_notes", assurance.notes);
+
+      // Send request
       const response = await fetch("/api/listings/create", {
         method: "POST",
         body: payload,
@@ -157,10 +193,9 @@ function AddListingPage3() {
         return;
       }
 
+      // Cleanup
       localStorage.removeItem("createListingDraft");
       window.__CREATE_LISTING_IMAGES = undefined;
-      window.__CREATE_LISTING_IMAGES_PROPERTYTYPE = undefined;
-      window.__CREATE_LISTING_IMAGES_META = undefined;
 
       navigate("/forms-tables/add-listing/confirmation");
     } catch (error) {
@@ -169,14 +204,27 @@ function AddListingPage3() {
     }
   };
 
+  const fetchWilayaId = async (name) => {
+    const res = await fetch("/api/choices/wilayas/");
+    const list = await res.json();
+    const found = list.find((w) => w.name === name);
+    return found ? found.id : null;
+  };
+
+  const fetchRegionId = async (wilayaId, regionName) => {
+    const res = await fetch(`/api/choices/regions/?wilayaid=${wilayaId}`);
+    const list = await res.json();
+    const found = list.find((r) => r.name === regionName);
+    return found ? found.id : null;
+  };
+
+  // -------------------------------
+  // RENDER
+  // -------------------------------
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
-        <button
-          className="back-button"
-          type="button"
-          onClick={() => navigate(-1)}
-        >
+        <button className="back-button" type="button" onClick={() => navigate(-1)}>
           <img src={BackIcon} className="back-icon" alt="Back" />
           Back
         </button>
@@ -185,85 +233,223 @@ function AddListingPage3() {
 
         <Section>
           <h2 className="section-title">Legal Documents</h2>
-          <p className="small-hint">
-            Add all required documents for verification.
-            <br />
-            They will be validated by an admin.
-          </p>
+          <p className="small-hint">Upload required documents or provide a note explaining missing ones.</p>
 
           <form onSubmit={handleSubmit}>
-            {DOCUMENT_TYPES.map((docType, idx) => (
-              <div key={docType.key} className="document-row">
-                <div className="document-head">
-                  <span className="document-title">
-                    {docType.label}
-                    <span className="info-icon" title={docType.tooltip}>
-                      ⓘ
-                    </span>
-                  </span>
 
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    style={{ display: "none" }}
-                    ref={(el) => (fileInputRefs.current[idx] = el)}
-                    onChange={(e) => handleFileAdded(idx, e.target.files[0])}
-                  />
-
-                  <button
-                    type="button"
-                    className={`add-document-btn ${
-                      documents[idx].file ? "added" : ""
-                    }`}
-                    disabled={!!documents[idx].file}
-                    onClick={() => handleAddFileClick(idx)}
-                  >
-                    +
-                  </button>
-                </div>
-
-                {documents[idx].file && (
-                  <div className="document-card">
-                    <div className="document-file-row">
-                      <span className="document-filename">
-                        <img
-                          src={DocumentIcon}
-                          className="small-pdf-icon"
-                          alt="file"
-                        />
-                        {documents[idx].file.name}
-                      </span>
-
-                      <button
-                        type="button"
-                        className="remove-document-btn"
-                        onClick={() => handleRemoveFile(idx)}
-                      >
-                        <img
-                          src={removeIcon}
-                          className="remove-icon"
-                          alt="Remove file"
-                        />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <label htmlFor={`notes-${idx}`} className="notes-label">
-                  Notes
-                </label>
-
-                <textarea
-                  id={`notes-${idx}`}
-                  className="notes-input"
-                  value={documents[idx].notes}
-                  placeholder="Add notes or explain why this document is missing..."
-                  maxLength={500}
-                  onChange={(e) => handleNotesChange(idx, e.target.value)}
+            {/* ---------------- Identity ---------------- */}
+            <div className="document-row">
+              <div className="document-title-row">
+                <h3 className="document-title">Identity Document</h3>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleSingleUpload(e, setIdentity)}
+                  id="identity-file"
                 />
+                <button
+                  type="button"
+                  className="add-document-btn"
+                  onClick={() => document.getElementById("identity-file").click()}
+                  disabled={!!identity.file}
+                >
+                  +
+                </button>
               </div>
-            ))}
 
+              {errors.identity && (
+                <p className="error-text">Upload a file or provide notes.</p>
+              )}
+
+              {identity.file && (
+                <div className="document-card">
+                  <div className="document-file-row">
+                    <span className="document-filename">
+                      <img src={DocumentIcon} className="small-pdf-icon" />
+                      {identity.file.name}
+                    </span>
+                    <button
+                      type="button"
+                      className="remove-document-btn"
+                      onClick={() => setIdentity({ ...identity, file: null })}
+                    >
+                      <img src={removeIcon} className="remove-icon" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <label className="notes-label">notes</label>
+              <textarea
+                className="notes-input"
+                value={identity.notes}
+                onChange={(e) => setIdentity({ ...identity, notes: e.target.value })}
+                placeholder="Write explanation if no document provided..."
+              />
+            </div>
+
+            {/* ---------------- Ownership ---------------- */}
+            <div className="document-row">
+              <div className="document-title-row">
+                <h3 className="document-title">
+                  Property Ownership Contract (up to 5 pages)
+                </h3>
+                <input
+                  type="file"
+                  ref={ownershipInputRef}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  style={{ display: "none" }}
+                  onChange={handleAddOwnership}
+                />
+                <button
+                  type="button"
+                  className="add-document-btn"
+                  onClick={() => ownershipInputRef.current.click()}
+                  disabled={ownershipFiles.length >= 5}
+                >
+                  +
+                </button>
+              </div>
+
+              {errors.ownership && (
+                <p className="error-text">
+                  Upload at least one file OR provide notes.
+                </p>
+              )}
+
+              {ownershipFiles.map((file, idx) => (
+                <div key={idx} className="document-card">
+                  <div className="document-file-row">
+                    <span className="document-filename">
+                      <img src={DocumentIcon} className="small-pdf-icon" />
+                      {file.name}
+                    </span>
+                    <button
+                      type="button"
+                      className="remove-document-btn"
+                      onClick={() => removeOwnershipFile(idx)}
+                    >
+                      <img src={removeIcon} className="remove-icon" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <label className="notes-label">notes</label>
+              <textarea
+                className="notes-input"
+                value={ownershipNotes}
+                onChange={(e) => setOwnershipNotes(e.target.value)}
+                placeholder="Write explanation if no ownership document provided..."
+              />
+            </div>
+
+            {/* ---------------- Certificate ---------------- */}
+            <div className="document-row">
+              <div className="document-title-row">
+                <h3 className="document-title">Certificate of Non-Existence</h3>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  id="certificate-file"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleSingleUpload(e, setCertificate)}
+                />
+                <button
+                  className="add-document-btn"
+                  type="button"
+                  onClick={() => document.getElementById("certificate-file").click()}
+                  disabled={!!certificate.file}
+                >
+                  +
+                </button>
+              </div>
+
+              {errors.certificate && (
+                <p className="error-text">Upload a file OR provide notes.</p>
+              )}
+
+              {certificate.file && (
+                <div className="document-card">
+                  <div className="document-file-row">
+                    <span className="document-filename">
+                      <img src={DocumentIcon} className="small-pdf-icon" />
+                      {certificate.file.name}
+                    </span>
+                    <button
+                      className="remove-document-btn"
+                      type="button"
+                      onClick={() => setCertificate({ ...certificate, file: null })}
+                    >
+                      <img src={removeIcon} className="remove-icon" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <label className="notes-label">notes</label>
+              <textarea
+                className="notes-input"
+                value={certificate.notes}
+                onChange={(e) => setCertificate({ ...certificate, notes: e.target.value })}
+                placeholder="Explain if the document is missing..."
+              />
+            </div>
+
+            {/* ---------------- Assurance ---------------- */}
+            <div className="document-row">
+              <div className="document-title-row">
+                <h3 className="document-title">Assurance Policy</h3>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  id="assurance-file"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleSingleUpload(e, setAssurance)}
+                />
+                <button
+                  className="add-document-btn"
+                  type="button"
+                  onClick={() => document.getElementById("assurance-file").click()}
+                  disabled={!!assurance.file}
+                >
+                  +
+                </button>
+              </div>
+
+              {errors.assurance && (
+                <p className="error-text">Upload a file OR provide notes.</p>
+              )}
+
+              {assurance.file && (
+                <div className="document-card">
+                  <div className="document-file-row">
+                    <span className="document-filename">
+                      <img src={DocumentIcon} className="small-pdf-icon" />
+                      {assurance.file.name}
+                    </span>
+                    <button
+                      className="remove-document-btn"
+                      type="button"
+                      onClick={() => setAssurance({ ...assurance, file: null })}
+                    >
+                      <img src={removeIcon} className="remove-icon" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <label className="notes-label">notes</label>
+              <textarea
+                className="notes-input"
+                value={assurance.notes}
+                onChange={(e) => setAssurance({ ...assurance, notes: e.target.value })}
+                placeholder="Explain if the document is missing..."
+              />
+            </div>
+
+            {/* ---------------- Submit ---------------- */}
             <div className="form-footer">
               <Button type="submit" variant="primary" icon="approval">
                 Send For Approval

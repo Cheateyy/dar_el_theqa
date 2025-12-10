@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/addListing.css";
 import { wilayas as wilayaNamesLocal, regions as regionsLocal } from "../utils/algeria.js";
-
+import { useAuth } from "../contexts/AuthContext"; 
 import Input from "../components/common/Input.jsx";
 import Select from "../components/common/Select.jsx";
 import TextArea from "../components/common/TextArea.jsx";
@@ -16,6 +16,15 @@ const DRAFT_KEY = "createListingDraft";
 
 function AddListingPage() {
   const navigate = useNavigate();
+
+  const { auth } = useAuth(); 
+
+  
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+    }
+  }, [auth]);
 
   const [formData, setFormData] = useState({
     title: "",
