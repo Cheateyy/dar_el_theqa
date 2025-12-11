@@ -52,11 +52,13 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         </div>
-                        <MainSearchFilters className="w-3/4 relative top-1/2 left-1/2 -translate-x-1/2 " />
+                        <MainSearchFilters
+                            className="w-full px-4 md:w-281 md:absolute md:top-[65%] md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0"
+                        />
                     </div>
                 </section>
 
-                <section role="suggested listings" className="mt-8 sm:mt-16 md:mt-20">
+                <section role="suggested listings" className="mt-15 md:mt-40 lg:mt-50">
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
                     </div>

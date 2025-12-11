@@ -11,14 +11,22 @@ import searchSvg from '../assets/search.svg'
 import menuHeartSvg from '../assets/menuHeart.svg'
 import messageSvg from '../assets/message.svg'
 import logoutSvg from '../assets/logout.svg'
+import { useState } from "react"
+import { Combobox } from "@/components/common/Combobox"
+import { useAuthMessaging } from "../context/AuthMessagingContext"
 
 function LanguageSelector({ className }) {
     const langs = ["arabic", "english", "language"];
+    const [language, set_language] = useState(langs[0])
+
     return (
-        <CustomDropdownMenu className={className} options={langs.map(lang => ({ label: lang }))}>
+        <div className="flex items-center">
             <GlobeIcon className="w-5 h-5" />
-            <span className="hidden md:inline ml-2">Language</span>
-        </CustomDropdownMenu>
+            <Combobox
+                className={className} options={langs.map(lang => ({ label: lang, value: lang }))}
+                label="language" state_control={[language, set_language]} variant='ghost'
+            />
+        </div>
     )
 }
 
@@ -42,6 +50,7 @@ function MenuButton() {
 }
 
 export function NotLoggedInActions() {
+    const { set_is_login_dlg_open } = useAuthMessaging()
     return (
         <div className="flex items-center gap-3">
             {/* show full language selector on md+, only icon on small */}
@@ -49,7 +58,10 @@ export function NotLoggedInActions() {
                 <LanguageSelector />
             </div>
 
-            <Button className="px-3 py-2 text-sm md:px-4 md:py-3">Log In</Button>
+            <Button className="px-3 py-2 text-sm md:px-4 md:py-3"
+                onClick={() => set_is_login_dlg_open(prev => !prev)}>
+                Log In
+            </Button>
         </div>
     )
 }

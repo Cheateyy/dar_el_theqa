@@ -9,8 +9,8 @@ export function BuyerHeader() {
                 <img src={logoSvg} alt="logo" className="w-full h-full object-contain" />
             </div>
             {/* <LoggedInSellerActions /> */}
-            {/* <NotLoggedInActions /> */}
-            <LoggedInBuyerActions />
+            <NotLoggedInActions />
+            {/* <LoggedInBuyerActions /> */}
         </div>
     </header>
 }

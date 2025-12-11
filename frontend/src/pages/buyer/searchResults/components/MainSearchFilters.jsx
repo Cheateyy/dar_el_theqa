@@ -27,13 +27,13 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
     return (
         <div>
             <SearchFiltersWrapper className={className} selectedOfferType={selected_property_type} setSelectedOfferType={set_selected_property_type}>
-                <div className="flex overflow-auto relative gap-5">
+                <div className="flex flex-col items-center sm:flex-col md:flex-row overflow-auto relative gap-5">
                     <FilterCombobox
                         filtername="Wilaya"
                         input_control={
                             [filters.wilaya,
                             (new_wilaya) => set_filters(prev => ({ ...prev, wilaya: new_wilaya }))]}
-                        className={'w-48 rounded-2xl'}
+                        className={'rounded-2xl'}
                         options={wilaya_options}
                     />
                     <FilterCombobox
