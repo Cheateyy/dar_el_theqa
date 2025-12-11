@@ -136,9 +136,9 @@ export const handlers = [
     }),
 
     // DELETE /api/listings/:id/  (seller delete)
-    http.delete(`${API_BASE_URL}/api/listings/:id/`, async (req) => {
-        const { id } = req.params;
-        const body = await req.json().catch(() => ({}));
+    http.delete(`${API_BASE_URL}/api/listings/:id/`, async ({ request, params }) => {
+        const { id } = params;
+        const body = await request.clone().json()
         console.log(`[MSW MOCK] Delete seller listing ${id}`, body);
 
         // Backend returns 204 No Content; MSW can't send 204+body, so we just send 204.

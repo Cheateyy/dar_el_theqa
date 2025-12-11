@@ -12,7 +12,7 @@ import { pause_listing } from "../lib/api"
  */
 export function UpdateListingDialog({ listing_id, state_control }) {
     /**@type {StateControl<string>} */
-    const [reason, set_reason] = useState("")
+    const [reason, set_reason] = useState(null)
     const [auto_activate_date, set_auto_activate_date] = useState(null)
 
     const [is_dlg_open, set_is_dlg_open] = state_control

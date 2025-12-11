@@ -23,7 +23,7 @@ import deleteSvg from "@/assets/icons/Delete.svg"
  */
 export function SellerListingCard({ listing }) {
     const { open_update_listing_dlg } = useListingsMessaging()
-    const { set_is_delete_dlg_open } = useListingsMessaging()
+    const { open_delete_listing_dlg } = useListingsMessaging()
 
     let verification_status_icon;
     let verification_status_str;
@@ -61,7 +61,7 @@ export function SellerListingCard({ listing }) {
                         <img src={editSvg} alt="edit" className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                 </div>
-                <CustomDropdownMenu asChild options={[{ label: "Delete", img: deleteSvg, onClick: () => set_is_delete_dlg_open(true) }]}>
+                <CustomDropdownMenu asChild options={[{ label: "Delete", img: deleteSvg, onClick: () => open_delete_listing_dlg(listing.id) }]}>
                     <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700/80 flex items-center justify-center">
                         <button className="cursor-pointer hover:opacity-75">
                             <img src={menuKebakSvg} alt="menu-kebab" className="w-4 h-4 sm:w-5 sm:h-5" />

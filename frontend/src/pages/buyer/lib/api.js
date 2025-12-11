@@ -1,4 +1,5 @@
 import { api } from "@/lib/api_client";
+import { format_date } from "@/lib/utils";
 
 /**@typedef {import('@/types/ListingModel')}*/
 
@@ -104,6 +105,8 @@ export async function get_favorites() {
     return data;
 };
 
+// -------------- Pause Listing
+
 /**
  * @typedef PauseListingPayload
  * @property {string} reason
@@ -116,20 +119,6 @@ export async function get_favorites() {
  * @property {string} message
  * @property {"RENTED"} new_status
  */
-
-/**
- * 
- * @param {Date} date 
- * @returns {string}
- */
-function format_date(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-}
-
 
 /**
  * @param {int} listing_id
@@ -152,4 +141,20 @@ export async function pause_listing(listing_id, payload) {
     }
     const data = await res.json();
     return data
+}
+
+// ---------- DELETE Listing
+/**
+ * @typedef DeleteListingUpload
+ * @property {string} reason
+ */
+/**
+ * 
+ * @param {int} listing_id 
+ * @param {DeleteListingUpload} payload 
+ * @returns {Promise<bool>}
+ */
+export async function delete_listing(listing_id, payload) {
+    const res = await api.delete(`/api/listings/${listing_id}/`, payload)
+    return res.status == 204; // No content
 }
