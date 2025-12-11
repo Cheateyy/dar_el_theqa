@@ -10,6 +10,9 @@ import isVerifiedSvg from '@/assets/icons/is_verified.svg'
 import isPartiallyVerifiedSvg from '@/assets/icons/is_partially_verified.svg'
 import { Button } from "../ui/button"
 import { useListingsMessaging } from "@/pages/buyer/context/ListingsMessagingContext"
+import { CustomDropdownMenu } from "./DropDownMenu"
+
+import deleteSvg from "@/assets/icons/Delete.svg"
 
 /** @typedef {import("@/types/ListingModel")}*/
 
@@ -19,7 +22,8 @@ import { useListingsMessaging } from "@/pages/buyer/context/ListingsMessagingCon
  * @returns 
  */
 export function SellerListingCard({ listing }) {
-    const { set_is_update_dlg_open } = useListingsMessaging()
+    const { open_update_listing_dlg } = useListingsMessaging()
+    const { set_is_delete_dlg_open } = useListingsMessaging()
 
     let verification_status_icon;
     let verification_status_str;
@@ -53,15 +57,18 @@ export function SellerListingCard({ listing }) {
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex gap-2">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700/80 flex items-center justify-center">
-                    <button className="cursor-pointer hover:opacity-75" onClick={() => set_is_update_dlg_open(true)}>
+                    <button className="cursor-pointer hover:opacity-75" onClick={() => open_update_listing_dlg(listing.id)}>
                         <img src={editSvg} alt="edit" className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                 </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700/80 flex items-center justify-center">
-                    <button className="cursor-pointer hover:opacity-75">
-                        <img src={menuKebakSvg} alt="menu-kebab" className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                </div>
+                <CustomDropdownMenu asChild options={[{ label: "Delete", img: deleteSvg, onClick: () => set_is_delete_dlg_open(true) }]}>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700/80 flex items-center justify-center">
+                        <button className="cursor-pointer hover:opacity-75">
+                            <img src={menuKebakSvg} alt="menu-kebab" className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                    </div>
+                </CustomDropdownMenu>
+
             </div>
 
             {/* gradient overlay for readability */}

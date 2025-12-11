@@ -103,3 +103,53 @@ export async function get_favorites() {
     const data = await res.json();
     return data;
 };
+
+/**
+ * @typedef PauseListingPayload
+ * @property {string} reason
+ * @property {string} auto_activate_date
+ */
+
+/**
+ * @typedef PauseListingResponse
+ * @property {"success" | "failure"} status
+ * @property {string} message
+ * @property {"RENTED"} new_status
+ */
+
+/**
+ * 
+ * @param {Date} date 
+ * @returns {string}
+ */
+function format_date(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+/**
+ * @param {int} listing_id
+ * @param {PauseListingPayload} payload
+ * @returns {Promise<PauseListingResponse>} 
+ * */
+export async function pause_listing(listing_id, payload) {
+    let auto_activate_date_f;
+    // format data according to the backend
+    if (payload.auto_activate_date) {
+        auto_activate_date_f = format_date(payload.auto_activate_date)
+    }
+    else {
+        auto_activate_date_f = null;
+    }
+    const res = await api.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json();
+    return data
+}

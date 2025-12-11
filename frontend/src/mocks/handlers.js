@@ -91,9 +91,9 @@ export const handlers = [
 
 
     // POST /api/listings/:id/pause/
-    http.post(`${API_BASE_URL}/api/listings/:id/pause/`, async (req) => {
-        const { id } = req.params;
-        const body = await req.json();
+    http.post(`${API_BASE_URL}/api/listings/:id/pause/`, async ({ request, params }) => {
+        const { id } = params;
+        const body = await request.clone().json();
         console.log(`[MSW MOCK] Pause listing ${id}`, body);
 
         let newStatus;

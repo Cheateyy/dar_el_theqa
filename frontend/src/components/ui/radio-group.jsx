@@ -4,12 +4,23 @@ import { CircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @param {Object} props
+ * @param {StateControl<string>} props.state_control
+ * 
+ * */
 function RadioGroup({
+  state_control,
   className,
+  name,
   ...props
 }) {
+  const [value, set_value] = state_control
   return (
     <RadioGroupPrimitive.Root
+      value={value}
+      onValueChange={set_value}
+      name={name}
       data-slot="radio-group"
       className={cn("grid gap-3", className)}
       {...props} />
