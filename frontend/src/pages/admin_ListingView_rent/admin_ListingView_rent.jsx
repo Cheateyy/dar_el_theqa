@@ -9,8 +9,10 @@ import status_icon from "../../assets/icons/certified_button.png";
 import document_icon from "../../assets/images/legal_doc.png";
 
 import { 
-    getAdminListingDetails, 
-    getAdminListingDocuments 
+    getAdminListingDetails,
+    getListingDocuments,
+    getAdminListingTopReviews,
+    deleteAdminReview
 } from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
@@ -21,6 +23,7 @@ export default function AdmingListingRent() {
     const [showLogin, setShowLogin] = useState(false);
     const [listing, setListing] = useState(null);
     const [documents, setDocuments] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const handleLoginClick = () => setShowLogin(true);
@@ -29,25 +32,29 @@ export default function AdmingListingRent() {
     useEffect(() => {
         async function fetchListing() {
             try {
-                const listingData = await getAdminListingDetails(listingId);
-                const docsData = await getAdminListingDocuments(listingId);
+                const [listingData, docsData, reviewsData] = await Promise.all([
+                    getAdminListingDetails(listingId),
+                    getListingDocuments(listingId),
+                    getAdminListingTopReviews(listingId),
+                ]);
 
                 setListing(listingData);
 
-                // 🔥 Convert API documents into usable format
-                const formattedDocs = docsData.map((doc) => ({
-                    name: doc.files?.[0]?.filename || doc.label || "Document",
-                    url: doc.files?.[0]?.url || "#",
+                const formattedDocs = (docsData || []).map((doc) => ({
+                    name: doc.document_type || doc.label || "Document",
+                    url: doc.file || doc.url || "#",
                     icon: document_icon,
                     status: doc.status,
-                    docId: doc.doc_id,
-                    reviewComment: doc.review_comment || doc.comment || "",
+                    docId: doc.id,
+                    reviewComment: doc.admin_note || "",
                 }));
 
                 setDocuments(formattedDocs);
+                setReviews(Array.isArray(reviewsData) ? reviewsData : []);
 
             } catch (error) {
                 console.error("Failed to load admin listing:", error);
+                setReviews([]);
             } finally {
                 setLoading(false);
             }
@@ -55,6 +62,15 @@ export default function AdmingListingRent() {
 
         fetchListing();
     }, [listingId]);
+
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            await deleteAdminReview(reviewId);
+            setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+        } catch (err) {
+            console.error("Failed to delete review", err);
+        }
+    };
 
     if (loading) return <p>Loading...</p>;
     if (!listing) return <p>Listing not found.</p>;
@@ -68,7 +84,8 @@ export default function AdmingListingRent() {
     const bathrooms = listing.bathrooms ?? listing.bathroom_count ?? 0;
     const rentUnit = listing.rent_unit || listing.rentUnit || "MONTH";
     const availableDate = listing.available_date || listing.activation_date || null;
-    const statusCode = listing.status || listing.rental_status || listing.verification_status || "PENDING";
+    const statusCode = listing.listing_status || listing.status || listing.rental_status || listing.verification_status || "PENDING";
+    const verificationStatus = listing.verification_status || statusCode;
     const transactionType = listing.transaction_type || (listing.rent_unit ? "RENT" : "SELL");
 
     return (
@@ -84,7 +101,9 @@ export default function AdmingListingRent() {
                     certifiedIcon={listing.certifiedIcon}
                     description={listing.description}
                     documents={documents}
-                    verificationStatus={listing.verification_status || listing.status}
+                    verificationStatus={verificationStatus}
+                    reviews={reviews}
+                    onDeleteReview={handleDeleteReview}
                 />
 
                 <RightSection

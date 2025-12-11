@@ -9,10 +9,12 @@ import status_icon from "../../assets/icons/certified_button.png";
 
 import {
     getAdminListingDetails,
-    getAdminListingDocuments,
+    getListingDocuments,
     approveAdminListing,
     rejectAdminListingDocument,
     deleteAdminListing,
+    getAdminListingAllReviews,
+    deleteAdminReview,
 } from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
@@ -22,6 +24,7 @@ export default function AdminReviewRent() {
     const [showLogin, setShowLogin] = useState(false);
     const [listing, setListing] = useState(null);
     const [documents, setDocuments] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isApproving, setIsApproving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -34,15 +37,29 @@ export default function AdminReviewRent() {
         async function fetchData() {
             setLoading(true);
             try {
-                const data = await getAdminListingDetails(listingId);
+                const [data, docs, reviewsPayload] = await Promise.all([
+                    getAdminListingDetails(listingId),
+                    getListingDocuments(listingId),
+                    getAdminListingAllReviews(listingId),
+                ]);
+
                 setListing(data || {});
 
-                const docs = await getAdminListingDocuments(listingId);
-                setDocuments(docs || []);
+                const normalizedDocs = (docs || []).map((doc) => ({
+                    name: doc.document_type || doc.label || doc.type || "Document",
+                    url: doc.file || doc.url || "#",
+                    icon: document_icon,
+                    status: doc.status || "PENDING",
+                    docId: doc.id,
+                    reviewComment: doc.admin_note || "",
+                }));
+                setDocuments(normalizedDocs);
+                setReviews(Array.isArray(reviewsPayload) ? reviewsPayload : []);
             } catch (err) {
                 console.error("Error fetching listing data:", err);
                 setListing({});
                 setDocuments([]);
+                setReviews([]);
             } finally {
                 setLoading(false);
             }
@@ -73,7 +90,9 @@ export default function AdminReviewRent() {
             console.log("Document rejected:", res);
             setDocuments((prev) =>
                 prev.map((doc) =>
-                    doc.doc_id === docId ? { ...doc, status: "REJECTED" } : doc
+                    doc.docId === docId
+                        ? { ...doc, status: "REJECTED", reviewComment: reason }
+                        : doc
                 )
             );
         } catch (err) {
@@ -84,9 +103,18 @@ export default function AdminReviewRent() {
     const handleAcceptDocument = (docId) => {
         setDocuments((prev) =>
             prev.map((doc) =>
-                doc.doc_id === docId ? { ...doc, status: "ACCEPTED" } : doc
+                doc.docId === docId ? { ...doc, status: "ACCEPTED", reviewComment: "" } : doc
             )
         );
+    };
+
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            await deleteAdminReview(reviewId);
+            setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+        } catch (err) {
+            console.error("Error deleting review:", err);
+        }
     };
 
     const handleDeleteListing = async () => {
@@ -118,6 +146,9 @@ export default function AdminReviewRent() {
     if (!listing || Object.keys(listing).length === 0)
         return <div>Listing not found</div>;
 
+    const normalizedStatus = listing.listing_status || listing.status || "PENDING";
+    const verificationStatus = listing.verification_status || normalizedStatus;
+
     return (
         <>
             <nav>
@@ -127,20 +158,16 @@ export default function AdminReviewRent() {
             <div className="admin-rent-ListingDetails">
                 <LeftSection
                     images={listing.images || []}
-                    document_icon={document_icon}
+                    certifiedIcon={status_icon}
                     status_icon={status_icon}
                     title={listing.slug || "Property Title"}
                     description={listing.description || ""}
-                    documents={documents.map((doc) => ({
-                        name: doc.files?.[0]?.filename || doc.label || "Document",
-                        url: doc.files?.[0]?.url || "#",
-                        icon: document_icon,
-                        status: doc.status || "PENDING",
-                        docId: doc.doc_id,
-                    }))}
+                    documents={documents}
                     onRejectDocument={handleRejectDocument}
                     onAcceptDocument={handleAcceptDocument}
-                    verificationStatus={listing.verification_status || listing.status}
+                    verificationStatus={verificationStatus}
+                    reviews={reviews}
+                    onDeleteReview={handleDeleteReview}
                 />
 
 
@@ -148,10 +175,10 @@ export default function AdminReviewRent() {
                     address={listing.address || "N/A"}
                     region={listing.wilaya || "N/A"}
                     price={listing.price || 0}
-                    status={listing.status || "PENDING"}
+                    status={normalizedStatus}
                     rentUnit={listing.rent_unit}
-                    propertyType={listing.appartement_type || "N/A"}
-                    area={listing.area_m2 || 0}
+                    propertyType={listing.property_type || "N/A"}
+                    area={listing.area || 0}
                     bedrooms={listing.bedrooms || 0}
                     bathrooms={listing.bathrooms || 0}
                     onApprove={handleApproveListing}

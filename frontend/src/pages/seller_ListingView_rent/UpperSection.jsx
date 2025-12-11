@@ -3,18 +3,46 @@ import updateBtnIcon from "../../assets/images/update-btn-icon.png";
 import activateBtnIcon from "../../assets/images/activate-btn-icon.png";
 import { Link } from "react-router-dom";
 
-export default function UpperSection({ address, region, ListingId }) {
+const noop = () => {};
+
+export default function UpperSection({
+    address,
+    region,
+    ListingId,
+    onToggleStatus = noop,
+    statusActionLabel = "Activate",
+    isStatusLoading = false,
+    onDeleteListing = noop,
+    isDeletingListing = false,
+}) {
     return (
         <div className="seller-rent-UpperRightSection">
             <div className="seller-rent-updateButtons">
-                <Link to={`/details/sellerUpdateListing/${ListingId}`}>                <button className="seller-rent-updateButton">
-                    <img src={updateBtnIcon} alt="Update" />
-                </button>
+                <Link to={`/details/sellerUpdateListing/${ListingId}`}>
+                    <button type="button" className="seller-rent-updateButton" title="Update listing">
+                        <img src={updateBtnIcon} alt="Update" />
+                    </button>
                 </Link>
-                <button className="seller-rent-activateButton">
-                    <img src={activateBtnIcon} alt="Activate" />
+                <button
+                    type="button"
+                    className="seller-rent-activateButton"
+                    onClick={onToggleStatus}
+                    disabled={isStatusLoading}
+                    title={`${statusActionLabel} listing`}
+                    aria-label={`${statusActionLabel} listing`}
+                    aria-busy={isStatusLoading}
+                >
+                    <img src={activateBtnIcon} alt={statusActionLabel} />
                 </button>
-                <button className="seller-rent-deleteButton">
+                <button
+                    type="button"
+                    className="seller-rent-deleteButton"
+                    onClick={onDeleteListing}
+                    disabled={isDeletingListing}
+                    title="Delete listing"
+                    aria-label="Delete listing"
+                    aria-busy={isDeletingListing}
+                >
                     <img src={deleteBtnIcon} alt="Delete" />
                 </button>
             </div>

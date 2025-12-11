@@ -1,7 +1,6 @@
 import UpperSection from "./UpperSection.jsx";
 import PriceSection from "./PriceSection.jsx";
 import InfoCards from "./InfoCards.jsx";
-import ReviewsSection from "../../components/common/ReviewSection/ReviewSection.jsx";
 
 export default function RightSection({
     address,
@@ -13,11 +12,25 @@ export default function RightSection({
     area,
     bedrooms,
     bathrooms,
-    ListingId
+    ListingId,
+    onToggleStatus,
+    statusActionLabel,
+    isStatusLoading,
+    onDeleteListing,
+    isDeletingListing,
 }) {
     return (
         <div className="seller-rent-listingRight card">
-            <UpperSection address={address} region={region} ListingId={ListingId} />
+            <UpperSection
+                address={address}
+                region={region}
+                ListingId={ListingId}
+                onToggleStatus={onToggleStatus}
+                statusActionLabel={statusActionLabel}
+                isStatusLoading={isStatusLoading}
+                onDeleteListing={onDeleteListing}
+                isDeletingListing={isDeletingListing}
+            />
             <PriceSection price={price} status={status} rentUnit={rentUnit} />
             <InfoCards
                 propertyType={propertyType}
@@ -25,9 +38,6 @@ export default function RightSection({
                 bedrooms={bedrooms}
                 bathrooms={bathrooms}
             />
-            <div className="RightSectionReviewMoreListings">
-                <ReviewsSection />
-            </div>
         </div>
     );
 }

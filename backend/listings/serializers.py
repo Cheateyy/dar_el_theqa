@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import serializers
 from .models import Listing, ListingImage, ListingDocument
 from users.serializers import PartnerSerializer
@@ -34,13 +36,13 @@ class ListingSerializer(serializers.ModelSerializer):
             'rejection_reason', 'created_at'
         ]
 
-    def get_cover_image(self, obj):
+    def get_cover_image(self, obj) -> Optional[str]:
         first_image = obj.images.first()
         if first_image:
             return first_image.image.url
         return None
 
-    def get_is_liked(self, obj):
+    def get_is_liked(self, obj) -> bool:
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.favorited_by.filter(user=request.user).exists()
