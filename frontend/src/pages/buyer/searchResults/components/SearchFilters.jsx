@@ -66,7 +66,7 @@ export function SearchFilters({ className, page }) {
     useEffect(() => {
         const params_obj = get_search_params_obj()
         set_search_params(new URLSearchParams(params_obj))
-    }, [filters, more_filters, page])
+    }, [filters, selected_property_type, more_filters, page])
 
     return (
         <div>

@@ -58,7 +58,7 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                <section role="suggested listings" className="mt-8 sm:mt-16 md:mt-20">
+                <section role="suggested listings" className="mt-15 md:mt-40 lg:mt-50">
                     <div className="flex justify-center items-center">
                         <h2 className="h2">You might find interesting</h2>
                     </div>

@@ -29,8 +29,8 @@ export default function MainSearchFilters({ className }) {
   const type = input_values.type;
 
   return (
-    <div>
-      <SearchFiltersWrapper className={className}
+    <div className={className}>
+      <SearchFiltersWrapper
         selectedOfferType={selected_offer_type}
         setSelectedOfferType={set_selected_offer_type}>
         <div className="flex flex-col sm:flex-col md:flex-row gap-5">
@@ -49,7 +49,7 @@ export default function MainSearchFilters({ className }) {
         </div>
       </SearchFiltersWrapper>
       <div className="flex justify-center items-center mt-4">
-        <Button onClick={() => navigate({ pathname: "/search", search: `?type=${type}&wilaya=${wilaya}` })}>
+        <Button onClick={() => navigate({ pathname: "/search-results", search: `?type=${type}&wilaya=${wilaya}` })}>
           <span>Search Listings</span>
           <ArrowRight />
         </Button>
