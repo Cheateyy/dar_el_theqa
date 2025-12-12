@@ -19,10 +19,9 @@ function AddListingPage() {
   const navigate = useNavigate();
 
   const { auth } = useAuth(); 
-
   
   useEffect(() => {
-    if (!auth.isAuthenticated) {
+    if (!isAuthenticated) {
       navigate("/login");
     }
   }, [auth]);
