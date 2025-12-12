@@ -11,7 +11,9 @@ import img3 from "../../assets/images/dummyPropertyImages/image3.jpg";
 import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
 import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
 import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
+import img7 from "../../assets/images/dummyPropertyImages/image7.png";
 import certifiedIcon from "../../assets/icons/certified_button.png";
+import legalDocIcon from "../../assets/images/legal_doc.png";
 
 import "./ListingDetails.css";
 
@@ -25,7 +27,7 @@ import {
 } from "../../lib/api_3.js";
 
 export default function ListingDetails_rent() {
-  const { listingId } = useParams(); 
+  const { listingId } = useParams();
   const [showLogin, setShowLogin] = useState(false);
 
   const [listing, setListing] = useState(null);
@@ -56,8 +58,10 @@ export default function ListingDetails_rent() {
     try {
       setIsActivating(true);
       const response = await activateSellerListing(listingId);
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus =
+        response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing activated.");
     } catch (err) {
@@ -73,8 +77,10 @@ export default function ListingDetails_rent() {
     try {
       setIsPausing(true);
       const response = await pauseSellerListing(listingId, { reason: "OTHER" });
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus =
+        response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing paused.");
     } catch (err) {
@@ -111,46 +117,63 @@ export default function ListingDetails_rent() {
     async function fetchListing() {
       try {
         setLoading(true);
-        console.log("Fetching listing with id:", listingId);
+        console.log("Fetching RENT listing with id:", listingId);
         const data = await getListingDetails(listingId);
 
         if (isCancelled) return;
 
+        const images =
+          data.images && data.images.length
+            ? data.images
+            : [img1, img2, img3, img4, img5, img6, img7];
+
+        const title = data.title || "Property Title";
+
+        const description =
+          data.description ||
+          data.summary ||
+          "No description available for this property.";
+
+        // 🔹 EXACT SAME DOCUMENT MAPPING AS SELL
+        const documents = (data.documents || data.legal_documents || []).map(
+          (doc) => ({
+            name:
+              doc.name ||
+              doc.file_name ||
+              doc.document_type ||
+              "Document",
+            url: doc.url || doc.file_url || doc.file || "",
+            icon: legalDocIcon,
+          })
+        );
+
+        const listingStatus = (
+          data.status_label ||
+          data.status ||
+          data.rental_status ||
+          data.verification_status ||
+          "PENDING"
+        ).toUpperCase();
+
         const mapped = {
-          images:
-            data.images && data.images.length
-              ? data.images
-              : [img1, img2, img3, img4, img5, img6],
-          certifiedIcon: certifiedIcon,
-          address: data.street_address || "No address provided",
+          images,
+          certifiedIcon,
+          address: data.address || "No address provided",
           region: data.region || data.city || "Region, Wilaya",
-          price: data.price || 0,
-          verificationStatus: data.verification_status || data.status || "PARTIAL",
-          listingStatus: (
-            data.status_label ||
-            data.status ||
-            data.rental_status ||
-            data.verification_status ||
-            "PENDING"
-          ).toUpperCase(),
+          price:
+            typeof data.price === "number"
+              ? data.price
+              : Number(data.price) || 0,
+          verificationStatus: data.verification_status || data.status,
+          listingStatus,
           propertyType: data.property_type || "Apartment",
           area: data.area || data.surface || 0,
           bedrooms: data.bedrooms || data.rooms || 0,
           bathrooms: data.bathrooms || 0,
           rentUnit: data.rent_unit || null,
-
-          title: data.title || "Property Title",
-          description:
-            data.description ||
-            data.summary ||
-            "No description available for this property.",
-
-          documents:
-            (data.documents || data.legal_documents || []).map((doc) => ({
-              name: doc.name || doc.file_name || "Document",
-              url: doc.url || doc.file_url || "",
-              icon: certifiedIcon,
-            })),
+          title,
+          description,
+          documents,
         };
 
         setListing(mapped);
@@ -208,8 +231,8 @@ export default function ListingDetails_rent() {
         const normalized = Array.isArray(data?.results)
           ? data.results
           : Array.isArray(data)
-            ? data
-            : [];
+          ? data
+          : [];
         setReviews(normalized);
       } catch (err) {
         if (!isCancelled) {
@@ -226,8 +249,8 @@ export default function ListingDetails_rent() {
         const normalized = Array.isArray(data?.results)
           ? data.results
           : Array.isArray(data)
-            ? data
-            : [];
+          ? data
+          : [];
         const filtered = normalized.filter(
           (item) => String(item.id) !== String(listingId)
         );

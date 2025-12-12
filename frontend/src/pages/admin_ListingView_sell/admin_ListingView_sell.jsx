@@ -29,6 +29,16 @@ export default function AdmingListing() {
     const handleLoginClick = () => setShowLogin(true);
     const handleCloseModal = () => setShowLogin(false);
 
+    // ✅ FIX: handler defined OUTSIDE useEffect
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            await deleteAdminReview(reviewId);
+            setReviews((prev) => prev.filter((review) => review.id !== reviewId));
+        } catch (error) {
+            console.error("Failed to delete review:", error);
+        }
+    };
+
     useEffect(() => {
         async function fetchListing() {
             try {
@@ -59,15 +69,6 @@ export default function AdmingListing() {
                 setLoading(false);
             }
         }
-    const handleDeleteReview = async (reviewId) => {
-        try {
-            await deleteAdminReview(reviewId);
-            setReviews((prev) => prev.filter((review) => review.id !== reviewId));
-        } catch (error) {
-            console.error("Failed to delete review:", error);
-        }
-    };
-
 
         fetchListing();
     }, [listingId]);
@@ -102,7 +103,7 @@ export default function AdmingListing() {
                     documents={documents}
                     verificationStatus={listing.verification_status || listing.status}
                     reviews={reviews}
-                    onDeleteReview={handleDeleteReview}
+                    onDeleteReview={handleDeleteReview}  // ✅ Now works
                 />
 
                 <RightSection
