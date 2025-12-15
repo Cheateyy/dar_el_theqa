@@ -5,8 +5,8 @@ import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
-import status_icon from "../../assets/icons/certified_button.png";
 import document_icon from "../../assets/images/legal_doc.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import { 
     getAdminListingDetails,
@@ -87,6 +87,8 @@ export default function AdmingListing() {
     const availableDate = listing.available_date || listing.activation_date || null;
     const statusCode = listing.status || listing.verification_status || listing.rental_status || "PENDING";
     const transactionType = listing.transaction_type || "SELL";
+    const verificationStatus = listing.verification_status || listing.status;
+    const verificationIcon = getVerificationIcon(verificationStatus);
 
     return (
         <>
@@ -96,12 +98,12 @@ export default function AdmingListing() {
 
             <div className="admin-ListingDetails">
                 <LeftSection
-                    status_icon={status_icon}
+                    status_icon={verificationIcon}
                     images={listing.images || []}
-                    certifiedIcon={listing.certifiedIcon}
+                    certifiedIcon={verificationIcon}
                     description={listing.description}
                     documents={documents}
-                    verificationStatus={listing.verification_status || listing.status}
+                    verificationStatus={verificationStatus}
                     reviews={reviews}
                     onDeleteReview={handleDeleteReview}  // ✅ Now works
                 />

@@ -24,8 +24,11 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
     onReject?.(docId, reason);
   };
 
-  const handleAccept = (docId) => {
-    onAccept?.(docId);
+  const handleAccept = (docId, fallbackNote = "") => {
+    const reason = (Object.prototype.hasOwnProperty.call(notes, docId)
+      ? notes[docId]
+      : fallbackNote || "").trim();
+    onAccept?.(docId, reason);
   };
 
   return (
@@ -48,7 +51,10 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
               </span>
             </div>
             <div className="acceptRejectDoc">
-              <button type="button" onClick={() => handleAccept(doc.docId)}>
+              <button
+                type="button"
+                onClick={() => handleAccept(doc.docId, doc.reviewComment)}
+              >
                 <img src={acceptImg} alt="accept" />
               </button>
               <button type="button" onClick={() => handleReject(doc.docId)}>

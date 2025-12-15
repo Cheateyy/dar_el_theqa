@@ -14,8 +14,10 @@ export default function RightSection({
     bedrooms,
     bathrooms,
     onApprove,
+    onReject,
     onDelete,
     isApproving,
+    isRejecting,
     isDeleting,
 }) {
     return (
@@ -31,9 +33,9 @@ export default function RightSection({
                 bedrooms={bedrooms}
                 bathrooms={bathrooms}
                 onApprove={onApprove}
-                onReject={onDelete}
+                onReject={onReject}
                 isApproving={isApproving}
-                isRejecting={isDeleting}
+                isRejecting={isRejecting}
             />
         </div>
     );

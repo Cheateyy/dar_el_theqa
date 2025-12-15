@@ -9,11 +9,36 @@ import legalDocIcon from '../../assets/images/legal_doc.png';
 
 import {
   getListingDetails,
+  getListingDocuments,
   updateSellerListing,
   pauseSellerListing,
   deleteSellerListing,
   activateSellerListing,
 } from "../../lib/api_3.js";
+
+const formatDocumentLabel = (value, fallback) => {
+  if (!value || typeof value !== "string") return fallback;
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+};
+
+const mapListingDocuments = (docs = []) => {
+  const safeDocs = Array.isArray(docs) ? docs : [];
+  return safeDocs.map((doc, index) => ({
+    id: doc.id ?? index,
+    name:
+      doc.name ||
+      doc.file_name ||
+      formatDocumentLabel(doc.document_type, `Document ${index + 1}`),
+    url: doc.url || doc.file_url || doc.file || "",
+    icon: legalDocIcon,
+    status: (doc.status || "PENDING").toUpperCase(),
+    adminNote: doc.admin_note || "",
+  }));
+};
 
 export default function Listing() {
   const { listingId } = useParams();
@@ -58,7 +83,13 @@ export default function Listing() {
   const handleAddDocument = () => {
     setDocuments((prev) => [
       ...prev,
-      { name: "NewDocument.pdf", url: "", icon: legalDocIcon },
+      {
+        name: "NewDocument.pdf",
+        url: "",
+        icon: legalDocIcon,
+        status: "PENDING",
+        adminNote: "",
+      },
     ]);
   };
 
@@ -81,6 +112,12 @@ export default function Listing() {
       try {
         setLoading(true);
         const data = await getListingDetails(listingId);
+        let docPayload = [];
+        try {
+          docPayload = await getListingDocuments(listingId);
+        } catch (docErr) {
+          console.error("Failed to fetch listing documents", docErr);
+        }
 
         if (isCancelled) return;
 
@@ -94,14 +131,8 @@ export default function Listing() {
             "", // last resort
         });
 
-        const mappedDocs = (data.documents || []).map((doc, index) => ({
-          name: doc.document_type || doc.label || `Document ${index + 1}`,
-          url: doc.file || doc.url || "",
-          icon: legalDocIcon,
-          status: doc.status || "PENDING",
-          id: doc.id || index,
-        }));
-        setDocuments(mappedDocs);
+        const normalizedDocuments = mapListingDocuments(docPayload);
+        setDocuments(normalizedDocuments);
 
         // Right section fields mapped from API response
         setFormData({
@@ -127,6 +158,7 @@ export default function Listing() {
       } catch (err) {
         console.error("Failed to load listing for edit", err);
         setError("Impossible de charger l'annonce.");
+        setDocuments([]);
       } finally {
         if (!isCancelled) setLoading(false);
       }
