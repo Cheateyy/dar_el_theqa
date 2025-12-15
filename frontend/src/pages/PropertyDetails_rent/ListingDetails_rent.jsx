@@ -5,7 +5,7 @@ import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
-import status_icon from "../../assets/icons/certified_button.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import {
   getListingDetails,
@@ -49,7 +49,7 @@ export default function ListingDetails_rent() {
       }
 
       try {
-        const similarData = await getSimilarListings(listingId);
+        //const similarData = await getSimilarListings(listingId);
         const normalized = Array.isArray(similarData)
           ? similarData
           : Array.isArray(similarData?.results)
@@ -140,6 +140,7 @@ export default function ListingDetails_rent() {
     const availableDate = listing.available_date || listing.activation_date || null;
     const statusCode = (listing.rental_status || listing.status || "AVAILABLE").toUpperCase();
     const verificationStatus = listing.verification_status || listing.status;
+    const verificationIcon = getVerificationIcon(verificationStatus);
 
     return (
         <>
@@ -151,7 +152,7 @@ export default function ListingDetails_rent() {
               <LeftSection
                 images={listing.images || []}
                 description={listing.description || ""}
-                status_icon={status_icon}
+                status_icon={verificationIcon}
                 reviews={reviews}
                 title={listing.slug || ""}
                 verificationStatus={verificationStatus}

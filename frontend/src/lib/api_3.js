@@ -35,18 +35,68 @@ export function getListingDocuments(id) {
 export function getAdminListingDocuments(id) {
   return fetchListingDocuments(id);
 }
-export async function rejectAdminListingDocument(id, docId, reason) {
-  const res = await authFetch(`${API_BASE_URL}/api/admin/listings/${id}/documents/${docId}/reject`, {
-    method: "POST",
-    body: JSON.stringify({ reason }),
-  });
-  if (!res.ok) throw new Error("Failed to reject document");
+
+export async function approveAdminListingDocument(id, docId, reason) {
+  const res = await authFetch(
+    `${API_BASE_URL}/api//admin/listings/${id}/documents/${docId}/approve/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Failed to approve document (${res.status}): ${text}`);
+  }
+
   return res.json();
 }
 
+export async function rejectAdminListingDocument(id, docId, reason) {
+  const res = await authFetch(
+    `${API_BASE_URL}/api//admin/listings/${id}/documents/${docId}/reject/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Failed to reject document (${res.status}): ${text}`);
+  }
+
+  return res.json();
+}
+
+export async function rejectAdminListing(id, reason = "") {
+  const payload = reason ? { reason } : {};
+  const res = await authFetch(
+    `${API_BASE_URL}/api/admin/listings/${id}/reject-anyways/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Failed to reject listing (${res.status}): ${text}`);
+  }
+
+  return res.json();
+}
+
+
+
+
 export async function approveAdminListing(id, force_fields = {}) {
   const body = force_fields ? { force_fields } : {};
-  const res = await authFetch(`${API_BASE_URL}/api/admin/listings/${id}/approve`, {
+  const res = await authFetch(`${API_BASE_URL}/api/admin/listings/${id}/approve/`, {
     method: "POST",
     body: JSON.stringify(body),
   });

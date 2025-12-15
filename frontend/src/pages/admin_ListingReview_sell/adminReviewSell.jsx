@@ -4,15 +4,16 @@ import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
-import certifiedIcon from "../../assets/icons/certified_button.png";
 import document_icon from "../../assets/images/legal_doc.png";
-import status_icon from "../../assets/icons/certified_button.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import {
   getAdminListingDetails,
   getListingDocuments,
   approveAdminListing,
+  approveAdminListingDocument,
   rejectAdminListingDocument,
+  rejectAdminListing,
   deleteAdminListing,
   getAdminListingAllReviews,
   deleteAdminReview,
@@ -28,7 +29,9 @@ export default function AdminReviewSell() {
   const [loading, setLoading] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("Listing processed successfully.");
   const [reviews, setReviews] = useState([]);
 
   const handleLoginClick = () => setShowLogin(true);
@@ -100,12 +103,20 @@ export default function AdminReviewSell() {
     }
   };
 
-  const handleAcceptDocument = (docId) => {
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.docId === docId ? { ...doc, status: "ACCEPTED", reviewComment: "" } : doc
-      )
-    );
+  const handleAcceptDocument = async (docId, reason = "") => {
+    try {
+      const res = await approveAdminListingDocument(listingId, docId, reason);
+      const adminNote = res?.admin_note ?? reason ?? "";
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc.docId === docId
+            ? { ...doc, status: "APPROVED", reviewComment: adminNote }
+            : doc
+        )
+      );
+    } catch (err) {
+      console.error("Error approving document:", err);
+    }
   };
 
   const handleDeleteReview = async (reviewId) => {
@@ -117,11 +128,27 @@ export default function AdminReviewSell() {
     }
   };
 
+  const handleRejectListing = async () => {
+    const reason = window.prompt("Enter rejection reason (optional):", "");
+    if (reason === null) return;
+    try {
+      setIsRejecting(true);
+      await rejectAdminListing(listingId, reason || "");
+      setFeedbackMessage("Listing rejected successfully.");
+      setIsDeleted(true);
+    } catch (err) {
+      console.error("Error rejecting listing:", err);
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
   const handleDeleteListing = async () => {
     if (!window.confirm("Delete this listing?")) return;
     try {
       setIsDeleting(true);
       await deleteAdminListing(listingId);
+      setFeedbackMessage("Listing deleted successfully.");
       setIsDeleted(true);
     } catch (err) {
       console.error("Error deleting listing:", err);
@@ -137,7 +164,7 @@ export default function AdminReviewSell() {
         <nav>
           <NavBar onLoginClick={handleLoginClick} />
         </nav>
-        <div className="admin-feedback-message">Listing deleted successfully.</div>
+        <div className="admin-feedback-message">{feedbackMessage}</div>
         <LoginModal show={showLogin} onClose={handleCloseModal} />
       </>
     );
@@ -146,6 +173,7 @@ export default function AdminReviewSell() {
 
   const normalizedStatus = listing.listing_status || listing.status || "PENDING";
   const verificationStatus = listing.verification_status || normalizedStatus;
+  const verificationIcon = getVerificationIcon(verificationStatus);
 
   return (
     <>
@@ -156,8 +184,8 @@ export default function AdminReviewSell() {
       <div className="admin-sell-ListingDetails">
         <LeftSection
           images={listing.images || []}
-          certifiedIcon={certifiedIcon}
-          status_icon={status_icon}
+          certifiedIcon={verificationIcon}
+          status_icon={verificationIcon}
           title={listing.slug || "Property Title"} 
           description={listing.description || ""}
           documents={documents}
@@ -178,9 +206,11 @@ export default function AdminReviewSell() {
           bedrooms={listing.bedrooms || 0}
           bathrooms={listing.bathrooms || 0}
           onApprove={handleApproveListing}
-          onReject={handleDeleteListing}
+          onReject={handleRejectListing}
+          onDelete={handleDeleteListing}
           isApproving={isApproving}
-          isRejecting={isDeleting}
+          isRejecting={isRejecting}
+          isDeleting={isDeleting}
         />
       </div>
 

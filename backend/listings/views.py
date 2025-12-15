@@ -222,7 +222,8 @@ class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
         
 
 class AdminListingApproveView(views.APIView):
-    permission_classes = [permissions.AllowAny]  # change to IsAdminUser later
+    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
     @extend_schema(
         request=None,
