@@ -219,7 +219,7 @@ class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
         listing = self.get_object()
         listing.delete()
         return Response({"status": "DELETED"}, status=status.HTTP_200_OK)
-
+        
 
 class AdminListingApproveView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
@@ -234,12 +234,31 @@ class AdminListingApproveView(views.APIView):
     )
     def post(self, request, id):
         try:
-            listing = Listing.objects.get(id=id)
-            listing.status = Listing.Status.APPROVED
-            listing.save()
-            return Response({"status": "APPROVED"})
+            listing = Listing.objects.prefetch_related('documents').get(id=id)
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        documents = listing.documents.all()
+
+        # If there are no documents, you may want to decide how to handle this
+        if not documents.exists():
+            listing.verification_status = Listing.VerificationStatusStatus.PARTIAL
+            listing.save()
+            return Response({"status": listing.verification_status})
+
+        approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+        total_docs = documents.count()
+
+        if approved_docs == total_docs:
+            listing.verification_status = Listing.VerificationStatusStatus.APPROVED
+        else:
+            listing.verification_status = Listing.VerificationStatusStatus.PARTIAL
+
+        listing.save()
+
+        return Response({"status": listing.verification_status})
+    
+
 
 class AdminListingRejectView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
