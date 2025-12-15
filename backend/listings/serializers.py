@@ -14,7 +14,9 @@ class ListingImageSerializer(serializers.ModelSerializer):
 class ListingDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListingDocument
-        fields = ['id', 'document_type', 'file', 'status', 'admin_note']
+        #ADDED the return of the owner note
+        fields = ['id', 'document_type', 'file', 'status', 'admin_note', 'owner_note'] ## <- HERE
+        #gotta ask cheatyy for this: why are these down here read_only?
         read_only_fields = ['status', 'admin_note']
 
 class ListingSerializer(serializers.ModelSerializer):

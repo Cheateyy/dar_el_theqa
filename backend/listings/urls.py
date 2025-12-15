@@ -1,9 +1,9 @@
 from django.urls import path
 from .views import (
-    FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
+    FeaturedListingsView, ListingActivateView, ListingDocumentApproveView, RejectDocumentView, SearchListingsView, ListingCreateView, ListingDetailView,
     MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
     AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
-    ListingViewDocuments, ListingDocumentRejectView,
+    ListingViewDocuments, #ListingDocumentRejectView,
 )
 
 urlpatterns = [
@@ -16,7 +16,7 @@ urlpatterns = [
     path('listings/<int:id>/activate/', ListingActivateView.as_view(), name='activate-listing'),
     path('listings/<int:id>/similar/', SimilarListingsView.as_view(), name='similar-listings'),
     path('listings/<int:id>/documents/', ListingDocumentUpdateView.as_view(), name='update-documents'),
-    
+
     # Admin URLs
     path('admin/listings/', AdminListingListView.as_view(), name='admin-listing-list'),
     path('admin/listings/<int:id>/approve/', AdminListingApproveView.as_view(), name='admin-approve-listing'),
@@ -26,6 +26,9 @@ urlpatterns = [
 
     #Gets you the id's documents
     path('listings/documents/<int:id>/fetch/', ListingViewDocuments.as_view(), name="get-listing-document"),
-    path('admin/listings/<int:id>/documents/<int:docId>/reject/', ListingDocumentRejectView.as_view(), name='admin-reject-document'),
+
+    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/reject/', RejectDocumentView.as_view(), name="reject-doc"),
+    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/approve/', ListingDocumentApproveView.as_view(), name="reject-doc"),
+    
 
 ]
