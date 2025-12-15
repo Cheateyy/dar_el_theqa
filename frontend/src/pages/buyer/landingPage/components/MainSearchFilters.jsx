@@ -29,30 +29,32 @@ export default function MainSearchFilters({ className }) {
   const type = input_values.type;
 
   return (
-    <SearchFiltersWrapper className={className}
-      selectedOfferType={selected_offer_type}
-      setSelectedOfferType={set_selected_offer_type}>
-      <div className="flex flex-col sm:flex-col md:flex-row gap-5">
-        <FilterCombobox
-          filtername="Wilaya"
-          input_control={[input_values.wilaya, (new_wilaya) => set_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
-          className={'flex-1 h-32 rounded-2xl'}
-          options={wilayas_options}
-        />
-        <FilterCombobox
-          filtername="Type"
-          input_control={[input_values.type, (new_type) => set_input_values(prev => ({ ...prev, type: new_type }))]}
-          className={'flex-1 h-32 rounded-2xl'}
-          options={property_types}
-        />
-      </div>
-      <div className="flex justify-center items-center">
-        <Button onClick={() => navigate({ pathname: "/search", search: `?type=${type}&wilaya=${wilaya}` })}>
+    <div className={className}>
+      <SearchFiltersWrapper
+        selectedOfferType={selected_offer_type}
+        setSelectedOfferType={set_selected_offer_type}>
+        <div className="flex flex-col sm:flex-col md:flex-row gap-5">
+          <FilterCombobox
+            filtername="Wilaya"
+            input_control={[input_values.wilaya, (new_wilaya) => set_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
+            className={'flex-1 h-32 rounded-2xl'}
+            options={wilayas_options}
+          />
+          <FilterCombobox
+            filtername="Type"
+            input_control={[input_values.type, (new_type) => set_input_values(prev => ({ ...prev, type: new_type }))]}
+            className={'flex-1 h-32 rounded-2xl'}
+            options={property_types}
+          />
+        </div>
+      </SearchFiltersWrapper>
+      <div className="flex justify-center items-center mt-4">
+        <Button onClick={() => navigate({ pathname: "/search-results", search: `?type=${type}&wilaya=${wilaya}` })}>
           <span>Search Listings</span>
           <ArrowRight />
         </Button>
       </div>
-    </SearchFiltersWrapper>
+    </div>
   )
 }
 
