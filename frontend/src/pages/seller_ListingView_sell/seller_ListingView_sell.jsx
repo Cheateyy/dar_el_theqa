@@ -12,13 +12,14 @@ import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
 import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
 import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
 import img7 from "../../assets/images/dummyPropertyImages/image7.png";
-import certifiedIcon from "../../assets/icons/certified_button.png";
 import legalDocIcon from "../../assets/images/legal_doc.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import "./ListingDetails.css";
 
 import {
   getListingDetails,
+  getListingDocuments,
   getMyListings,
   getListingReviews,
   activateSellerListing,
@@ -26,11 +27,36 @@ import {
   deleteSellerListing,
 } from "../../lib/api_3.js";
 
+const formatDocumentLabel = (value, fallback) => {
+  if (!value || typeof value !== "string") return fallback;
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+};
+
+const mapListingDocuments = (docs = []) => {
+  const safeDocs = Array.isArray(docs) ? docs : [];
+  return safeDocs.map((doc, index) => ({
+    id: doc.id ?? index,
+    name:
+      doc.name ||
+      doc.file_name ||
+      formatDocumentLabel(doc.document_type, `Document ${index + 1}`),
+    url: doc.url || doc.file_url || doc.file || "",
+    icon: legalDocIcon,
+    status: (doc.status || "PENDING").toUpperCase(),
+    adminNote: doc.admin_note || "",
+  }));
+};
+
 export default function ListingDetails_sell() {
   const { listingId } = useParams(); // must match :listingId in route
   const [showLogin, setShowLogin] = useState(false);
 
   const [listing, setListing] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [moreListings, setMoreListings] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +90,12 @@ export default function ListingDetails_sell() {
         setLoading(true);
         console.log("Fetching SELL listing with id:", listingId);
         const data = await getListingDetails(listingId);
+        let docPayload = [];
+        try {
+          docPayload = await getListingDocuments(listingId);
+        } catch (docErr) {
+          console.error("Failed to fetch listing documents", docErr);
+        }
 
         if (isCancelled) return;
 
@@ -79,13 +111,8 @@ export default function ListingDetails_sell() {
           data.summary ||
           "No description available for this property.";
 
-        const documents = (data.documents || data.legal_documents || []).map(
-          (doc) => ({
-            name: doc.name || doc.file_name || doc.document_type || "Document",
-            url: doc.url || doc.file_url || doc.file || "",
-            icon: legalDocIcon,
-          })
-        );
+        const normalizedDocuments = mapListingDocuments(docPayload);
+        setDocuments(normalizedDocuments);
 
         const listingStatus = (
           data.status_label ||
@@ -93,6 +120,7 @@ export default function ListingDetails_sell() {
           data.verification_status ||
           "PENDING"
         ).toUpperCase();
+        const verificationStatus = data.verification_status || data.status;
         const property = {
           type: data.property_type || "Apartment",
           area: data.area ? `${data.area} m²` : "0 m²",
@@ -112,14 +140,14 @@ export default function ListingDetails_sell() {
           title,
           description,
           images,
-          documents,
           property,
-          verificationStatus: data.verification_status || data.status,
+          verificationStatus,
         });
         setError(null);
       } catch (err) {
         console.error("Failed to fetch sell listing details", err);
         setError("Impossible de charger l'annonce.");
+        setDocuments([]);
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -240,6 +268,7 @@ export default function ListingDetails_sell() {
   };
 
   const normalizedStatus = (listing?.property?.status || "").toUpperCase();
+  const verificationIcon = getVerificationIcon(listing?.verificationStatus);
   const shouldActivateStatus =
     normalizedStatus === "" ||
     normalizedStatus === "PAUSED" ||
@@ -267,10 +296,10 @@ export default function ListingDetails_sell() {
         {!loading && !error && listing && (
           <>
             <LeftSection
-              certifiedIcon={certifiedIcon}
+              certifiedIcon={verificationIcon}
               images={listing.images}
               description={listing.description}
-              documents={listing.documents}
+              documents={documents}
               title={listing.title}
               verificationStatus={listing.verificationStatus}
               reviews={reviews}

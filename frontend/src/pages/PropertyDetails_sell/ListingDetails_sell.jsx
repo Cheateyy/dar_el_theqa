@@ -5,7 +5,7 @@ import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
-import status_icon from "../../assets/icons/certified_button.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import {
     getListingDetails,
@@ -33,7 +33,7 @@ export default function ListingDetails_sell() {
                 setLiked(Boolean(data?.is_liked));
 
                 try {
-                    const similarData = await getSimilarListings(listingId);
+                    //const similarData = await getSimilarListings(listingId);
                     const normalized = Array.isArray(similarData)
                         ? similarData
                         : Array.isArray(similarData?.results)
@@ -95,6 +95,8 @@ export default function ListingDetails_sell() {
     const areaValue = listing.area || listing.area_m2 || 0;
     const bedrooms = listing.bedrooms ?? listing.bedroom_count ?? 0;
     const bathrooms = listing.bathrooms ?? listing.bathroom_count ?? 0;
+    const verificationStatus = listing.verification_status || listing.status;
+    const verificationIcon = getVerificationIcon(verificationStatus);
 
     return (
         <>
@@ -105,10 +107,10 @@ export default function ListingDetails_sell() {
             <div className="sell-ListingDetails">
                 <LeftSection
                     images={listing.images || []}
-                    status_icon={status_icon}
+                    status_icon={verificationIcon}
                     title={listing.slug || ""}
                     description={listing.description || ""}
-                    verificationStatus={listing.verification_status || listing.status}
+                    verificationStatus={verificationStatus}
                     similarListings={similarListings}
                 />
                 <RightSection
