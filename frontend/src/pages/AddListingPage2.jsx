@@ -21,14 +21,13 @@ const MAX_IMAGES = 20;
 function AddListingPage2() {
   const navigate = useNavigate();
 
-    const { auth } = useAuth();   
-
- 
-  useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate("/login");
-    }
-  }, [auth]);
+  const { isAuthenticated, loading } = useAuth();
+    
+    useEffect(() => {
+      if (!loading && !isAuthenticated) {
+        navigate("/login");
+      }
+    }, [loading, isAuthenticated, navigate]);
   
   const [propertyType, setPropertyType] = useState("");
   const [listingPurpose, setListingPurpose] = useState("");
@@ -110,6 +109,21 @@ function AddListingPage2() {
     "Urban Land",
     "Agricultural Land",
   ].includes(propertyType);
+
+
+   useEffect(() => {
+  // Reset fields that no longer apply when property type changes
+  if (isLandType) {
+    setFloors("");
+    setBedrooms("");
+    setBathrooms("");
+  }
+
+  if (hideRooms) {
+    setBedrooms("");
+    setBathrooms("");
+  }
+}, [propertyType]);
 
   const validateField = (name, value) => {
     if (name === "propertyType") {
@@ -252,6 +266,7 @@ function AddListingPage2() {
     navigate("/forms-tables/add-listing/step-2/step-3");
   };
 
+   if (loading) return null;
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
@@ -508,8 +523,6 @@ function AddListingPage2() {
               ))}
           </div>
         </Section>
-
-        
         <div className="form-footer">
           <Button
             variant="primary"

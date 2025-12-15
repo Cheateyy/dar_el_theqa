@@ -35,11 +35,13 @@ const loadStepData = () => {
 
 function AddListingPage3() {
   const navigate = useNavigate();
-  const { auth } = useAuth();
-
-  useEffect(() => {
-    if (!auth.isAuthenticated) navigate("/login");
-  }, [auth]);
+const { isAuthenticated, loading } = useAuth();
+    
+    useEffect(() => {
+      if (!loading && !isAuthenticated) {
+        navigate("/login");
+      }
+    }, [loading, isAuthenticated, navigate]);
 
   const { step1, step2, images } = loadStepData();
   const ownershipInputRef = useRef(null);
@@ -109,6 +111,12 @@ function AddListingPage3() {
   // -------------------------------
   // Submit Form
   // -------------------------------
+  console.log("STEP1:", step1);
+  console.log("STEP2:", step2);
+  console.log("IMAGES:", images);
+ 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -118,9 +126,13 @@ function AddListingPage3() {
     }
 
     try {
-      const wilaya_id = await fetchWilayaId(step1.wilaya);
-      const region_id = await fetchRegionId(wilaya_id, step1.region);
+      payload.append("wilaya_id", step1.wilaya);
+      payload.append("region_id", step1.region);
 
+
+      console.log("WILAYA ID:", wilaya_id);
+      console.log("REGION ID:", region_id);
+      
       const payload = new FormData();
 
       // Step 1
@@ -219,6 +231,7 @@ function AddListingPage3() {
   // -------------------------------
   // RENDER
   // -------------------------------
+   if (loading) return null;
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
