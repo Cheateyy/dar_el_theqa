@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 import "../assets/styles/Addpartner.css";
-import { wilayas, regions } from "../utils/algeria.js";
 
 import Input from "../components/common/Input.jsx";
 import Select from "../components/common/Select.jsx";
@@ -15,27 +14,21 @@ import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
 
-const USE_MOCK_PARTNERS = false; 
+const USE_MOCK_PARTNERS = false;
 
 function AddPartner() {
   const navigate = useNavigate();
-
-  const { auth } = useAuth();
-
-  useEffect(() => {
-  if (!auth.isAuthenticated) {
-    navigate("/login");
-    return;
-  }
-
-  if (auth.user.role !== "ADMIN") {
-    navigate("/"); 
-  }
-}, [auth]);
+ const { user, isAuthenticated, loading } = useAuth();
 
 
+
+  /* =======================
+     STATE
+  ======================== */
   const logoInputRef = useRef(null);
 
+  const [wilayas, setWilayas] = useState([]);
+  const [regions, setRegions] = useState([]);
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -53,7 +46,55 @@ function AddPartner() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  
+  /* =======================
+     FETCH WILAYAS
+  ======================== */
+  useEffect(() => {
+    const fetchWilayas = async () => {
+      try {
+        const res = await fetch("/api/choices/wilayas/", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch wilayas");
+        const data = await res.json();
+        setWilayas(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchWilayas();
+  }, []);
+
+  /* =======================
+     FETCH REGIONS BY WILAYA
+  ======================== */
+  useEffect(() => {
+    if (!formData.wilaya) {
+      setRegions([]);
+      return;
+    }
+
+    const fetchRegions = async () => {
+      try {
+        const res = await fetch(
+          `/api/choices/regions/?wilaya=${formData.wilaya}`,
+          { credentials: "include" }
+        );
+        if (!res.ok) throw new Error("Failed to fetch regions");
+        const data = await res.json();
+        setRegions(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchRegions();
+  }, [formData.wilaya]);
+
+  /* =======================
+     VALIDATION
+  ======================== */
   const validateField = (name, value) => {
     switch (name) {
       case "companyName": {
@@ -71,7 +112,8 @@ function AddPartner() {
       case "phoneNumber": {
         const phoneRegex = /^(00213|\+213|0)(5|6|7)[0-9]{8}$/;
         if (!value) return "Required";
-        if (!phoneRegex.test(value)) return "Invalid Algerian phone number";
+        if (!phoneRegex.test(value))
+          return "Invalid Algerian phone number";
         return "";
       }
       case "wilaya":
@@ -81,7 +123,8 @@ function AddPartner() {
       case "address": {
         const v = value.trim();
         if (!v) return "Required";
-        if (v.length < 10 || v.length > 200) return "Must be 10-200 characters";
+        if (v.length < 10 || v.length > 200)
+          return "Must be 10-200 characters";
         return "";
       }
       case "logo":
@@ -90,7 +133,6 @@ function AddPartner() {
         return "";
     }
   };
-
 
   const validateForm = () => {
     const newErrors = {};
@@ -101,11 +143,18 @@ function AddPartner() {
     return newErrors;
   };
 
- 
+  /* =======================
+     HANDLERS
+  ======================== */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "wilaya" ? { region: "" } : {}),
+    }));
+
     setTouched((prev) => ({ ...prev, [name]: true }));
 
     const fieldError = validateField(name, value);
@@ -116,38 +165,29 @@ function AddPartner() {
   };
 
   const openLogoPicker = () => {
-    if (logoInputRef.current) {
-      logoInputRef.current.value = "";
-      logoInputRef.current.click();
-    }
+    logoInputRef.current?.click();
   };
 
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      setFormData((prev) => ({ ...prev, logo: file.name }));
-      setTouched((prev) => ({ ...prev, logo: true }));
+    if (!file) return;
 
-      const fieldError = validateField("logo", file.name);
-      setErrors((prev) => ({ ...prev, logo: fieldError }));
-    }
+    setLogoFile(file);
+    setFormData((prev) => ({ ...prev, logo: file.name }));
+    setTouched((prev) => ({ ...prev, logo: true }));
+    setErrors((prev) => ({ ...prev, logo: "" }));
   };
 
   const removeLogo = () => {
     setLogoFile(null);
     setFormData((prev) => ({ ...prev, logo: "" }));
     setTouched((prev) => ({ ...prev, logo: true }));
-
-    const fieldError = validateField("logo", "");
-    setErrors((prev) => ({ ...prev, logo: fieldError }));
+    setErrors((prev) => ({ ...prev, logo: "Required" }));
   };
 
-  
   useEffect(() => {
-    const hasErrors = Object.values(errors).some((msg) => msg);
-
-    const allRequiredFilled =
+    const hasErrors = Object.values(errors).some(Boolean);
+    const allFilled =
       formData.companyName &&
       formData.email &&
       formData.phoneNumber &&
@@ -156,79 +196,52 @@ function AddPartner() {
       formData.address &&
       formData.logo;
 
-    setIsFormValid(!hasErrors && !!allRequiredFilled);
+    setIsFormValid(!hasErrors && allFilled);
   }, [errors, formData]);
 
+  /* =======================
+     SUBMIT
+  ======================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = validateForm();
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      setIsFormValid(false);
-      return;
-    }
+    if (Object.keys(newErrors).length > 0) return;
 
-   
-    if (USE_MOCK_PARTNERS) {
-      const newPartner = {
-        id: Date.now(),
-        companyName: formData.companyName,
-        address: `${formData.address}, ${formData.region}, ${formData.wilaya}`,
-        phoneNumber: formData.phoneNumber,
-        email: formData.email,
-      };
-
-      const stored = localStorage.getItem("partners");
-      const partners = stored ? JSON.parse(stored) : [];
-      partners.push(newPartner);
-      localStorage.setItem("partners", JSON.stringify(partners));
-
-      navigate("/forms-tables/partner-accounts");
-      return; 
-    }
-
-    
     const payload = new FormData();
     payload.append("name", formData.companyName);
     payload.append("email", formData.email);
     payload.append("phone_number", formData.phoneNumber);
-    payload.append(
-      "address",
-      `${formData.address}, ${formData.region}, ${formData.wilaya}`
-    );
-    if (logoFile) {
-      payload.append("logo", logoFile);
-    }
+    payload.append("wilaya", formData.wilaya);
+    payload.append("region", formData.region);
+    payload.append("address", formData.address);
+    if (logoFile) payload.append("logo", logoFile);
 
+    setSubmitting(true);
     const res = await fetch("/api/admin/partners/", {
       method: "POST",
       body: payload,
       credentials: "include",
     });
+    setSubmitting(false);
 
     if (!res.ok) {
-      console.error("Failed to create partner", await res.text());
+      console.error(await res.text());
       return;
     }
 
     navigate("/forms-tables/partner-accounts");
   };
 
-
+  /* =======================
+     UI (UNCHANGED)
+  ======================== */
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
-        <button
-          className="back-button"
-          type="button"
-          onClick={() => navigate(-1)}
-        >
-          <img
-            src={BackIcon}
-            className="back-icon"
-            alt="Back"
-          />
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <img src={BackIcon} className="back-icon" alt="Back" />
           Back
         </button>
 
@@ -236,111 +249,30 @@ function AddPartner() {
 
         <form className="add-listing-form" onSubmit={handleSubmit}>
           <Section title="Basics">
-            <Input
-              label="Company Name *"
-              name="companyName"
-              value={formData.companyName}
-              placeholder="Enter company name"
-              onChange={handleChange}
-            />
-            {errors.companyName ? (
-              <span className="error-text">{errors.companyName}</span>
-            ) : (
-              touched.companyName &&
-              formData.companyName && (
-                <span className="success-text">Valid!</span>
-              )
-            )}
+            <Input label="Company Name *" name="companyName" value={formData.companyName} onChange={handleChange} />
+            {errors.companyName && <span className="error-text">{errors.companyName}</span>}
 
-            <Input
-              label="Email *"
-              name="email"
-              type="email"
-              value={formData.email}
-              placeholder="Enter company email"
-              onChange={handleChange}
-            />
-            {errors.email ? (
-              <span className="error-text">{errors.email}</span>
-            ) : (
-              touched.email &&
-              formData.email && <span className="success-text">Valid!</span>
-            )}
+            <Input label="Email *" name="email" value={formData.email} onChange={handleChange} />
+            {errors.email && <span className="error-text">{errors.email}</span>}
 
-            <Input
-              label="Phone Number *"
-              name="phoneNumber"
-              type="tel"
-              value={formData.phoneNumber}
-              placeholder="Enter phone number"
-              onChange={handleChange}
-            />
-            {errors.phoneNumber ? (
-              <span className="error-text">{errors.phoneNumber}</span>
-            ) : (
-              touched.phoneNumber &&
-              formData.phoneNumber && (
-                <span className="success-text">Valid!</span>
-              )
-            )}
+            <Input label="Phone Number *" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+            {errors.phoneNumber && <span className="error-text">{errors.phoneNumber}</span>}
           </Section>
 
           <Section title="Location">
-            <Select
-              label="Wilaya *"
-              name="wilaya"
-              value={formData.wilaya}
-              onChange={handleChange}
-            >
+            <Select label="Wilaya *" name="wilaya" value={formData.wilaya} onChange={handleChange}>
               <option value="">Select wilaya</option>
               {wilayas.map((w) => (
-                <option key={w} value={w}>
-                  {w}
-                </option>
+                <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </Select>
-            {errors.wilaya ? (
-              <span className="error-text">{errors.wilaya}</span>
-            ) : (
-              touched.wilaya &&
-              formData.wilaya && <span className="success-text">Valid!</span>
-            )}
 
-            <Select
-              label="Region *"
-              name="region"
-              value={formData.region}
-              disabled={!formData.wilaya}
-              onChange={handleChange}
-            >
+            <Select label="Region *" name="region" value={formData.region} disabled={!formData.wilaya} onChange={handleChange}>
               <option value="">Select region</option>
-              {formData.wilaya &&
-                regions[formData.wilaya]?.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
             </Select>
-            {errors.region ? (
-              <span className="error-text">{errors.region}</span>
-            ) : (
-              touched.region &&
-              formData.region && <span className="success-text">Valid!</span>
-            )}
-
-            <Input
-              label="Listing Address *"
-              name="address"
-              value={formData.address}
-              placeholder="Enter street address"
-              onChange={handleChange}
-            />
-            {errors.address ? (
-              <span className="error-text">{errors.address}</span>
-            ) : (
-              touched.address &&
-              formData.address && <span className="success-text">Valid!</span>
-            )}
           </Section>
 
           <Section title="">

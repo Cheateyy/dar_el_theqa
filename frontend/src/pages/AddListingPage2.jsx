@@ -244,19 +244,20 @@ function AddListingPage2() {
 
   
   const mapPropertyType = (label) => {
-    const map = {
-      Apartment: "apartment",
-      "House/Villa": "villa",
-      "Urban Land": "urban_land",
-      "Agricultural Land": "agricultural_land",
-      Shop: "shop",
-      Office: "office",
-      Warehouse: "warehouse",
-      Flat: "apartment",
-      "Studio/Room": "studio",
-    };
-    return map[label] || label?.toLowerCase?.() || "";
+  const map = {
+    Apartment: "APARTMENT",
+    "House/Villa": "VILLA",
+    "Urban Land": "LAND",
+    "Agricultural Land": "LAND",
+    Shop: "SHOP",
+    Office: "OFFICE",
+    Warehouse: "WAREHOUSE",
+    Flat: "APARTMENT",
+    "Studio/Room": "STUDIO",
   };
+  return map[label] || "";
+};
+
 
   const handleSubmit = () => {
     if (!isFormValid) return;

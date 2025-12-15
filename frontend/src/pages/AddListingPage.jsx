@@ -65,7 +65,7 @@ function AddListingPage() {
 
   /* ================= FETCH WILAYAS ================= */
   useEffect(() => {
-    fetch("/api/choices/wilayas/")
+    fetch("http://127.0.0.1:8000/api/choices/wilayas/")
       .then((res) => res.json())
       .then((data) => {
         setWilayas(Array.isArray(data) ? data : []);
@@ -77,7 +77,7 @@ function AddListingPage() {
   const fetchRegions = (wilayaId) => {
     if (!wilayaId || regionsCache[wilayaId]) return;
 
-    fetch(`/api/choices/regions/?wilayaid=${wilayaId}`)
+    fetch(`http://127.0.0.1:8000/api/choices/regions/?wilaya_id=${wilayaId}`)
       .then((res) => res.json())
       .then((data) => {
         setRegionsCache((prev) => ({

@@ -114,119 +114,106 @@ const { isAuthenticated, loading } = useAuth();
   console.log("STEP1:", step1);
   console.log("STEP2:", step2);
   console.log("IMAGES:", images);
+  console.log("auth_token:", localStorage.getItem("auth_token"));
+console.log("refresh_token:", localStorage.getItem("refresh_token"));
+console.log("auth_user:", localStorage.getItem("auth_user"));
+
  
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!validateDocuments()) {
-      alert("Please upload all required documents OR provide notes.");
+  if (!validateDocuments()) {
+    alert("Please upload all required documents OR provide notes.");
+    return;
+  }
+
+  try {
+    const accessToken = localStorage.getItem("auth_token");
+    const payload = new FormData();
+
+    /* ---------------- STEP 1 ---------------- */
+    payload.append("title", step1.title);
+    payload.append("description", step1.description);
+    payload.append("price", Number(step1.price));
+
+    payload.append(
+      "transaction_type",
+      step1.purpose === "sale" ? "BUY" : "RENT"
+    );
+
+    if (step1.purpose === "rent") {
+      payload.append("rent_unit", step1.paymentUnit);
+    }
+
+    payload.append("address", step1.address);
+    payload.append("wilaya", step1.wilaya);
+    payload.append("region", step1.region);
+
+    /* ---------------- STEP 2 ---------------- */
+    payload.append("property_type", step2.propertyTypeBackend);
+    payload.append("area", Number(step2.area));
+    payload.append("floors", Number(step2.floors || 0));
+    payload.append("bedrooms", Number(step2.bedrooms || 0));
+    payload.append("bathrooms", Number(step2.bathrooms || 0));
+
+    /* ---------------- IMAGES ---------------- */
+    const labelsObject = {};
+    images.forEach((img, index) => {
+      if (img.file) {
+        payload.append("images", img.file);
+        labelsObject[index] = img.label || "";
+      }
+    });
+    payload.append("image_labels", JSON.stringify(labelsObject));
+
+    /* ---------------- DOCUMENTS (IMPORTANT) ---------------- */
+    if (identity.file) {
+      payload.append("doc_identity", identity.file);
+    }
+
+    if (assurance.file) {
+      payload.append("doc_assurance", assurance.file);
+    }
+
+    if (certificate.file) {
+      payload.append("doc_register", certificate.file);
+    }
+
+    ownershipFiles.forEach((file, index) => {
+      if (index === 0) payload.append("doc_ownership_1", file);
+      if (index === 1) payload.append("doc_ownership_2", file);
+    });
+
+    /* ---------------- SEND ---------------- */
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/listings/create/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: payload,
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("Create listing failed:", err);
+      alert("Failed to submit listing.");
       return;
     }
 
-    try {
-      payload.append("wilaya_id", step1.wilaya);
-      payload.append("region_id", step1.region);
+    localStorage.removeItem("createListingDraft");
+    window.__CREATE_LISTING_IMAGES = undefined;
 
-
-      console.log("WILAYA ID:", wilaya_id);
-      console.log("REGION ID:", region_id);
-      
-      const payload = new FormData();
-
-      // Step 1
-      payload.append("title", step1.title);
-      payload.append("description", step1.description);
-      payload.append("price", Number(step1.price));
-
-      payload.append(
-        "transaction_type",
-        step1.purpose === "sale" ? "BUY" : "RENT"
-      );
-
-      if (step1.purpose === "rent") {
-        payload.append("rent_unit", step1.paymentUnit);
-      }
-
-      payload.append("street_address", step1.address);
-      payload.append("wilaya_id", wilaya_id);
-      payload.append("region_id", region_id);
-
-      // Step 2
-      payload.append("property_type", step2.propertyTypeBackend);
-      payload.append("area", Number(step2.area));
-      payload.append("floors", Number(step2.floors || 0));
-      payload.append("bedrooms", Number(step2.bedrooms || 0));
-      payload.append("bathrooms", Number(step2.bathrooms || 0));
-
-      // Images
-      const labelsObject = {};
-      images.forEach((img, index) => {
-        if (img.file) {
-          payload.append("images", img.file);
-          labelsObject[index] = img.label || "";
-        }
-      });
-      payload.append("image_labels", JSON.stringify(labelsObject));
-
-      // Upload ownership files (if any)
-      ownershipFiles.forEach((file) => {
-        payload.append("docownership", file);
-      });
-      payload.append("docownership_notes", ownershipNotes);
-
-      // Upload identity
-      if (identity.file) payload.append("docidentity", identity.file);
-      payload.append("docidentity_notes", identity.notes);
-
-      // Upload certificate
-      if (certificate.file)
-        payload.append("doccertificate", certificate.file);
-      payload.append("doccertificate_notes", certificate.notes);
-
-      // Upload assurance
-      if (assurance.file) payload.append("docassurance", assurance.file);
-      payload.append("docassurance_notes", assurance.notes);
-
-      // Send request
-      const response = await fetch("/api/listings/create", {
-        method: "POST",
-        body: payload,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Create listing failed:", data);
-        alert("Failed to submit listing.");
-        return;
-      }
-
-      // Cleanup
-      localStorage.removeItem("createListingDraft");
-      window.__CREATE_LISTING_IMAGES = undefined;
-
-      navigate("/forms-tables/add-listing/confirmation");
-    } catch (error) {
-      console.error("Error submitting listing:", error);
-      alert("Error submitting listing.");
-    }
-  };
-
-  const fetchWilayaId = async (name) => {
-    const res = await fetch("/api/choices/wilayas/");
-    const list = await res.json();
-    const found = list.find((w) => w.name === name);
-    return found ? found.id : null;
-  };
-
-  const fetchRegionId = async (wilayaId, regionName) => {
-    const res = await fetch(`/api/choices/regions/?wilayaid=${wilayaId}`);
-    const list = await res.json();
-    const found = list.find((r) => r.name === regionName);
-    return found ? found.id : null;
-  };
+    navigate("/forms-tables/add-listing/confirmation");
+  } catch (error) {
+    console.error("Error submitting listing:", error);
+    alert("Error submitting listing.");
+  }
+};
 
   // -------------------------------
   // RENDER
