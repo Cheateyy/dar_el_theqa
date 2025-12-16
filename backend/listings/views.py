@@ -330,6 +330,7 @@ class ListingDocumentApproveView(views.APIView):
                 "status": "APPROVED",
                 "admin_note": admin_note,
             },
+            
             status=status.HTTP_200_OK
         )
 
