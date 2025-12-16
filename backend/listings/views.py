@@ -305,16 +305,17 @@ class RejectDocumentView(views.APIView):
             listing_id=listing_id
         )
 
-        document.status = ListingDocument.STATUS_REJECTED
+        document.status = ListingDocument.Status.REJECTED
 
-        admin_message = request.data.get("reason", "Document rejected.")
-        document.admin_message = admin_message
+        admin_note = request.data.get("reason", "Document rejected.")
+        document.admin_note = admin_note
 
         document.save()
 
         return Response(
             {
-                "reason": admin_message,
+                "reason": admin_note,
+                "admin_note": admin_note,
                 "status": "REJECTED",
                 "message": "Document rejected",
                 "doc_id": document_id,
@@ -333,11 +334,11 @@ class ListingDocumentApproveView(views.APIView):
             listing_id=listing_id
         )
 
-        document.status = ListingDocument.STATUS_APPROVED
-        admin_message = request.data.get("reason", "doc approved")
+        document.status = ListingDocument.Status.APPROVED
+        admin_note = request.data.get("reason", "doc approved")
 
-        if admin_message:
-            document.admin_message = admin_message
+        if admin_note:
+            document.admin_note = admin_note
 
         document.save()
 
@@ -345,8 +346,10 @@ class ListingDocumentApproveView(views.APIView):
             {
                 "message": "Document approved successfully.",
                 "doc_id": ListingDocumentSerializer(document).data["id"],
-                "status": "APPROVED"
+                "status": "APPROVED",
+                "admin_note": admin_note,
             },
+            
             status=status.HTTP_200_OK
         )
 
