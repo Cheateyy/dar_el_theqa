@@ -1,0 +1,16 @@
+.notfound-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #dfe9f3 100%);
+}
+
+.notfound-message {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    color: #051a47;
+    text-align: center;
+    letter-spacing: 0.05em;
+}

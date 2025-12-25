@@ -22,6 +22,7 @@ import SearchResults from '@/pages/buyer/searchResults/page';
 import { Favorites } from '@/pages/buyer/favorites/page';
 import { BuyerLayout } from '@/pages/buyer/layout';
 import { Interests } from '@/pages/buyer/Interests/page';
+import NotFound from '../pages/NotFound.jsx';
 
 // Forms-tables imports
 import AddListingPage from "../pages/AddListingPage.jsx";
@@ -85,8 +86,8 @@ function AppRouter() {
         <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
       </Route>
 
-      {/* 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes >
   );
 }
