@@ -66,6 +66,10 @@ class Listing(TimeStampedModel):
     rental_status = models.CharField(max_length=10, choices=RentalStatus.choices, default=RentalStatus.AVAILABLE)
     available_date = models.DateField(null=True, blank=True)
 
+    # Stores per-document notes (e.g. reasons a required document is missing)
+    # Example: {"docidentity": "will upload later", "docregister": "pending"}
+    document_notes = models.JSONField(default=dict, blank=True)
+
     def __str__(self):
         return self.title
 

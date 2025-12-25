@@ -9,6 +9,7 @@ from .views import (
     UserDetailView,
     PartnerListView,
     AdminUserListView,
+    AdminUserDetailView,
     AdminPartnerListView,
     AdminPartnerDetailView,
 )
@@ -25,6 +26,7 @@ urlpatterns = [
     
     # Admin URLs
     path('admin/users/', AdminUserListView.as_view(), name='admin_user_list'),
+    path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin_user_detail'),
     path('admin/partners/', AdminPartnerListView.as_view(), name='admin_partner_list'),
     path('admin/partners/<int:pk>/', AdminPartnerDetailView.as_view(), name='admin_partner_detail'),
 ]
