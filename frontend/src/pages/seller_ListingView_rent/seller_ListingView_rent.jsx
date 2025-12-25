@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 import img1 from "../../assets/images/dummyPropertyImages/image1.jpg";
 import img2 from "../../assets/images/dummyPropertyImages/image2.jpg";
@@ -12,13 +13,14 @@ import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
 import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
 import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
 import img7 from "../../assets/images/dummyPropertyImages/image7.png";
-import certifiedIcon from "../../assets/icons/certified_button.png";
 import legalDocIcon from "../../assets/images/legal_doc.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import "./ListingDetails.css";
 
 import {
   getListingDetails,
+  getListingDocuments,
   getListingReviews,
   getMyListings,
   activateSellerListing,
@@ -26,11 +28,36 @@ import {
   deleteSellerListing,
 } from "../../lib/api_3.js";
 
+const formatDocumentLabel = (value, fallback) => {
+  if (!value || typeof value !== "string") return fallback;
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+};
+
+const mapListingDocuments = (docs = []) => {
+  const safeDocs = Array.isArray(docs) ? docs : [];
+  return safeDocs.map((doc, index) => ({
+    id: doc.id ?? index,
+    name:
+      doc.name ||
+      doc.file_name ||
+      formatDocumentLabel(doc.document_type, `Document ${index + 1}`),
+    url: doc.url || doc.file_url || doc.file || "",
+    icon: legalDocIcon,
+    status: (doc.status || "PENDING").toUpperCase(),
+    adminNote: doc.admin_note || "",
+  }));
+};
+
 export default function ListingDetails_rent() {
   const { listingId } = useParams();
   const [showLogin, setShowLogin] = useState(false);
 
   const [listing, setListing] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [moreListings, setMoreListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +65,7 @@ export default function ListingDetails_rent() {
   const [isActivating, setIsActivating] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const updateListingStatus = (nextStatus) => {
     setListing((prev) => {
@@ -91,18 +119,26 @@ export default function ListingDetails_rent() {
     }
   };
 
-  const handleDeleteListing = async () => {
+  const handleOpenDeleteModal = () => {
     if (!listingId) return;
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
-    if (!confirmDelete) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteListing = async (reason) => {
+    if (!listingId) return;
 
     try {
       setIsDeleting(true);
-      await deleteSellerListing(listingId, "SOLD");
+      await deleteSellerListing(listingId, reason || "SOLD");
       updateListingStatus("DELETED");
       window.alert("Listing deleted.");
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Failed to delete listing", err);
       window.alert("Impossible de supprimer l'annonce.");
@@ -119,6 +155,12 @@ export default function ListingDetails_rent() {
         setLoading(true);
         console.log("Fetching RENT listing with id:", listingId);
         const data = await getListingDetails(listingId);
+        let docPayload = [];
+        try {
+          docPayload = await getListingDocuments(listingId);
+        } catch (docErr) {
+          console.error("Failed to fetch listing documents", docErr);
+        }
 
         if (isCancelled) return;
 
@@ -135,17 +177,8 @@ export default function ListingDetails_rent() {
           "No description available for this property.";
 
         // 🔹 EXACT SAME DOCUMENT MAPPING AS SELL
-        const documents = (data.documents || data.legal_documents || []).map(
-          (doc) => ({
-            name:
-              doc.name ||
-              doc.file_name ||
-              doc.document_type ||
-              "Document",
-            url: doc.url || doc.file_url || doc.file || "",
-            icon: legalDocIcon,
-          })
-        );
+        const normalizedDocuments = mapListingDocuments(docPayload);
+        setDocuments(normalizedDocuments);
 
         const listingStatus = (
           data.status_label ||
@@ -154,17 +187,19 @@ export default function ListingDetails_rent() {
           data.verification_status ||
           "PENDING"
         ).toUpperCase();
+        const verificationStatus = data.verification_status || data.status;
+        const verificationIcon = getVerificationIcon(verificationStatus);
 
         const mapped = {
           images,
-          certifiedIcon,
+          certifiedIcon: verificationIcon,
           address: data.address || "No address provided",
           region: data.region || data.city || "Region, Wilaya",
           price:
             typeof data.price === "number"
               ? data.price
               : Number(data.price) || 0,
-          verificationStatus: data.verification_status || data.status,
+          verificationStatus,
           listingStatus,
           propertyType: data.property_type || "Apartment",
           area: data.area || data.surface || 0,
@@ -173,7 +208,6 @@ export default function ListingDetails_rent() {
           rentUnit: data.rent_unit || null,
           title,
           description,
-          documents,
         };
 
         setListing(mapped);
@@ -181,6 +215,7 @@ export default function ListingDetails_rent() {
       } catch (err) {
         console.error("Failed to fetch listing details", err);
         setError("Impossible de charger l'annonce.");
+        setDocuments([]);
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -271,6 +306,10 @@ export default function ListingDetails_rent() {
     };
   }, [listingId]);
 
+  if (!loading && !listing) {
+    return <Navigate to="/404" replace />;
+  }
+
   return (
     <>
       <nav>
@@ -287,7 +326,7 @@ export default function ListingDetails_rent() {
             <LeftSection
               images={listing.images}
               certifiedIcon={listing.certifiedIcon}
-              documents={listing.documents}
+              documents={documents}
               title={listing.title}
               description={listing.description}
               verificationStatus={listing.verificationStatus}
@@ -308,12 +347,24 @@ export default function ListingDetails_rent() {
               onToggleStatus={statusActionHandler}
               statusActionLabel={statusActionLabel}
               isStatusLoading={statusActionLoading}
-              onDeleteListing={handleDeleteListing}
+                onDeleteListing={handleOpenDeleteModal}
               isDeletingListing={isDeleting}
             />
           </>
         )}
       </div>
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDeleteListing}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let us know why this rental listing is being removed."
+        placeholder="Example: Property rented out, incorrect information, duplicate listing, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
 
       <LoginModal show={showLogin} onClose={handleCloseModal} />
     </>

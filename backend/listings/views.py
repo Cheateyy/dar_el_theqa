@@ -219,7 +219,7 @@ class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
         listing = self.get_object()
         listing.delete()
         return Response({"status": "DELETED"}, status=status.HTTP_200_OK)
-
+        
 
 class AdminListingApproveView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
@@ -234,12 +234,34 @@ class AdminListingApproveView(views.APIView):
     )
     def post(self, request, id):
         try:
-            listing = Listing.objects.get(id=id)
+            listing = Listing.objects.prefetch_related('documents').get(id=id)
             listing.status = Listing.Status.APPROVED
             listing.save()
-            return Response({"status": "APPROVED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        documents = listing.documents.all()
+
+        # If there are no documents, you may want to decide how to handle this
+        if not documents.exists():
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+            listing.save()
+            return Response({"status": listing.verification_status})
+
+        approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+        total_docs = documents.count()
+
+        if approved_docs == total_docs:
+            listing.verification_status = Listing.VerificationStatus.VERIFIED
+        else:
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+        listing.save()
+
+        return Response({"status": listing.verification_status})
+    
+
 
 class AdminListingRejectView(views.APIView):
     #permission_classes = [permissions.IsAdminUser]
@@ -286,16 +308,17 @@ class RejectDocumentView(views.APIView):
             listing_id=listing_id
         )
 
-        document.status = ListingDocument.STATUS_REJECTED
+        document.status = ListingDocument.Status.REJECTED
 
-        admin_message = request.data.get("reason", "Document rejected.")
-        document.admin_message = admin_message
+        admin_note = request.data.get("reason", "Document rejected.")
+        document.admin_note = admin_note
 
         document.save()
 
         return Response(
             {
-                "reason": admin_message,
+                "reason": admin_note,
+                "admin_note": admin_note,
                 "status": "REJECTED",
                 "message": "Document rejected",
                 "doc_id": document_id,
@@ -314,11 +337,11 @@ class ListingDocumentApproveView(views.APIView):
             listing_id=listing_id
         )
 
-        document.status = ListingDocument.STATUS_APPROVED
-        admin_message = request.data.get("reason", "doc approved")
+        document.status = ListingDocument.Status.APPROVED
+        admin_note = request.data.get("reason", "doc approved")
 
-        if admin_message:
-            document.admin_message = admin_message
+        if admin_note:
+            document.admin_note = admin_note
 
         document.save()
 
@@ -326,8 +349,10 @@ class ListingDocumentApproveView(views.APIView):
             {
                 "message": "Document approved successfully.",
                 "doc_id": ListingDocumentSerializer(document).data["id"],
-                "status": "APPROVED"
+                "status": "APPROVED",
+                "admin_note": admin_note,
             },
+            
             status=status.HTTP_200_OK
         )
 

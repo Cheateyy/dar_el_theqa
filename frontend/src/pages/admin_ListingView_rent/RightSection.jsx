@@ -13,11 +13,18 @@ export default function RightSection({
     bathrooms,
     rentUnit,
     availableDate,
-    transactionType
+    transactionType,
+    onDeleteListing = () => {},
+    isDeletingListing = false,
 }) {
     return (
         <div className="admin-listingRight card">
-            <UpperSection address={address} region={region} />
+            <UpperSection
+                address={address}
+                region={region}
+                onDeleteListing={onDeleteListing}
+                isDeleting={isDeletingListing}
+            />
             <PriceSection
                 status={status}
                 price={price}

@@ -1,10 +1,11 @@
 import { api } from "@/lib/api_client";
+import { format_date } from "@/lib/utils";
 
 /**@typedef {import('@/types/ListingModel')}*/
 
 /**@returns {Prmose<Listing[]>} */
 export async function get_listings() {
-    const res = await api.get("/api/listings/featured");
+    const res = await api.get("/api/listings/featured/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -20,7 +21,7 @@ export async function get_listings() {
  */
 
 export async function toggle_like(listing_id) {
-    const res = await api.post(`/api/listings/${listing_id}/favorite`);
+    const res = await api.post(`/api/listings/${listing_id}/favorite/`);
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -35,7 +36,7 @@ export async function toggle_like(listing_id) {
 
 /**@returns {Promise<Option[]>} */
 export async function get_property_types() {
-    const res = await api.get("/api/choices/property-types");
+    const res = await api.get("/api/choices/property-types/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -47,7 +48,7 @@ export async function get_property_types() {
 
 /**@returns {Promise<Wilaya[]>} */
 export async function get_wilayas() {
-    const res = await api.get("/api/choices/wilayas");
+    const res = await api.get("/api/choices/wilayas/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -61,7 +62,7 @@ export async function get_wilayas() {
  * @returns {Promise<SearchResponse>}
  */
 export async function search(search_payload) {
-    const res = await api.post("/api/listings/search", search_payload);
+    const res = await api.post("/api/listings/search/", search_payload);
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -73,7 +74,7 @@ export async function search(search_payload) {
 /**@type {import('@/types/PartnerModel')} */
 /**@returns {Promise<Partner[]>} */
 export async function get_partners() {
-    const res = await api.get("/api/partners")
+    const res = await api.get("/api/partners/")
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -84,7 +85,7 @@ export async function get_partners() {
 
 /**@returns {Promise<Region[]>} */
 export async function get_regions() {
-    const res = await api.get("/api/choices/regions")
+    const res = await api.get("/api/choices/regions/")
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -95,7 +96,7 @@ export async function get_regions() {
 
 /**@returns {Promise<Paginated<Listing>>} */
 export async function get_favorites() {
-    const res = await api.get("/api/listings/favorites");
+    const res = await api.get("/api/listings/favorites/");
     if (!res.ok) {
         const error = await res.text();
         throw new Error(error);
@@ -103,3 +104,57 @@ export async function get_favorites() {
     const data = await res.json();
     return data;
 };
+
+// -------------- Pause Listing
+
+/**
+ * @typedef PauseListingPayload
+ * @property {string} reason
+ * @property {string} auto_activate_date
+ */
+
+/**
+ * @typedef PauseListingResponse
+ * @property {"success" | "failure"} status
+ * @property {string} message
+ * @property {"RENTED"} new_status
+ */
+
+/**
+ * @param {int} listing_id
+ * @param {PauseListingPayload} payload
+ * @returns {Promise<PauseListingResponse>} 
+ * */
+export async function pause_listing(listing_id, payload) {
+    let auto_activate_date_f;
+    // format data according to the backend
+    if (payload.auto_activate_date) {
+        auto_activate_date_f = format_date(payload.auto_activate_date)
+    }
+    else {
+        auto_activate_date_f = null;
+    }
+    const res = await api.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error);
+    }
+    const data = await res.json();
+    return data
+}
+
+// ---------- DELETE Listing
+/**
+ * @typedef DeleteListingUpload
+ * @property {string} reason
+ */
+/**
+ * 
+ * @param {int} listing_id 
+ * @param {DeleteListingUpload} payload 
+ * @returns {Promise<bool>}
+ */
+export async function delete_listing(listing_id, payload) {
+    const res = await api.delete(`/api/listings/${listing_id}/`, payload)
+    return res.status == 204; // No content
+}

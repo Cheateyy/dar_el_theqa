@@ -18,7 +18,7 @@ export const wilayas = [
   "Djelfa",
   "Jijel",
   "Sétif",
-  "Saïda",
+  "Saïdas",
   "Skikda",
   "Sidi Bel Abbès",
   "Annaba",

@@ -30,14 +30,7 @@ function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Redirect based on role
-      if (user.role === 'ADMIN') {
-        navigate('/admin/dashboard');
-      } else if (user.role === 'PARTNER') {
-        navigate('/partner/dashboard');
-      } else {
-        navigate('/');
-      }
+      navigate('/');
     }
   }, [isAuthenticated, user, navigate]);
 
