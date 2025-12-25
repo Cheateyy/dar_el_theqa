@@ -31,6 +31,7 @@ export default function ListingRightSection({
   statusCode,
   isPausing,
   isActivating,
+  isDeleting = false,
 }) {
   const {
     wilaya,
@@ -193,6 +194,9 @@ export default function ListingRightSection({
               className="seller-update-deleteButton"
               type="button"
               onClick={onDelete}
+              disabled={isDeleting}
+              aria-busy={isDeleting}
+              title="Delete listing"
             >
               <img src={deleteBtnIcon} alt="Delete" />
             </button>
