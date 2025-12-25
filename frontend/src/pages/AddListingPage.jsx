@@ -1,4 +1,6 @@
 // src/pages/AddListingPage.jsx
+import { API_BASE_URL } from "/src/config/env.js";
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/addListing.css";
@@ -65,7 +67,7 @@ function AddListingPage() {
 
   /* ================= FETCH WILAYAS ================= */
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/choices/wilayas/")
+    fetch(`${API_BASE_URL}/api/choices/wilayas/`)
       .then((res) => res.json())
       .then((data) => {
         setWilayas(Array.isArray(data) ? data : []);
@@ -77,7 +79,7 @@ function AddListingPage() {
   const fetchRegions = (wilayaId) => {
     if (!wilayaId || regionsCache[wilayaId]) return;
 
-    fetch(`http://127.0.0.1:8000/api/choices/regions/?wilaya_id=${wilayaId}`)
+    fetch(`${API_BASE_URL}/api/choices/regions/?wilaya_id=${wilayaId}`)
       .then((res) => res.json())
       .then((data) => {
         setRegionsCache((prev) => ({

@@ -15,50 +15,49 @@ import addressIcon from "../assets/icons/AddressIcon.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
 import actionsIcon from "../assets/icons/Actions.svg";
-
-const USE_MOCK_PARTNERS = false;
+import { API_BASE_URL } from "/src/config/env.js";
 
 function PartnerAccounts() {
   const navigate = useNavigate();
-   const { auth } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
-  // ADMIN ONLY PAGE
+  const [partners, setPartners] = useState([]);
+  const PAGE_SIZE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
-    if (!auth.isAuthenticated) {
+    if (loading) return;
+
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    if (auth.user.role !== "ADMIN") {
+    if (!user || user.role !== "ADMIN") {
       navigate("/not-authorized");
     }
-  }, [auth]);
+  }, [loading, isAuthenticated, user, navigate]);
 
-  // ---------------------------
-  // LOAD PARTNERS
-  // ---------------------------
-  const [partners, setPartners] = useState(() => {
-    if (!USE_MOCK_PARTNERS) return [];
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.role !== "ADMIN") return;
 
-    try {
-      const stored = JSON.parse(localStorage.getItem("partners") || "[]");
+    const token = localStorage.getItem("auth_token");
 
-      return stored.map((p) => ({
-        id: p.id,
-        name: p.companyName,
-        email: p.email,
-        phone_number: p.phoneNumber,
-        address: p.address,
-        logo: null,
-        status: p.status || "active",
-      }));
-    } catch {
-      return [];
-    }
-  });
+    fetch(`${API_BASE_URL}/api/admin/partners/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        setPartners(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setPartners([]));
+  }, [isAuthenticated, user]);
 
-  const PAGE_SIZE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(partners.length / PAGE_SIZE));
 
   const currentPageItems = useMemo(() => {
@@ -66,53 +65,49 @@ function PartnerAccounts() {
     return partners.slice(start, start + PAGE_SIZE);
   }, [partners, currentPage]);
 
-  // Sync storage in mock mode
-  useEffect(() => {
-    if (!USE_MOCK_PARTNERS) return;
-
-    const normalized = partners.map((p) => ({
-      id: p.id,
-      companyName: p.name,
-      email: p.email,
-      phoneNumber: p.phone_number,
-      address: p.address,
-      status: p.status,
-    }));
-
-    localStorage.setItem("partners", JSON.stringify(normalized));
-  }, [partners]);
-
-  // ---------------------------
-  // ACTIONS
-  // ---------------------------
   const handleAddPartner = () => {
     navigate("/forms-tables/add-partner");
   };
 
-  const toggleStatus = (id) => {
-    setPartners((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, status: p.status === "active" ? "suspended" : "active" } : p
-      )
-    );
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem("auth_token");
+
+    await fetch(`${API_BASE_URL}/api/admin/partners/${id}/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setPartners((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleDelete = async (id) => {
-    setPartners((prev) => prev.filter((p) => p.id !== id));
+  const toggleStatus = async (partner) => {
+    const token = localStorage.getItem("auth_token");
+    const newStatus = partner.status === "active" ? "suspended" : "active";
 
-    if (!USE_MOCK_PARTNERS) {
-      await fetch(`/api/admin/partners/${id}/`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-    }
+    const res = await fetch(`${API_BASE_URL}/api/admin/partners/${partner.id}/`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (!res.ok) return;
+
+    setPartners((prev) =>
+      prev.map((p) =>
+        p.id === partner.id ? { ...p, status: newStatus } : p
+      )
+    );
   };
 
   const handleAddProperty = (id) => {
     navigate(`/forms-tables/add-listing?partnerId=${id}`);
   };
 
-  // Pagination
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -142,13 +137,11 @@ function PartnerAccounts() {
     }
 
     pages.push(first);
-    if (start > 2) pages.push("left-ellipsis");
+    if (start > 2) pages.push("left");
 
-    for (let i = start; i <= end && i < last; i++) {
-      pages.push(i);
-    }
+    for (let i = start; i <= end && i < last; i++) pages.push(i);
 
-    if (end < last - 1) pages.push("right-ellipsis");
+    if (end < last - 1) pages.push("right");
     pages.push(last);
 
     return pages;
@@ -156,15 +149,14 @@ function PartnerAccounts() {
 
   const pageItems = getPageNumbers();
 
-  // ---------------------------
-  // RENDER
-  // ---------------------------
+  if (loading) return null;
+
   return (
     <div className="partner-page-wrapper">
       <div className="add-partner-container">
         <div className="partners-header">
           <h1 className="page-title">Partners</h1>
-          <button type="button" className="add-partner-main-btn" onClick={handleAddPartner}>
+          <button className="add-partner-main-btn" onClick={handleAddPartner}>
             +
           </button>
         </div>
@@ -217,7 +209,6 @@ function PartnerAccounts() {
 
                     <td className="actions-col">
                       <button
-                        type="button"
                         className="row-action-btn row-action-add"
                         onClick={() => handleAddProperty(partner.id)}
                       >
@@ -225,22 +216,24 @@ function PartnerAccounts() {
                       </button>
 
                       <button
-                        type="button"
                         className="row-action-btn row-action-status"
-                        onClick={() => toggleStatus(partner.id)}
+                        onClick={() => toggleStatus(partner)}
                       >
                         <img
-                          src={partner.status === "suspended" ? suspendIcon : activateIcon}
-                          alt={partner.status === "suspended" ? "Activate" : "Suspend"}
+                          src={
+                            partner.status === "suspended"
+                              ? suspendIcon
+                              : activateIcon
+                          }
+                          alt=""
                         />
                       </button>
 
                       <button
-                        type="button"
                         className="row-action-btn row-action-delete"
                         onClick={() => handleDelete(partner.id)}
                       >
-                        <img src={deleteIcon} alt="Delete" />
+                        <img src={deleteIcon} alt="" />
                       </button>
                     </td>
                   </tr>
@@ -259,14 +252,13 @@ function PartnerAccounts() {
         </Section>
       </div>
 
-      {/* Pagination */}
       <div className="partners-pagination">
         <button
           className="paging-button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <img src={backButton} alt="back" />
+          <img src={backButton} alt="" />
         </button>
 
         {pageItems.map((item, idx) =>
@@ -290,7 +282,7 @@ function PartnerAccounts() {
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <img src={nextPage} alt="next" />
+          <img src={nextPage} alt="" />
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 // src/pages/AddListingPage3.jsx
+import { API_BASE_URL } from "/src/config/env.js";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -188,7 +189,7 @@ const handleSubmit = async (e) => {
 
     /* ---------------- SEND ---------------- */
     const response = await fetch(
-      "http://127.0.0.1:8000/api/listings/create/",
+      `${API_BASE_URL}/api/listings/create/`,
       {
         method: "POST",
         headers: {
