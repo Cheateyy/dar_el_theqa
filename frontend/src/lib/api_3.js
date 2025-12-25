@@ -104,9 +104,11 @@ export async function approveAdminListing(id, force_fields = {}) {
   return res.json();
 }
 
-export async function deleteAdminListing(id) {
+export async function deleteAdminListing(id, reason = "") {
   const res = await authFetch(`${API_BASE_URL}/api/admin/listings/${id}/`, {
     method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reason }),
   });
   if (!res.ok) throw new Error("Failed to delete listing");
   if (res.status === 204) {

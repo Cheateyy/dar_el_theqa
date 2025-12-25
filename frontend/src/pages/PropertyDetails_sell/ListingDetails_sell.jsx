@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
@@ -86,7 +86,7 @@ export default function ListingDetails_sell() {
     };
 
     if (loading) return <p>Loading...</p>;
-    if (!listing) return <p>Listing not found.</p>;
+    if (!listing) return <Navigate to="/404" replace />;
 
     const address = listing.street_address || listing.address || "N/A";
     const region = listing.region || listing.wilaya || "N/A";

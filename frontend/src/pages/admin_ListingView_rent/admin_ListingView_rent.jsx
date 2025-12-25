@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 import document_icon from "../../assets/images/legal_doc.png";
 import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
@@ -12,7 +13,8 @@ import {
     getAdminListingDetails,
     getListingDocuments,
     getAdminListingTopReviews,
-    deleteAdminReview
+    deleteAdminReview,
+    deleteAdminListing,
 } from "../../lib/api_3.js";
 
 import "./ListingDetails.css";
@@ -25,6 +27,10 @@ export default function AdmingListingRent() {
     const [documents, setDocuments] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState("Listing processed successfully.");
 
     const handleLoginClick = () => setShowLogin(true);
     const handleCloseModal = () => setShowLogin(false);
@@ -72,8 +78,43 @@ export default function AdmingListingRent() {
         }
     };
 
+    const handleOpenDeleteModal = () => {
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        if (!isDeleting) {
+            setIsDeleteModalOpen(false);
+        }
+    };
+
+    const handleDeleteListing = async (reason) => {
+        try {
+            setIsDeleting(true);
+            await deleteAdminListing(listingId, reason || "");
+            setFeedbackMessage("Listing deleted successfully.");
+            setIsDeleted(true);
+            setIsDeleteModalOpen(false);
+        } catch (error) {
+            console.error("Failed to delete listing", error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     if (loading) return <p>Loading...</p>;
-    if (!listing) return <p>Listing not found.</p>;
+    if (isDeleted) {
+        return (
+            <>
+                <nav>
+                    <NavBar onLoginClick={handleLoginClick} />
+                </nav>
+                <div className="admin-feedback-message">{feedbackMessage}</div>
+                <LoginModal show={showLogin} onClose={handleCloseModal} />
+            </>
+        );
+    }
+    if (!listing) return <Navigate to="/404" replace />;
 
     const normalizedAddress = listing.street_address || listing.address || "N/A";
     const normalizedRegion = listing.region || listing.wilaya || "";
@@ -119,8 +160,22 @@ export default function AdmingListingRent() {
                     rentUnit={rentUnit}
                     availableDate={availableDate}
                     transactionType={transactionType}
+                    onDeleteListing={handleOpenDeleteModal}
+                    isDeletingListing={isDeleting}
                 />
             </div>
+
+            <ReasonModal
+                open={isDeleteModalOpen}
+                onClose={handleCloseDeleteModal}
+                onSubmit={handleDeleteListing}
+                isSubmitting={isDeleting}
+                title="Delete Listing"
+                description="Let the owner know why this listing is being removed."
+                placeholder="Example: Violates policy, duplicate entry, incorrect data, etc."
+                confirmLabel="Delete listing"
+                requireReason
+            />
 
             <LoginModal show={showLogin} onClose={handleCloseModal} />
         </>
