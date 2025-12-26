@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 from core.models import TimeStampedModel
 
 class Listing(TimeStampedModel):
@@ -69,6 +71,17 @@ class Listing(TimeStampedModel):
     # Stores per-document notes (e.g. reasons a required document is missing)
     # Example: {"docidentity": "will upload later", "docregister": "pending"}
     document_notes = models.JSONField(default=dict, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Enforce a unique, non-empty slug even if some caller forgets to set it.
+        if not self.slug:
+            base_slug = slugify(self.title or '') or 'listing'
+            candidate = base_slug
+            while Listing.objects.exclude(pk=self.pk).filter(slug=candidate).exists():
+                candidate = f"{base_slug}-{get_random_string(6)}"
+            self.slug = candidate
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
