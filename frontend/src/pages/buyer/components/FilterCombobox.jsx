@@ -59,7 +59,7 @@ function ControlledFilterCombobox({ className, options, filtername, input_contro
                     <h4>{filtername}</h4>
                     <div>
                         {value
-                            ? options.find((options) => options.value === value)?.label
+                            ? options.find((option) => option.value === value)?.label
                             : "select " + filtername.toLowerCase()}
                     </div>
                     <div>
@@ -79,24 +79,26 @@ function ControlledFilterCombobox({ className, options, filtername, input_contro
                     <CommandList>
                         <CommandEmpty>No options found.</CommandEmpty>
                         <CommandGroup>
-                            {options.map((options) => (
-                                <CommandItem
-                                    key={options.value}
-                                    value={options.value}
-                                    onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
-                                    }}
-                                >
-                                    {options.label}
-                                    <Check
-                                        className={cn(
-                                            "ml-auto",
-                                            value === options.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                </CommandItem>
-                            ))}
+                            {options.map((option) => {
+                                return (
+                                    <CommandItem
+                                        key={option.value}
+                                        value={option.value}
+                                        onSelect={() => {
+                                            setValue(option.value)
+                                            setOpen(false)
+                                        }}
+                                    >
+                                        {option.label}
+                                        <Check
+                                            className={cn(
+                                                "ml-auto",
+                                                value === option.value ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                    </CommandItem>
+                                )
+                            })}
                         </CommandGroup>
                     </CommandList>
                 </Command>

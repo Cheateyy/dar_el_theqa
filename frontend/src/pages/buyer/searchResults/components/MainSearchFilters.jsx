@@ -6,7 +6,6 @@ import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
 import { Combobox } from "@/components/common/Combobox"
-import { useListings } from "../../context/ListingsContext"
 
 /**@type {import("../../types/common")} */
 
@@ -31,8 +30,8 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                     <FilterCombobox
                         filtername="Wilaya"
                         input_control={
-                            [filters.wilaya,
-                            (new_wilaya) => set_filters(prev => ({ ...prev, wilaya: new_wilaya }))]}
+                            [filters.wilaya_id,
+                            (new_wilaya_id) => set_filters(prev => ({ ...prev, wilaya_id: new_wilaya_id }))]}
                         className={'rounded-2xl'}
                         options={wilaya_options}
                     />

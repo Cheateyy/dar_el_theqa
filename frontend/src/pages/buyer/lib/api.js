@@ -8,7 +8,8 @@ export async function get_listings() {
     const res = await api.get("/api/listings/featured/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json();
     return data;
@@ -24,7 +25,8 @@ export async function toggle_like(listing_id) {
     const res = await api.post(`/api/listings/${listing_id}/favorite/`);
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return null;
     }
     /**@type {ToggleLikeResponse} */
     const data = await res.json();
@@ -39,7 +41,8 @@ export async function get_property_types() {
     const res = await api.get("/api/choices/property-types/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return [];
     }
 
     const data = await res.json()
@@ -51,7 +54,8 @@ export async function get_wilayas() {
     const res = await api.get("/api/choices/wilayas/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -65,7 +69,8 @@ export async function search(search_payload) {
     const res = await api.post("/api/listings/search/", search_payload);
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -77,7 +82,8 @@ export async function get_partners() {
     const res = await api.get("/api/partners/")
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -88,7 +94,8 @@ export async function get_regions() {
     const res = await api.get("/api/choices/regions/")
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -99,7 +106,8 @@ export async function get_favorites() {
     const res = await api.get("/api/listings/favorites/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json();
     return data;
@@ -137,7 +145,7 @@ export async function pause_listing(listing_id, payload) {
     const res = await api.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
     }
     const data = await res.json();
     return data

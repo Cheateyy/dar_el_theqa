@@ -12,7 +12,7 @@ import { useWilayaOptions } from "../../lib/hooks"
 
 /**
  * @typedef MainSearchFilters
- * @property {string} wilaya
+ * @property {int} wilaya_id
  * @property {string} type
  */
 
@@ -25,7 +25,7 @@ export default function MainSearchFilters({ className }) {
   /**@type {InputControl<MainSearchFilters>} */
   const [input_values, set_input_values] = useState({ wilaya: null, type: null })
 
-  const wilaya = input_values.wilaya;
+  const wilaya_id = input_values.wilaya_id;
   const type = input_values.type;
 
   return (
@@ -36,7 +36,7 @@ export default function MainSearchFilters({ className }) {
         <div className="flex flex-col sm:flex-col md:flex-row gap-5">
           <FilterCombobox
             filtername="Wilaya"
-            input_control={[input_values.wilaya, (new_wilaya) => set_input_values(prev => ({ ...prev, wilaya: new_wilaya }))]}
+            input_control={[input_values.wilaya_id, (new_wilaya_id) => set_input_values(prev => ({ ...prev, wilaya_id: new_wilaya_id }))]}
             className={'flex-1 h-32 rounded-2xl'}
             options={wilayas_options}
           />
@@ -49,7 +49,7 @@ export default function MainSearchFilters({ className }) {
         </div>
       </SearchFiltersWrapper>
       <div className="flex justify-center items-center mt-4">
-        <Button onClick={() => navigate({ pathname: "/search-results", search: `?type=${type}&wilaya=${wilaya}` })}>
+        <Button onClick={() => navigate({ pathname: "/search-results", search: `?type=${type}&wilaya_id=${wilaya_id}` })}>
           <span>Search Listings</span>
           <ArrowRight />
         </Button>

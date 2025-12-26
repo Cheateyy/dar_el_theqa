@@ -19,7 +19,7 @@ export function SearchFilters({ className, page }) {
 
     /**@type {InputControl<SearchFilters>} */
     const [filters, set_filters] = useState({
-        wilaya: search_params.get("wilaya"),
+        wilaya_id: search_params.get("wilaya_id"),
         type: search_params.get("type"),
         property_type: search_params.get("property_type"),
         price_range: search_params.get("price_range") ?? [-Infinity, Infinity],
@@ -45,8 +45,8 @@ export function SearchFilters({ className, page }) {
     function get_search_params_obj() {
         return {
             transaction_type: selected_property_type,
-            wilaya_id: filters.wilaya,
-            region_id: filters.region,
+            wilaya_id: filters.wilaya_id,
+            region_id: filters.region_id,
             property_type: filters.property_type,
             price_min: filters.price_range[0],
             price_max: filters.price_range[1],

@@ -11,8 +11,8 @@
 /**
  * 
  * @typedef SearchFilters
- * @property {string} wilaya
- * @property {string} region
+ * @property {int} wilaya_id
+ * @property {int} region_id
  * @property {string} property_type
  * @property {[string, string]} price_range
  * @property {string} rent_time_unit
