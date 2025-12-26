@@ -18,9 +18,9 @@ import { Combobox } from "@/components/common/Combobox"
 export function MainSearchFilters({ className, state_control, dialog_control, property_type_control }) {
     const [filters, set_filters] = state_control
     const [selected_property_type, set_selected_property_type] = property_type_control
-    const wilaya_options = useWilayaOptions()
     const [is_dlg_open, set_is_dlg_open] = dialog_control
 
+    const wilaya_options = useWilayaOptions()
     const regions = useRegionOptions()
 
     return (
@@ -47,9 +47,9 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                         filtername="Appartement"
                         input_control={
                             [filters.property_type,
-                            (new_appartement) => set_filters(prev => ({ ...prev, appartement: new_appartement }))]}
+                            (new_appartement) => set_filters(prev => ({ ...prev, property_type: new_appartement }))]}
                         className={'w-48 rounded-2xl'}
-                        options={[]}
+                        options={[{ label: "APARTMENT", value: "APARTMENT" }]}
                     />
 
                     <PriceInput

@@ -50,25 +50,26 @@ export function SearchFilters({ className, page }) {
         * @returns {SearchPayload}
         */
     function get_search_params_obj() {
-        return {
-            transaction_type: selected_property_type,
-            wilaya_id: filters.wilaya_id,
-            region_id: filters.region_id,
-            property_type: filters.property_type,
-            price_min: filters.price_range[0],
-            price_max: filters.price_range[1],
-            rent_time_unit: filters.rent_time_unit,
+        return Object.fromEntries(
+            Object.entries({
+                transaction_type: selected_property_type,
+                wilaya_id: filters.wilaya_id,
+                region_id: filters.region_id,
+                property_type: filters.property_type,
+                price_min: filters.price_range?.[0],
+                price_max: filters.price_range?.[1],
+                rent_time_unit: filters.rent_time_unit,
 
-            // more filters
-            is_verified_only: more_filters.is_verified_only,
-            floors: more_filters.floors,
-            bedrooms: more_filters.bedrooms,
-            bathrooms: more_filters.bathrooms,
+                is_verified_only: more_filters.is_verified_only,
+                floors: more_filters.floors,
+                bedrooms: more_filters.bedrooms,
+                bathrooms: more_filters.bathrooms,
 
-            // from parent page
-            page: page,
-        }
+                page,
+            }).filter(([_, v]) => v !== undefined && v !== null)
+        )
     }
+
 
     useEffect(() => {
         const params_obj = get_search_params_obj()
