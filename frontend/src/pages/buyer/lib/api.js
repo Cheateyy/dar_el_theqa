@@ -23,7 +23,7 @@ export async function get_listings() {
  */
 
 export async function toggle_like(listing_id) {
-    const res = await api.post(`/api/listings/${listing_id}/favorite/`);
+    const res = await authApi.post(`/api/listings/${listing_id}/favorite/`);
     if (!res.ok) {
         const error = await res.text();
         console.error(error)
@@ -31,7 +31,6 @@ export async function toggle_like(listing_id) {
     }
     /**@type {ToggleLikeResponse} */
     const data = await res.json();
-    console.log(`Listing like is ${data.status}`)
     return data;
 }
 
@@ -104,7 +103,19 @@ export async function get_regions({ wilaya_id }) {
 
 /**@returns {Promise<Paginated<Listing>>} */
 export async function get_favorites() {
-    const res = await api.get("/api/listings/favorites/");
+    const res = await authApi.get("/api/listings/favorites/");
+    if (!res.ok) {
+        const error = await res.text();
+        console.error(error)
+        return []
+    }
+    const data = await res.json();
+    return data;
+};
+
+/**@returns {Promise<Paginated<Listing>>} */
+export async function get_contacted() {
+    const res = await authApi.get("/api/listings/contacted/");
     if (!res.ok) {
         const error = await res.text();
         console.error(error)
