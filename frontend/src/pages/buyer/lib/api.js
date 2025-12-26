@@ -1,5 +1,6 @@
 import { api } from "@/lib/api_client";
 import { format_date } from "@/lib/utils";
+import { authApi } from "@/services/authService";
 
 /**@typedef {import('@/types/ListingModel')}*/
 
@@ -90,8 +91,8 @@ export async function get_partners() {
 }
 
 /**@returns {Promise<Region[]>} */
-export async function get_regions() {
-    const res = await api.get("/api/choices/regions/")
+export async function get_regions({ wilaya_id }) {
+    const res = await api.get(`/api/choices/regions/?wilaya_id=${wilaya_id}`)
     if (!res.ok) {
         const error = await res.text();
         console.error(error)
@@ -142,7 +143,8 @@ export async function pause_listing(listing_id, payload) {
     else {
         auto_activate_date_f = null;
     }
-    const res = await api.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
+
+    const res = await authApi.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
     if (!res.ok) {
         const error = await res.text();
         console.error(error)
@@ -163,6 +165,6 @@ export async function pause_listing(listing_id, payload) {
  * @returns {Promise<bool>}
  */
 export async function delete_listing(listing_id, payload) {
-    const res = await api.delete(`/api/listings/${listing_id}/`, payload)
+    const res = await authApi.delete(`/api/listings/${listing_id}/`, payload)
     return res.status == 204; // No content
 }
