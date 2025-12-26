@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/contexts/AuthContext"
+import { useState } from "react"
 import ReactModal from "react-modal"
 
 /**
@@ -8,7 +10,10 @@ import ReactModal from "react-modal"
  * @param {StateControl<boolean>} props.state_control
  */
 export function LoginDialog({ state_control }) {
+    const { login } = useAuth()
     const [is_dlg_open, set_is_dlg_open] = state_control
+    const [inputs, set_inputs] = useState({ email: "", password: "" })
+
     return (
         <ReactModal
             isOpen={is_dlg_open}
@@ -45,6 +50,7 @@ export function LoginDialog({ state_control }) {
                     <div>
                         <Label htmlFor="email">Email</Label>
                         <Input
+                            state_control={[inputs.email, (new_email) => set_inputs(prev => ({ ...prev, email: new_email }))]}
                             id="email"
                             name="email"
                             placeholder="user@gmail.com"
@@ -54,6 +60,7 @@ export function LoginDialog({ state_control }) {
                     <div>
                         <Label htmlFor="password">Password</Label>
                         <Input
+                            state_control={[inputs.password, (new_password) => set_inputs(prev => ({ ...prev, password: new_password }))]}
                             id="password"
                             name="password"
                             type="password"
@@ -79,6 +86,7 @@ export function LoginDialog({ state_control }) {
                         Cancel
                     </Button>
                     <Button
+                        onClick={() => { login(inputs.email, inputs.password) }}
                         variant="default"
                         className="rounded-full py-4 px-8 sm:px-12 w-full sm:w-auto"
                     >
@@ -86,6 +94,6 @@ export function LoginDialog({ state_control }) {
                     </Button>
                 </div>
             </div>
-        </ReactModal>
+        </ReactModal >
     )
 }
