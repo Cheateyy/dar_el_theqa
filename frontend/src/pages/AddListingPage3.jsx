@@ -24,7 +24,7 @@ const loadStepData = () => {
       const parsed = JSON.parse(raw);
       step1 = parsed.stepData?.step1 || {};
       step2 = parsed.stepData?.step2 || {};
-    } catch (e) {}
+    } catch {}
   }
 
   const images = Array.isArray(window.__CREATE_LISTING_IMAGES)
@@ -36,64 +36,49 @@ const loadStepData = () => {
 
 function AddListingPage3() {
   const navigate = useNavigate();
-const { isAuthenticated, loading } = useAuth();
-    
-    useEffect(() => {
-      if (!loading && !isAuthenticated) {
-        navigate("/login");
-      }
-    }, [loading, isAuthenticated, navigate]);
+  const { isAuthenticated, loading } = useAuth();
 
   const { step1, step2, images } = loadStepData();
   const ownershipInputRef = useRef(null);
 
-  // Each document structure: { file: File | null, notes: "" }
   const [identity, setIdentity] = useState({ file: null, notes: "" });
-  const [certificate, setCertificate] = useState({ file: null, notes: "" });
+  const [register, setRegister] = useState({ file: null, notes: "" });
   const [assurance, setAssurance] = useState({ file: null, notes: "" });
-
-  // Ownership: up to 5 files + notes
   const [ownershipFiles, setOwnershipFiles] = useState([]);
   const [ownershipNotes, setOwnershipNotes] = useState("");
+  const [silbiya, setSilbiya] = useState({ file: null, notes: "" });
+
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [errors, setErrors] = useState({
     identity: false,
-    certificate: false,
+    register: false,
     assurance: false,
     ownership: false,
+    silbiya: false,
   });
 
-  // -------------------------------
-  // Validation Rule:
-  // Valid if: file exists OR notes entered
-  // -------------------------------
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [loading, isAuthenticated, navigate]);
+
   const validateDocuments = () => {
     const newErrors = {
-      identity: !identity.file && identity.notes.trim().length === 0,
-      certificate: !certificate.file && certificate.notes.trim().length === 0,
-      assurance: !assurance.file && assurance.notes.trim().length === 0,
-      ownership:
-        ownershipFiles.length === 0 &&
-        ownershipNotes.trim().length === 0,
+      identity: !identity.file && !identity.notes.trim(),
+      register: !register.file && !register.notes.trim(),
+      assurance: !assurance.file && !assurance.notes.trim(),
+      ownership: ownershipFiles.length === 0 && !ownershipNotes.trim(),
+      silbiya: !silbiya.file && !silbiya.notes.trim(),
     };
-
     setErrors(newErrors);
-
-    return !Object.values(newErrors).some((e) => e === true);
+    return !Object.values(newErrors).some(Boolean);
   };
 
-  // -------------------------------
-  // Ownership file upload handler (max 5)
-  // -------------------------------
   const handleAddOwnership = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (ownershipFiles.length >= 5) {
-      alert("You can upload up to 5 ownership documents.");
-      return;
-    }
-
+    if (!file || ownershipFiles.length >= 2) return;
     setOwnershipFiles((prev) => [...prev, file]);
   };
 
@@ -101,141 +86,105 @@ const { isAuthenticated, loading } = useAuth();
     setOwnershipFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  // -------------------------------
-  // Handle Identity / Certificate / Assurance Upload
-  // -------------------------------
   const handleSingleUpload = (e, setter) => {
     const file = e.target.files?.[0];
     if (file) setter((prev) => ({ ...prev, file }));
   };
 
-  // -------------------------------
-  // Submit Form
-  // -------------------------------
-  console.log("STEP1:", step1);
-  console.log("STEP2:", step2);
-  console.log("IMAGES:", images);
-  console.log("auth_token:", localStorage.getItem("auth_token"));
-console.log("refresh_token:", localStorage.getItem("refresh_token"));
-console.log("auth_user:", localStorage.getItem("auth_user"));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateDocuments()) return;
 
- 
+    try {
+      console.log("IDENTITY NOTES:", identity.notes);
+      console.log("REGISTER NOTES:", register.notes);
+      console.log("ASSURANCE NOTES:", assurance.notes);
+      console.log("OWNERSHIP NOTES:", ownershipNotes);
 
+      const payload = new FormData();
+      const token = localStorage.getItem("auth_token");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+      payload.append("title", step1.title);
+      payload.append("description", step1.description);
+      payload.append("price", Number(step1.price));
+      payload.append(
+        "transaction_type",
+        step1.purpose === "sale" ? "BUY" : "RENT"
+      );
+      if (step1.purpose === "rent")
+        payload.append("rent_unit", step1.paymentUnit);
+      payload.append("address", step1.address);
+      payload.append("wilaya", step1.wilaya);
+      payload.append("region", step1.region);
 
-  if (!validateDocuments()) {
-    alert("Please upload all required documents OR provide notes.");
-    return;
-  }
+      payload.append("property_type", step2.propertyTypeBackend);
+      payload.append("area", Number(step2.area));
+      payload.append("floors", Number(step2.floors || 0));
+      payload.append("bedrooms", Number(step2.bedrooms || 0));
+      payload.append("bathrooms", Number(step2.bathrooms || 0));
 
-  try {
-    const accessToken = localStorage.getItem("auth_token");
-    const payload = new FormData();
+      const labels = {};
+      images.forEach((img, i) => {
+        if (img.file) {
+          payload.append("images", img.file);
+          labels[i] = img.label || "";
+        }
+      });
+      payload.append("image_labels", JSON.stringify(labels));
 
-    /* ---------------- STEP 1 ---------------- */
-    payload.append("title", step1.title);
-    payload.append("description", step1.description);
-    payload.append("price", Number(step1.price));
+      if (identity.file) payload.append("doc_identity", identity.file);
+      if (identity.notes.trim())
+        payload.append("doc_identity_note", identity.notes.trim());
 
-    payload.append(
-      "transaction_type",
-      step1.purpose === "sale" ? "BUY" : "RENT"
-    );
+      if (register.file) payload.append("doc_register", register.file);
+      if (register.notes.trim())
+        payload.append("doc_register_note", register.notes.trim());
 
-    if (step1.purpose === "rent") {
-      payload.append("rent_unit", step1.paymentUnit);
-    }
+      if (assurance.file) payload.append("doc_assurance", assurance.file);
+      if (assurance.notes.trim())
+        payload.append("doc_assurance_note", assurance.notes.trim());
 
-    payload.append("address", step1.address);
-    payload.append("wilaya", step1.wilaya);
-    payload.append("region", step1.region);
+      ownershipFiles.forEach((file, i) => {
+        payload.append(`doc_ownership_${i + 1}`, file);
+      });
+      if (ownershipNotes.trim())
+        payload.append("doc_ownership_note", ownershipNotes.trim());
 
-    /* ---------------- STEP 2 ---------------- */
-    payload.append("property_type", step2.propertyTypeBackend);
-    payload.append("area", Number(step2.area));
-    payload.append("floors", Number(step2.floors || 0));
-    payload.append("bedrooms", Number(step2.bedrooms || 0));
-    payload.append("bathrooms", Number(step2.bathrooms || 0));
+      if (silbiya.file) payload.append("doc_silbiya", silbiya.file);
+      if (silbiya.notes.trim())
+        payload.append("doc_silbiya_note", silbiya.notes.trim());
 
-    /* ---------------- IMAGES ---------------- */
-    const labelsObject = {};
-    images.forEach((img, index) => {
-      if (img.file) {
-        payload.append("images", img.file);
-        labelsObject[index] = img.label || "";
-      }
-    });
-    payload.append("image_labels", JSON.stringify(labelsObject));
-
-    /* ---------------- DOCUMENTS (IMPORTANT) ---------------- */
-    if (identity.file) {
-      payload.append("doc_identity", identity.file);
-    }
-
-    if (assurance.file) {
-      payload.append("doc_assurance", assurance.file);
-    }
-
-    if (certificate.file) {
-      payload.append("doc_register", certificate.file);
-    }
-
-    ownershipFiles.forEach((file, index) => {
-      if (index === 0) payload.append("doc_ownership_1", file);
-      if (index === 1) payload.append("doc_ownership_2", file);
-    });
-
-    /* ---------------- SEND ---------------- */
-    const response = await fetch(
-      `${API_BASE_URL}/api/listings/create/`,
-      {
+      const res = await fetch(`${API_BASE_URL}/api/listings/create/`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: payload,
-      }
-    );
+      });
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("Create listing failed:", err);
-      alert("Failed to submit listing.");
-      return;
+      if (!res.ok) throw new Error("Submission failed");
+
+      localStorage.removeItem(DRAFT_KEY);
+      window.__CREATE_LISTING_IMAGES = undefined;
+      setShowSuccess(true);
+    } catch (err) {
+      alert("Error submitting listing");
     }
+  };
 
-    localStorage.removeItem("createListingDraft");
-    window.__CREATE_LISTING_IMAGES = undefined;
+  if (loading) return null;
 
-    navigate("/forms-tables/add-listing/confirmation");
-  } catch (error) {
-    console.error("Error submitting listing:", error);
-    alert("Error submitting listing.");
-  }
-};
-
-  // -------------------------------
-  // RENDER
-  // -------------------------------
-   if (loading) return null;
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
-        <button className="back-button" type="button" onClick={() => navigate(-1)}>
-          <img src={BackIcon} className="back-icon" alt="Back" />
-          Back
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <img src={BackIcon} className="back-icon" /> Back
         </button>
 
         <h1 className="page-title">Add a Listing</h1>
 
         <Section>
           <h2 className="section-title">Legal Documents</h2>
-          <p className="small-hint">Upload required documents or provide a note explaining missing ones.</p>
 
           <form onSubmit={handleSubmit}>
-
             {/* ---------------- Identity ---------------- */}
             <div className="document-row">
               <div className="document-title-row">
@@ -250,7 +199,9 @@ const handleSubmit = async (e) => {
                 <button
                   type="button"
                   className="add-document-btn"
-                  onClick={() => document.getElementById("identity-file").click()}
+                  onClick={() =>
+                    document.getElementById("identity-file").click()
+                  }
                   disabled={!!identity.file}
                 >
                   +
@@ -283,7 +234,9 @@ const handleSubmit = async (e) => {
               <textarea
                 className="notes-input"
                 value={identity.notes}
-                onChange={(e) => setIdentity({ ...identity, notes: e.target.value })}
+                onChange={(e) =>
+                  setIdentity({ ...identity, notes: e.target.value })
+                }
                 placeholder="Write explanation if no document provided..."
               />
             </div>
@@ -292,7 +245,7 @@ const handleSubmit = async (e) => {
             <div className="document-row">
               <div className="document-title-row">
                 <h3 className="document-title">
-                  Property Ownership Contract (up to 5 pages)
+                  Property Ownership Contract (up to 2 pages)
                 </h3>
                 <input
                   type="file"
@@ -305,7 +258,7 @@ const handleSubmit = async (e) => {
                   type="button"
                   className="add-document-btn"
                   onClick={() => ownershipInputRef.current.click()}
-                  disabled={ownershipFiles.length >= 5}
+                  disabled={ownershipFiles.length >= 2}
                 >
                   +
                 </button>
@@ -344,42 +297,46 @@ const handleSubmit = async (e) => {
               />
             </div>
 
-            {/* ---------------- Certificate ---------------- */}
+            {/* ---------------- register ---------------- */}
             <div className="document-row">
               <div className="document-title-row">
-                <h3 className="document-title">Certificate of Non-Existence</h3>
+                <h3 className="document-title">Property Registration Document</h3>
                 <input
                   type="file"
                   accept=".pdf,.jpg,.jpeg,.png"
-                  id="certificate-file"
+                  id="register-file"
                   style={{ display: "none" }}
-                  onChange={(e) => handleSingleUpload(e, setCertificate)}
+                  onChange={(e) => handleSingleUpload(e, setRegister)}
                 />
                 <button
                   className="add-document-btn"
                   type="button"
-                  onClick={() => document.getElementById("certificate-file").click()}
-                  disabled={!!certificate.file}
+                  onClick={() =>
+                    document.getElementById("register-file").click()
+                  }
+                  disabled={!!register.file}
                 >
                   +
                 </button>
               </div>
 
-              {errors.certificate && (
+              {errors.register && (
                 <p className="error-text">Upload a file OR provide notes.</p>
               )}
 
-              {certificate.file && (
+              {register.file && (
                 <div className="document-card">
                   <div className="document-file-row">
                     <span className="document-filename">
                       <img src={DocumentIcon} className="small-pdf-icon" />
-                      {certificate.file.name}
+                      {register.file.name}
                     </span>
                     <button
                       className="remove-document-btn"
                       type="button"
-                      onClick={() => setCertificate({ ...certificate, file: null })}
+                      onClick={() =>
+                        setRegister({ ...register, file: null })
+                      }
                     >
                       <img src={removeIcon} className="remove-icon" />
                     </button>
@@ -390,8 +347,10 @@ const handleSubmit = async (e) => {
               <label className="notes-label">notes</label>
               <textarea
                 className="notes-input"
-                value={certificate.notes}
-                onChange={(e) => setCertificate({ ...certificate, notes: e.target.value })}
+                value={register.notes}
+                onChange={(e) =>
+                  setRegister({ ...register, notes: e.target.value })
+                }
                 placeholder="Explain if the document is missing..."
               />
             </div>
@@ -410,7 +369,9 @@ const handleSubmit = async (e) => {
                 <button
                   className="add-document-btn"
                   type="button"
-                  onClick={() => document.getElementById("assurance-file").click()}
+                  onClick={() =>
+                    document.getElementById("assurance-file").click()
+                  }
                   disabled={!!assurance.file}
                 >
                   +
@@ -443,20 +404,96 @@ const handleSubmit = async (e) => {
               <textarea
                 className="notes-input"
                 value={assurance.notes}
-                onChange={(e) => setAssurance({ ...assurance, notes: e.target.value })}
+                onChange={(e) =>
+                  setAssurance({ ...assurance, notes: e.target.value })
+                }
+                placeholder="Explain if the document is missing..."
+              />
+            </div>
+            {/* ---------------- Silbiya ---------------- */}
+            <div className="document-row">
+              <div className="document-title-row">
+                <h3 className="document-title">Silbiya Document</h3>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  id="silbiya-file"
+                  style={{ display: "none" }}
+                  onChange={(e) => handleSingleUpload(e, setSilbiya)}
+                />
+                <button
+                  className="add-document-btn"
+                  type="button"
+                  onClick={() =>
+                    document.getElementById("silbiya-file").click()
+                  }
+                  disabled={!!silbiya.file}
+                >
+                  +
+                </button>
+              </div>
+
+              {errors.silbiya && (
+                <p className="error-text">Upload a file OR provide notes.</p>
+              )}
+
+              {silbiya.file && (
+                <div className="document-card">
+                  <div className="document-file-row">
+                    <span className="document-filename">
+                      <img src={DocumentIcon} className="small-pdf-icon" />
+                      {silbiya.file.name}
+                    </span>
+                    <button
+                      className="remove-document-btn"
+                      type="button"
+                      onClick={() => setSilbiya({ ...silbiya, file: null })}
+                    >
+                      <img src={removeIcon} className="remove-icon" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <label className="notes-label">notes</label>
+              <textarea
+                className="notes-input"
+                value={silbiya.notes}
+                onChange={(e) =>
+                  setSilbiya({ ...silbiya, notes: e.target.value })
+                }
                 placeholder="Explain if the document is missing..."
               />
             </div>
 
             {/* ---------------- Submit ---------------- */}
             <div className="form-footer">
-              <Button type="submit" variant="primary" icon="approval">
+              <Button type="submit" variant="primary">
                 Send For Approval
               </Button>
             </div>
           </form>
         </Section>
       </div>
+
+      {showSuccess && (
+        <div className="success-modal-overlay">
+          <div className="success-modal">
+            <h2>✅ Listing Submitted</h2>
+            <p>Your listing was sent successfully for approval.</p>
+
+            <button
+              className="success-btn primary"
+              onClick={() => {
+                setShowSuccess(false);
+                navigate("/");
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
