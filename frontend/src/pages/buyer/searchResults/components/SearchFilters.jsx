@@ -12,6 +12,13 @@ import { useSearchParams } from "react-router-dom"
 
 ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
+// sentinel numbers
+const MIN_PRICE = 0
+const MAX_PRICE = 1_000_000_000
+
+const MIN_AREA = 0
+const MAX_AREA = 1_000_000_000
+
 export function SearchFilters({ className, page }) {
     const [is_dialog_open, set_is_dialog_open] = useState(false)
     const [selected_property_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
@@ -22,12 +29,12 @@ export function SearchFilters({ className, page }) {
         wilaya_id: search_params.get("wilaya_id"),
         type: search_params.get("type"),
         property_type: search_params.get("property_type"),
-        price_range: search_params.get("price_range") ?? [-Infinity, Infinity],
+        price_range: search_params.get("price_range") ?? [MIN_PRICE, MAX_PRICE],
     })
     /**@type {StateControl<MoreFilters>} */
     const [more_filters, set_more_filters] = useState({
         is_verified_only: search_params.get("is_verified_only"),
-        area_range: search_params.get("area_range") ?? [-Infinity, Infinity],
+        area_range: search_params.get("area_range") ?? [MIN_AREA, MAX_AREA],
         floors: search_params.get("floors"),
         bedrooms: search_params.get("bedrooms"),
         bathrooms: search_params.get("bathrooms"),
