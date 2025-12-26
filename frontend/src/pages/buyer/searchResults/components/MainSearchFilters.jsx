@@ -12,12 +12,12 @@ import { Combobox } from "@/components/common/Combobox"
 /**
  * @param {Object} props
  * @param {StateControl<SearchFilters>} props.state_control
- * @param {StateControl<string>} props.property_type_control
+ * @param {StateControl<string>} props.offer_type_control
  * @param {StateControl<boolean>} props.dialog_control
  */
-export function MainSearchFilters({ className, state_control, dialog_control, property_type_control }) {
+export function MainSearchFilters({ className, state_control, dialog_control, offer_type_control }) {
     const [filters, set_filters] = state_control
-    const [selected_property_type, set_selected_property_type] = property_type_control
+    const [selected_offer_type, set_selected_offer_type] = offer_type_control
     const [is_dlg_open, set_is_dlg_open] = dialog_control
 
     const wilaya_options = useWilayaOptions()
@@ -25,7 +25,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
 
     return (
         <div>
-            <SearchFiltersWrapper className={className} selectedOfferType={selected_property_type} setSelectedOfferType={set_selected_property_type}>
+            <SearchFiltersWrapper className={className} selectedOfferType={selected_offer_type} setSelectedOfferType={set_selected_offer_type}>
                 <div className="flex flex-col items-center sm:flex-col md:flex-row overflow-auto relative gap-5">
                     <FilterCombobox
                         filtername="Wilaya"
@@ -53,7 +53,7 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                     />
 
                     <PriceInput
-                        offerType={selected_property_type}
+                        offerType={selected_offer_type}
                         input_control={[filters.price_range, (new_range) => set_filters(prev => ({ ...prev, price_range: new_range }))]}
                         rent_unit_control={[filters.rent_time_unit, (new_rent_unit) => set_filters(prev => ({ ...prev, rent_time_unit: new_rent_unit }))]}
                     />

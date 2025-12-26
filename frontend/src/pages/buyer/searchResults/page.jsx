@@ -4,14 +4,22 @@ import { ListingGrid } from "../../../components/common/ListingGrid";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { search as get_search_listings } from "../lib/api";
+import { SearchProvider, useSearch } from "./context/searchContext";
 
 export default function SearchResults() {
+    return (
+        <SearchProvider>
+            <SearchResults_ />
+        </SearchProvider>
+    )
+}
+
+function SearchResults_() {
     const [search_params, _] = useSearchParams()
+    const { page, set_page } = useSearch()
 
     /**@type {StateControl<Listing[]>} */
     const [listings, set_listings] = useState([])
-
-    const [page, set_page] = useState(1)
 
     useEffect(() => {
         async function fetchData() {
