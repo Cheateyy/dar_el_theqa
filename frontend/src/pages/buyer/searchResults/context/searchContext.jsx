@@ -19,8 +19,8 @@ const MAX_AREA = 1_000_000_000
  * @property {MoreFilters} more_filters
  * @property {import('react').Dispatch<import('react').SetStateAction<MoreFilters>>} set_more_filters
   
- * @property {string} selected_property_type
- * @property {import('react').Dispatch<import('react').SetStateAction<string>>} set_selected_property_type
+ * @property {string} selected_offer_type
+ * @property {import('react').Dispatch<import('react').SetStateAction<string>>} set_selected_offer_type
  
  * @property {number} page
  * @property {import('react').Dispatch<import('react').SetStateAction<number>>} set_page

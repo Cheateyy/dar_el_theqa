@@ -1,6 +1,5 @@
 import { useState } from "react"
 
-import { OFFER_TYPE } from "../../enum"
 import { MoreFilters } from "@/pages/buyer/searchResults/components/MoreFilters"
 
 import closeSvg from '../assets/close.svg'
@@ -8,25 +7,18 @@ import ReactModal from "react-modal"
 import { MainSearchFilters } from "./MainSearchFilters"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import { useSearch } from "../context/searchContext"
 
 ReactModal.setAppElement('#root'); // Or whatever your main app container ID is
 
-
-
 export function SearchFilters({ className }) {
     const [is_dialog_open, set_is_dialog_open] = useState(false)
-    const { filters, set_filters } = useSearch()
-    const { more_filters, set_more_filters } = useSearch()
-    const { selected_offer_type, set_selected_offer_type } = useSearch()
 
     return (
         <div>
             <div role="static-filters" className={className}>
                 <MainSearchFilters
                     dialog_control={[is_dialog_open, set_is_dialog_open]}
-                    state_control={[filters, set_filters]}
-                    offer_type_control={[selected_offer_type, set_selected_offer_type]} />
+                />
                 <ApplyFiltersButton />
             </div>
 
@@ -70,11 +62,11 @@ export function SearchFilters({ className }) {
 
                 <MainSearchFilters
                     dialog_control={[is_dialog_open, set_is_dialog_open]}
-                    state_control={[filters, set_filters]}
-                    offer_type_control={[selected_offer_type, set_selected_offer_type]}
                 />
 
-                <MoreFilters className={"mt-8 p-10 rounded-2xl bg-white"} state_control={[more_filters, set_more_filters]} />
+                <MoreFilters
+                    className={"mt-8 p-10 rounded-2xl bg-white"}
+                />
             </ReactModal>
         </div>
     )

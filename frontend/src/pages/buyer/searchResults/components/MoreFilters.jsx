@@ -8,16 +8,16 @@ import { RangeInput } from "../../components/RangeInput"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSearch } from "../context/searchContext"
 /**@type {import('../../types/common')} */
 
 
 /**
  * 
  * @param {Object} props
- * @param {StateControl<MoreFilters>} props.state_control
  */
-export function MoreFilters({ className, state_control }) {
-    const [more_filters, set_more_filters] = state_control
+export function MoreFilters({ className, }) {
+    const { more_filters, set_more_filters } = useSearch()
     return (
         <div className={cn(className, "w-full p-10 shadow-xl rounded-xl outline bg-white relative")}>
             <h4 className="h4">More Filters</h4>
