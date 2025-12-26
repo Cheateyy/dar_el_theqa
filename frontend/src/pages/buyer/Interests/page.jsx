@@ -1,6 +1,5 @@
 // Interests page
 import { ListingGrid } from "@/components/common/ListingGrid"
-import MainSearchFilters from "../landingPage/components/MainSearchFilters"
 
 export function Interests() {
     const results = []

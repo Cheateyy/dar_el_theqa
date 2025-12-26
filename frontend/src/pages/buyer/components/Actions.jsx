@@ -14,6 +14,9 @@ import logoutSvg from '../assets/logout.svg'
 import { useState } from "react"
 import { Combobox } from "@/components/common/Combobox"
 import { useAuthMessaging } from "../context/AuthMessagingContext"
+import { useNavigate } from "react-router-dom"
+import AuthService from "@/services/authService"
+import { useAuth } from "@/contexts/AuthContext"
 
 function LanguageSelector({ className }) {
     const langs = ["arabic", "english", "language"];
@@ -31,12 +34,15 @@ function LanguageSelector({ className }) {
 }
 
 function MenuButton() {
+    const navigate = useNavigate()
+    const { logout } = useAuth()
+    /**@type {import("@/components/common/DropDownMenu").DropDownMenuOption[]} */
     const options = [
-        { label: "Home", icon: homeSvg, },
-        { label: "Find a Property", icon: searchSvg, },
-        { label: "Favorites", icon: menuHeartSvg, },
-        { label: "Contacted Properties", icon: messageSvg, },
-        { label: "Log out", icon: logoutSvg, },
+        { label: "Home", icon: homeSvg, onClick: () => navigate("/") },
+        { label: "Find a Property", icon: searchSvg, onClick: () => navigate("/search-results") },
+        { label: "Favorites", icon: menuHeartSvg, onClick: () => navigate("/favorites") },
+        { label: "Contacted Properties", icon: messageSvg, onClick: () => navigate("/interests") },
+        { label: "Log out", icon: logoutSvg, onClick: async () => await logout() },
     ]
 
     return (
