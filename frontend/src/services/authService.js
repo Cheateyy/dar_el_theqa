@@ -9,44 +9,44 @@ const USER_KEY = 'auth_user';
 
 export const TokenManager = {
   getToken: () => localStorage.getItem(TOKEN_KEY),
-  
+
   setToken: (token) => {
     if (token) {
       localStorage.setItem(TOKEN_KEY, token);
     }
   },
-  
+
   removeToken: () => {
     localStorage.removeItem(TOKEN_KEY);
   },
 
   getRefreshToken: () => localStorage.getItem(REFRESH_TOKEN_KEY),
-  
+
   setRefreshToken: (token) => {
     if (token) {
       localStorage.setItem(REFRESH_TOKEN_KEY, token);
     }
   },
-  
+
   removeRefreshToken: () => {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   },
-  
+
   getUser: () => {
     const user = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
   },
-  
+
   setUser: (user) => {
     if (user) {
       localStorage.setItem(USER_KEY, JSON.stringify(user));
     }
   },
-  
+
   removeUser: () => {
     localStorage.removeItem(USER_KEY);
   },
-  
+
   clear: () => {
     TokenManager.removeToken();
     TokenManager.removeRefreshToken();
@@ -57,10 +57,10 @@ export const TokenManager = {
 /**
  * Enhanced API client with auth token injection
  */
-const authApi = {
+export const authApi = {
   async request(path, options = {}) {
     const token = TokenManager.getToken();
-    
+
     return await api.request(path, {
       ...options,
       headers: {
@@ -109,7 +109,7 @@ const handleResponse = async (response) => {
       // If dict like {email: ["already exists"], password: ["too short"], ...}
       if (!data.detail && !data.message) {
         errorMessage = Object.values(data)[0][0]; // extract first message
-      } 
+      }
       else {
         errorMessage = data.detail || data.message;
       }
@@ -133,19 +133,19 @@ const AuthService = {
     try {
       const response = await authApi.post('/api/auth/login/', credentials);
       const data = await handleResponse(response);
-      
+
       // Backend returns {access, refresh} tokens
       if (data.access) {
         TokenManager.setToken(data.access);
         if (data.refresh) {
           TokenManager.setRefreshToken(data.refresh);
         }
-        
+
         // Fetch user info after successful login
         try {
           const userResponse = await authApi.get('/api/auth/user/');
           const userData = await handleResponse(userResponse);
-          
+
           if (userData.isAuthenticated && userData.user) {
             TokenManager.setUser(userData.user);
             return {
@@ -158,7 +158,7 @@ const AuthService = {
           console.error('Failed to fetch user data:', userError);
         }
       }
-      
+
       return data;
     } catch (error) {
       console.error('Login error:', error);
@@ -203,12 +203,12 @@ const AuthService = {
     try {
       const response = await authApi.get('/api/auth/user/');
       const data = await handleResponse(response);
-      
+
       // Update stored user info if authenticated
       if (data.isAuthenticated && data.user) {
         TokenManager.setUser(data.user);
       }
-      
+
       return data;
     } catch (error) {
       console.error('Get current user error:', error);
@@ -244,51 +244,51 @@ const AuthService = {
     }
   },
 
- /**
- * Activate user account with code
- */
-activateAccount: async (payload) => {
-  try {
-    const response = await authApi.post('/api/auth/activation/', payload);
-    const data = await handleResponse(response);
-    
-    // Backend returns 'token' not 'access' for activation
-    // Check for both 'access' and 'token' to handle different responses
-    const token = data.access || data.token;
-    
-    if (token) {
-      TokenManager.setToken(token);
-      
-      // Handle refresh token if provided
-      if (data.refresh) {
-        TokenManager.setRefreshToken(data.refresh);
-      }
-      
-      // Fetch user info
-      try {
-        const userResponse = await authApi.get('/api/auth/user/');
-        const userData = await handleResponse(userResponse);
-        
-        if (userData.isAuthenticated && userData.user) {
-          TokenManager.setUser(userData.user);
-          return {
-            token: token,
-            user: userData.user,
-            status: 'success',
-            message: data.message || 'Account activated'
-          };
+  /**
+  * Activate user account with code
+  */
+  activateAccount: async (payload) => {
+    try {
+      const response = await authApi.post('/api/auth/activation/', payload);
+      const data = await handleResponse(response);
+
+      // Backend returns 'token' not 'access' for activation
+      // Check for both 'access' and 'token' to handle different responses
+      const token = data.access || data.token;
+
+      if (token) {
+        TokenManager.setToken(token);
+
+        // Handle refresh token if provided
+        if (data.refresh) {
+          TokenManager.setRefreshToken(data.refresh);
         }
-      } catch (err) {
-        console.error('Failed to fetch user after activation:', err);
+
+        // Fetch user info
+        try {
+          const userResponse = await authApi.get('/api/auth/user/');
+          const userData = await handleResponse(userResponse);
+
+          if (userData.isAuthenticated && userData.user) {
+            TokenManager.setUser(userData.user);
+            return {
+              token: token,
+              user: userData.user,
+              status: 'success',
+              message: data.message || 'Account activated'
+            };
+          }
+        } catch (err) {
+          console.error('Failed to fetch user after activation:', err);
+        }
       }
+
+      return data;
+    } catch (error) {
+      console.error('Account activation error:', error);
+      throw error;
     }
-    
-    return data;
-  } catch (error) {
-    console.error('Account activation error:', error);
-    throw error;
-  }
-},
+  },
 
   /**
    * Resend activation code

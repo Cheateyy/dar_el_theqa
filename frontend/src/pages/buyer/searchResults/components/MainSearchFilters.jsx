@@ -35,8 +35,8 @@ export function MainSearchFilters({ className, dialog_control }) {
                     <FilterCombobox
                         filtername="Region"
                         input_control={
-                            [filters.region,
-                            (new_region) => set_filters(prev => ({ ...prev, region: new_region }))]}
+                            [filters.region_id,
+                            (new_region_id) => set_filters(prev => ({ ...prev, region_id: new_region_id }))]}
                         className={'w-48 rounded-2xl'}
                         options={regions}
                     />

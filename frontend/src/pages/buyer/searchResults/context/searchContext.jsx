@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { OFFER_TYPE } from "../../enum";
+import { get_regions } from "../../lib/api";
 
 
 // sentinel numbers
@@ -24,7 +25,9 @@ const MAX_AREA = 1_000_000_000
  
  * @property {number} page
  * @property {import('react').Dispatch<import('react').SetStateAction<number>>} set_page
-set_page
+
+ * @property {Region[]} regions
+ * @property {import('react').Dispatch<import('react').SetStateAction<Region[]>>} set_regions
  */
 
 
@@ -37,17 +40,20 @@ const SearchContext = createContext(null);
 export function SearchProvider({ children }) {
     const [search_params, set_search_params] = useSearchParams()
 
+    /**@type {StateControl<string>}*/
     const [selected_offer_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
 
+    /**@type {StateControl<number>}*/
     const [page, set_page] = useState(1)
 
     /**@type {InputControl<SearchFilters>} */
     const [filters, set_filters] = useState({
         wilaya_id: search_params.get("wilaya_id"),
-        type: search_params.get("type"),
+        region_id: search_params.get("region"),
         property_type: search_params.get("property_type"),
         price_range: search_params.get("price_range") ?? [MIN_PRICE, MAX_PRICE],
     })
+
     /**@type {StateControl<MoreFilters>} */
     const [more_filters, set_more_filters] = useState({
         is_verified_only: search_params.get("is_verified_only"),
@@ -58,6 +64,9 @@ export function SearchProvider({ children }) {
         rating: search_params.get("rating"),
     })
 
+    /** @type {StateControl<Region[]>} */
+    const [regions, set_regions] = useState([]);
+
     // We are updating searchParams each time filter_input_values got changed
     // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
 
@@ -66,6 +75,14 @@ export function SearchProvider({ children }) {
         const params_obj = get_search_params_obj()
         set_search_params(new URLSearchParams(params_obj))
     }, [filters, selected_offer_type, more_filters, page])
+
+    useEffect(() => {
+        async function fetchData() {
+            const regions = await get_regions({ wilaya_id: filters.wilaya_id })
+            set_regions(regions)
+        }
+        fetchData()
+    }, [filters.wilaya_id])
 
     /**
             * @returns {SearchPayload}
@@ -97,6 +114,8 @@ export function SearchProvider({ children }) {
             more_filters, set_more_filters,
             selected_offer_type, set_selected_offer_type,
             page, set_page,
+
+            regions, set_regions,
         }}>
             {children}
         </SearchContext.Provider>

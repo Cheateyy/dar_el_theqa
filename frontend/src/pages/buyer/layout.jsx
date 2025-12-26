@@ -3,6 +3,7 @@ import { BuyerHeader } from "./components/Header";
 import { ListingProvider } from "./context/ListingsContext";
 import { AuthMessagingProvider } from "./context/AuthMessagingContext";
 import { ListingsMessagingProvider } from "./context/ListingsMessagingContext";
+import { SearchProvider } from "./searchResults/context/searchContext";
 
 export function BuyerLayout() {
     return (
@@ -10,7 +11,9 @@ export function BuyerLayout() {
             <AuthMessagingProvider>
                 <ListingsMessagingProvider>
                     <BuyerHeader />
-                    <Outlet />
+                    <SearchProvider>
+                        <Outlet />
+                    </SearchProvider>
                     <footer className="mt-20">
                     </footer>
                 </ListingsMessagingProvider>

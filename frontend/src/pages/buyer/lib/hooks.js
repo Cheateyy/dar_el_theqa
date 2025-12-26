@@ -1,4 +1,5 @@
 import { useListings } from "../context/ListingsContext"
+import { useSearch } from "../searchResults/context/searchContext";
 
 export function useWilayaOptions() {
     const { wilayas } = useListings()
@@ -7,7 +8,7 @@ export function useWilayaOptions() {
 }
 
 export function useRegionOptions() {
-    const { regions } = useListings()
-    const wilayas_option = regions.map((region) => ({ label: region.name, value: region.name }))
-    return wilayas_option;
+    const { regions } = useSearch()
+    const region_options = regions.map((region) => ({ label: region.name, value: region.name }))
+    return region_options;
 }
