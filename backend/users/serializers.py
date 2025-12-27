@@ -11,6 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'role', 'is_active']
         read_only_fields = ['id', 'email', 'role', 'is_active']
 
+
+class AdminUserStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'role', 'is_active']
+        read_only_fields = ['id', 'email', 'role']
+
 class RegisterSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(write_only=True)
     re_password = serializers.CharField(write_only=True)
