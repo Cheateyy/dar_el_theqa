@@ -16,6 +16,5 @@ urlpatterns = [
     path('admin/listings/<int:id>/reviews/', AdminReviewListView.as_view(), name='admin-review-list'),
 
     #Admin can Delete Review (10.7 DELETE) "I do not think it is implemented"
-    path('admin/reviews/<int:id>/delete', AdminDeleteReviewView.as_view(), name='review-delete'),
-    
+    path('admin/reviews/<int:id>/delete/', AdminDeleteReviewView.as_view(), name='review-delete'),
 ]

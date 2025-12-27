@@ -11,6 +11,7 @@ from .serializers import (
     UserSerializer,
     RegisterSerializer,
     PartnerSerializer,
+    AdminUserStatusSerializer,
     ActivationSerializer,
     ActivationResendSerializer,
     PasswordResetRequestSerializer,
@@ -266,6 +267,12 @@ class PartnerListView(generics.ListAPIView):
 class AdminUserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class AdminUserDetailView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AdminUserStatusSerializer
     permission_classes = [permissions.IsAdminUser]
 
 class AdminPartnerListView(generics.ListCreateAPIView):

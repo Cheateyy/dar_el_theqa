@@ -1,9 +1,9 @@
 from django.urls import path
 from .views import (
-    FeaturedListingsView, ListingActivateView, ListingDocumentApproveView, RejectDocumentView, SearchListingsView, ListingCreateView, ListingDetailView,
+    FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
     MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
     AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
-    ListingViewDocuments, #ListingDocumentRejectView,
+    ListingViewDocuments, ListingDocumentRejectView,
 )
 
 urlpatterns = [
