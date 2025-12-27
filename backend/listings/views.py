@@ -5,6 +5,9 @@ from django.shortcuts import get_object_or_404
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
+
+
 from drf_spectacular.utils import extend_schema, inline_serializer
 
 class FeaturedListingsView(generics.ListAPIView):
@@ -219,12 +222,34 @@ class AdminListingApproveView(views.APIView):
     )
     def post(self, request, id):
         try:
-            listing = Listing.objects.get(id=id)
+            listing = Listing.objects.prefetch_related('documents').get(id=id)
             listing.status = Listing.Status.APPROVED
             listing.save()
-            return Response({"status": "APPROVED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        documents = listing.documents.all()
+
+        # If there are no documents, you may want to decide how to handle this
+        if not documents.exists():
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+            listing.save()
+            return Response({"status": listing.verification_status})
+
+        approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+        total_docs = documents.count()
+
+        if approved_docs == total_docs:
+            listing.verification_status = Listing.VerificationStatus.VERIFIED
+        else:
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+        listing.save()
+
+        return Response({"status": listing.verification_status})
+    
+
 
 class AdminListingRejectView(views.APIView):
     permission_classes = [permissions.IsAdminUser]

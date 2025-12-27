@@ -21,6 +21,18 @@ import favorites from './favorites_mock.json';
 /**@type {import("@/pages/buyer/types/common")} */
 
 export const handlers = [
+    /**
+     * **NOTE:** 
+     * 
+     * /featured/ must be considred before /:id
+     * 
+     * So that featrured is not considered as :id which is invalid
+     */
+    http.get(API_BASE_URL + "/api/listings/featured/", async () => {
+        console.log("Mock listings executed")
+        let data = listings;
+        return HttpResponse.json(data)
+    }),
 
     // GET listing details
     http.get(`${API_BASE_URL}/api/listings/:id/`, (req) => {
@@ -79,9 +91,9 @@ export const handlers = [
 
 
     // POST /api/listings/:id/pause/
-    http.post(`${API_BASE_URL}/api/listings/:id/pause/`, async (req) => {
-        const { id } = req.params;
-        const body = await req.json();
+    http.post(`${API_BASE_URL}/api/listings/:id/pause/`, async ({ request, params }) => {
+        const { id } = params;
+        const body = await request.clone().json();
         console.log(`[MSW MOCK] Pause listing ${id}`, body);
 
         let newStatus;
@@ -124,60 +136,56 @@ export const handlers = [
     }),
 
     // DELETE /api/listings/:id/  (seller delete)
-    http.delete(`${API_BASE_URL}/api/listings/:id/`, async (req) => {
-        const { id } = req.params;
-        const body = await req.json().catch(() => ({}));
+    http.delete(`${API_BASE_URL}/api/listings/:id/`, async ({ request, params }) => {
+        const { id } = params;
+        const body = await request.clone().json()
         console.log(`[MSW MOCK] Delete seller listing ${id}`, body);
 
         // Backend returns 204 No Content; MSW can't send 204+body, so we just send 204.
         return new HttpResponse(null, { status: 204 });
     }),
 
-    http.get(API_BASE_URL + "/api/listings/featured", async () => {
-        console.log("Mock listings executed")
-        let data = listings;
-        return HttpResponse.json(data)
-    }),
+    // ---------------------- BUYER ENDPOINTS ------------------------
 
-    http.post(API_BASE_URL + "/api/listings/:id/favorite", async (req) => {
+    http.post(API_BASE_URL + "/api/listings/:id/favorite/", async (req) => {
         const { id } = req.params
         console.log(`Mock like toggle for listing #${id}`)
         return HttpResponse.json({ status: "added", message: "Added to favorites", })
     }),
 
-    http.get(API_BASE_URL + "/api/choices/property-types", async () => {
+    http.get(API_BASE_URL + "/api/choices/property-types/", async () => {
         return HttpResponse.json(property_types);
     }),
 
-    http.get(API_BASE_URL + "/api/choices/wilayas", async () => {
+    http.get(API_BASE_URL + "/api/choices/wilayas/", async () => {
         return HttpResponse.json(wilayas);
     }),
 
-    http.post(API_BASE_URL + "/api/listings/search", async ({ request }) => {
+    http.post(API_BASE_URL + "/api/listings/search/", async ({ request }) => {
         /**@type {SearchPayload} */
         const body = await request.clone().json()
         console.log("MOCKING: search filters payload is: ", body)
 
         const page = body.page
-        const next = API_BASE_URL + "/api/listings/search" + `?page=${page ?? 0 + 1}`
+        const next = API_BASE_URL + "/api/listings/search/" + `?page=${page ?? 0 + 1}`
         const previous = page ? page - 1 : null
         // debugger;
         return HttpResponse.json({ count: search_listings.length, next, previous, results: search_listings })
     }),
 
-    http.get(API_BASE_URL + "/api/partners", async () => {
+    http.get(API_BASE_URL + "/api/partners/", async () => {
         return HttpResponse.json(partners)
     }),
 
-    http.get(API_BASE_URL + "/api/choices/regions", async () => {
+    http.get(API_BASE_URL + "/api/choices/regions/", async () => {
         return HttpResponse.json(regions);
     }),
 
-    http.get(API_BASE_URL + "/api/listings/favorites", async () => {
+    http.get(API_BASE_URL + "/api/listings/favorites/", async () => {
         /**@type {Paginated<Listing[]>} */
         // TODO : from where to get the page
         const page = 1
-        const next = API_BASE_URL + "/api/listings/favorites" + `?page=${page ?? 0 + 1}`
+        const next = API_BASE_URL + "/api/listings/favorites/" + `?page=${page ?? 0 + 1}`
         const previous = page ? page - 1 : null
 
         return HttpResponse.json({ count: favorites.length, next, previous, results: favorites })

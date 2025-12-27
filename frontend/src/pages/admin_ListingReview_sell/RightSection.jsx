@@ -13,12 +13,14 @@ export default function RightSection({
     bathrooms,
     onApprove,
     onReject,
+    onDelete,
     isApproving,
     isRejecting,
+    isDeleting,
 }) {
     return (
         <div className="admin-sell-listingRight card">
-            <UpperSection address={address} region={region} onDelete={onReject} isDeleting={isRejecting} />
+            <UpperSection address={address} region={region} onDelete={onDelete} isDeleting={isDeleting} />
             <PriceSection price={price} status={status} />
             <InfoCards
                 propertyType={propertyType}

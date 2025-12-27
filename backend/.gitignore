@@ -32,6 +32,10 @@ Thumbs.db
 .env
 .env.local
 
+# poetry
+pyproject.toml
+poetry.lock
+
 # Migrations (optional - uncomment if you want to ignore migrations)
 # */migrations/*.py
 # !*/migrations/__init__.py

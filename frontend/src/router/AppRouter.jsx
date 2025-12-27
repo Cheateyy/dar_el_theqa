@@ -13,7 +13,7 @@ import ListingDetails_rent from '../pages/PropertyDetails_rent/ListingDetails_re
 import SellerListingSell from '../pages/seller_ListingView_sell/seller_ListingView_sell.jsx';
 import SellerListingRent from '../pages/seller_ListingView_rent/seller_ListingView_rent.jsx';
 import AdmingListingRent from '../pages/admin_ListingView_rent/admin_ListingView_rent.jsx';
-import AdmingListingSell from '../pages/admin_ListingView_Sell/admin_ListingView_sell.jsx';
+import AdmingListingSell from '../pages/admin_ListingView_sell/admin_ListingView_sell';
 import UpdateListing from '../pages/seller_Update_listing/Listing.jsx';
 import AdminReviewSell from '../pages/admin_ListingReview_sell/adminReviewSell.jsx';
 import AdminReviewRent from '../pages/admin_ListingReview_rent/adminReviewRent.jsx';
@@ -22,6 +22,7 @@ import SearchResults from '@/pages/buyer/searchResults/page';
 import { Favorites } from '@/pages/buyer/favorites/page';
 import { BuyerLayout } from '@/pages/buyer/layout';
 import { Interests } from '@/pages/buyer/Interests/page';
+import NotFound from '../pages/NotFound.jsx';
 
 // Forms-tables imports
 import AddListingPage from "../pages/AddListingPage.jsx";
@@ -34,6 +35,7 @@ import AuditLog from "../pages/AuditLog.jsx";
 import LeadMessages from "../pages/LeadMessages.jsx";
 import Navbar from "../components/Navbar.jsx";
 import NavbarAdmin from "../components/NavbarAdmin.jsx";
+import MyListings from '@/pages/my_listings/page';
 
 function AppRouter() {
   return (
@@ -64,6 +66,7 @@ function AppRouter() {
         <Route path="search-results" element={<SearchResults />} />
         <Route path="favorites" element={<Favorites />} />
         <Route path="interests" element={<Interests />} />
+        <Route path="my-listings" element={<MyListings />} />
       </Route>
 
       {/* Forms & Tables Routes */}
@@ -83,9 +86,9 @@ function AppRouter() {
         <Route path="lead-messages" element={<><Navbar /><LeadMessages /></>} />
       </Route>
 
-      {/* 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
+    </Routes >
   );
 }
 
