@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/LeadMessages.css";
 
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
 
@@ -9,11 +12,12 @@ import listingIcon from "../assets/icons/Listing.svg";
 import clientIcon from "../assets/icons/fullname.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import closeIcon from "../assets/icons/removeimage.png";
+
 import propertyImage from "../assets/images/propertyimage.jpg";
 import PanelcallIcon from "../assets/icons/PanelCall.svg";
 import PanelMessagesIcon from "../assets/icons/PanelMessages.svg";
 
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 const MOCK_LEADS = [
   {
@@ -23,7 +27,8 @@ const MOCK_LEADS = [
     clientFullName: "George Martin",
     phoneNumber: "+213 560 30 47 77",
     email: "client@mail.com",
-    message: "message from client lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    message:
+      "message from client lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     property: {
       title: "Property title",
       address: "Hydra, Alger",
@@ -40,6 +45,7 @@ const MOCK_LEADS = [
 
 function formatRentUnit(unit) {
   if (!unit) return null;
+
   const map = {
     MONTH: "per month",
     YEAR: "per year",
@@ -47,10 +53,27 @@ function formatRentUnit(unit) {
     WEEK: "per week",
     DAY: "per day",
   };
+
   return map[unit] || `per ${unit.toLowerCase().replace("_", " ")}`;
 }
 
 function LeadsPage() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.role !== "PARTNER" && user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [loading, isAuthenticated, user, navigate]);
+
   const [leads, setLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null);
 
@@ -61,14 +84,17 @@ function LeadsPage() {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [error, setError] = useState(null);
 
+  // -------------------------------
+  // Load LEADS LIST
+  // -------------------------------
   const fetchLeads = async (page = 1) => {
     if (USE_MOCK_DATA) {
       const PAGE_SIZE = 10;
       const start = (page - 1) * PAGE_SIZE;
-      const mockPageItems = MOCK_LEADS.slice(start, start + PAGE_SIZE);
+      const sliced = MOCK_LEADS.slice(start, start + PAGE_SIZE);
 
       setLeads(
-        mockPageItems.map((m) => ({
+        sliced.map((m) => ({
           id: m.id,
           date: m.date,
           listing_title: m.listingTitle,
@@ -77,8 +103,7 @@ function LeadsPage() {
         }))
       );
 
-      setTotalPages(Math.ceil(MOCK_LEADS.length / PAGE_SIZE) || 1);
-      
+      setTotalPages(Math.ceil(MOCK_LEADS.length / PAGE_SIZE));
       return;
     }
 
@@ -86,18 +111,21 @@ function LeadsPage() {
       setLoadingList(true);
       setError(null);
 
+      const token = localStorage.getItem("auth_token");
+
       const res = await fetch(`/api/vendor/leads/?page=${page}`, {
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Failed request");
 
       const data = await res.json();
 
       setLeads(data.results || []);
       setTotalPages(data.total_pages || 1);
-      setCurrentPage(data.page || 1);
-    } catch {
+    } catch (err) {
       setError("Could not load leads.");
     } finally {
       setLoadingList(false);
@@ -108,19 +136,22 @@ function LeadsPage() {
     fetchLeads(currentPage);
   }, [currentPage]);
 
+  // -------------------------------
+  // Load SINGLE LEAD DETAILS
+  // -------------------------------
   const fetchLeadDetails = async (leadId) => {
     if (USE_MOCK_DATA) {
-      const mockLead = MOCK_LEADS.find((l) => l.id === leadId);
-      if (!mockLead) return;
+      const lead = MOCK_LEADS.find((l) => l.id === leadId);
+      if (!lead) return;
 
       setSelectedLead({
-        id: mockLead.id,
-        date: mockLead.date,
-        clientFullName: mockLead.clientFullName,
-        phoneNumber: mockLead.phoneNumber,
-        email: mockLead.email,
-        message: mockLead.message,
-        property: mockLead.property,
+        id: lead.id,
+        date: lead.date,
+        clientFullName: lead.clientFullName,
+        phoneNumber: lead.phoneNumber,
+        email: lead.email,
+        message: lead.message,
+        property: lead.property,
       });
       return;
     }
@@ -129,15 +160,19 @@ function LeadsPage() {
       setLoadingDetails(true);
       setError(null);
 
-      const res = await fetch(`/api/vendor/leads/${leadId}/`, {
-        credentials: "include",
+      const token = localStorage.getItem("auth_token");
+
+      const res = await fetch(`/api/leads/${leadId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Failed request");
 
       const data = await res.json();
 
-      const parsedLead = {
+      setSelectedLead({
         id: data.id,
         date: data.date,
         clientFullName: data.client.full_name,
@@ -155,10 +190,8 @@ function LeadsPage() {
           area: data.property.area,
           imageUrl: data.property.cover_image,
         },
-      };
-
-      setSelectedLead(parsedLead);
-    } catch {
+      });
+    } catch (err) {
       setError("Could not load lead details.");
     } finally {
       setLoadingDetails(false);
@@ -171,48 +204,59 @@ function LeadsPage() {
 
   const handleClosePanel = () => setSelectedLead(null);
 
+  // -------------------------------
+  // Pagination
+  // -------------------------------
   const getPageNumbers = () => {
     const pages = [];
-    const maxVisible = 4;
+    const max = 4;
 
-    if (totalPages <= maxVisible) {
+    if (totalPages <= max) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
       return pages;
     }
 
-    const firstPage = 1;
-    const lastPage = totalPages;
+    const first = 1;
+    const last = totalPages;
 
     let start = currentPage - 1;
     let end = currentPage + 1;
 
     if (start < 2) {
       start = 2;
-      end = start + (maxVisible - 2);
+      end = start + (max - 2);
     }
 
-    if (end > lastPage - 1) {
-      end = lastPage - 1;
-      start = end - (maxVisible - 2);
-      if (start < 2) start = 2;
+    if (end > last - 1) {
+      end = last - 1;
+      start = end - (max - 2);
     }
 
-    pages.push(firstPage);
+    pages.push(first);
+
     if (start > 2) pages.push("left-ellipsis");
 
-    for (let i = start; i <= end && i < lastPage; i++) pages.push(i);
-    if (end < lastPage - 1) pages.push("right-ellipsis");
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
 
-    pages.push(lastPage);
+    if (end < last - 1) pages.push("right-ellipsis");
+
+    pages.push(last);
+
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
+  // -------------------------------
+  // RENDER
+  // -------------------------------
   return (
     <div className="leads-page-wrapper">
       <div className="leads-container">
         <div className={`leads-main-layout ${selectedLead ? "has-details" : ""}`}>
+          {/* TABLE COLUMN */}
           <div className="leads-table-column">
             <div className="leads-table-section">
               <h1 className="page-title">Lead Messages</h1>
@@ -224,10 +268,27 @@ function LeadsPage() {
                 <table className="leads-table">
                   <thead>
                     <tr>
-                      <th><span className="th-with-icon"><img src={dateIcon} alt="" className="th-icon" /> Date</span></th>
-                      <th><span className="th-with-icon"><img src={listingIcon} alt="" className="th-icon" /> Listing Title</span></th>
-                      <th><span className="th-with-icon"><img src={clientIcon} alt="" className="th-icon" /> Client</span></th>
-                      <th><span className="th-with-icon"><img src={phoneIcon} alt="" className="th-icon" /> Phone</span></th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={dateIcon} className="th-icon" /> Date
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={listingIcon} className="th-icon" /> Listing
+                          Title
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={clientIcon} className="th-icon" /> Client
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={phoneIcon} className="th-icon" /> Phone
+                        </span>
+                      </th>
                     </tr>
                   </thead>
 
@@ -243,7 +304,9 @@ function LeadsPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4" className="empty-row">No leads found.</td>
+                        <td colSpan="4" className="empty-row">
+                          No leads found.
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -251,18 +314,26 @@ function LeadsPage() {
               </div>
             </div>
 
+            {/* PAGINATION */}
             <div className="leads-pagination">
-              <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
+              <button
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
                 <img src={backButton} alt="back" />
               </button>
 
               {pageItems.map((item, idx) =>
                 typeof item === "string" ? (
-                  <button key={idx} disabled className="page-dot">...</button>
+                  <button key={idx} disabled className="page-dot">
+                    ...
+                  </button>
                 ) : (
                   <button
                     key={item}
-                    className={`page-dot ${item === currentPage ? "active" : ""}`}
+                    className={`page-dot ${
+                      item === currentPage ? "active" : ""
+                    }`}
                     onClick={() => setCurrentPage(item)}
                   >
                     {item}
@@ -270,12 +341,16 @@ function LeadsPage() {
                 )
               )}
 
-              <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+              <button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
                 <img src={nextPage} alt="next" />
               </button>
             </div>
           </div>
 
+          {/* DETAILS PANEL */}
           {selectedLead && (
             <div className="lead-details-card">
               <div className="lead-details-panel">
@@ -287,23 +362,30 @@ function LeadsPage() {
                   <p>Loading details...</p>
                 ) : (
                   <>
+                    {/* CLIENT INFO */}
                     <div className="lead-client-info">
-                      <h2 className="lead-client-name">{selectedLead.clientFullName}</h2>
+                      <h2 className="lead-client-name">
+                        {selectedLead.clientFullName}
+                      </h2>
 
                       <p className="lead-client-phone">
-                        <img src={PanelcallIcon} alt="" /> {selectedLead.phoneNumber}
+                        <img src={PanelcallIcon} alt="" />{" "}
+                        {selectedLead.phoneNumber}
                       </p>
 
                       <p className="lead-client-email">
-                        <img src={PanelMessagesIcon} alt="" /> {selectedLead.email}
+                        <img src={PanelMessagesIcon} alt="" />{" "}
+                        {selectedLead.email}
                       </p>
                     </div>
 
+                    {/* MESSAGE */}
                     <div className="lead-message-box">
                       <h3>Customer Message</h3>
                       <p>{selectedLead.message}</p>
                     </div>
 
+                    {/* PROPERTY INFO */}
                     {selectedLead.property && (
                       <div className="lead-property-summary">
                         <div className="property-image-wrap">
@@ -314,13 +396,21 @@ function LeadsPage() {
                           />
                         </div>
 
-                        <h3 className="lead-property-title">{selectedLead.property.title}</h3>
-                        <p className="lead-property-address">{selectedLead.property.address}</p>
+                        <h3 className="lead-property-title">
+                          {selectedLead.property.title}
+                        </h3>
+
+                        <p className="lead-property-address">
+                          {selectedLead.property.address}
+                        </p>
 
                         <p className="lead-property-price">
                           {selectedLead.property.price.toLocaleString()} DZD
                           {selectedLead.property.priceUnit && (
-                            <span className="lead-property-price-unit"> {selectedLead.property.priceUnit}</span>
+                            <span className="lead-property-price-unit">
+                              {" "}
+                              {selectedLead.property.priceUnit}
+                            </span>
                           )}
                         </p>
 
@@ -328,28 +418,36 @@ function LeadsPage() {
                           {selectedLead.property.type && (
                             <div className="meta-card">
                               <div className="meta-label">Type</div>
-                              <div className="meta-value">{selectedLead.property.type}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.type}
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.area && (
                             <div className="meta-card">
                               <div className="meta-label">Area</div>
-                              <div className="meta-value">{selectedLead.property.area} m²</div>
+                              <div className="meta-value">
+                                {selectedLead.property.area} m²
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.bedrooms && (
                             <div className="meta-card">
                               <div className="meta-label">Bedrooms</div>
-                              <div className="meta-value">{selectedLead.property.bedrooms}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.bedrooms}
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.bathrooms && (
                             <div className="meta-card">
                               <div className="meta-label">Bathrooms</div>
-                              <div className="meta-value">{selectedLead.property.bathrooms}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.bathrooms}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -360,7 +458,6 @@ function LeadsPage() {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
