@@ -4,7 +4,6 @@ import "../assets/styles/LeadMessages.css";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
 
@@ -45,24 +44,8 @@ const MOCK_LEADS = [
 ];
 
 function formatRentUnit(unit) {
-
-
-  const { auth } = useAuth();
-const navigate = useNavigate();
-
-useEffect(() => {
-  if (!auth.isAuthenticated) {
-    navigate("/login");
-    return;
-  }
-
-  if (auth.user.role !== "VENDOR" && auth.user.role !== "ADMIN") {
-    navigate("/not-authorized");
-  }
-}, [auth]);
-
-
   if (!unit) return null;
+
   const map = {
     MONTH: "per month",
     YEAR: "per year",
@@ -70,10 +53,27 @@ useEffect(() => {
     WEEK: "per week",
     DAY: "per day",
   };
+
   return map[unit] || `per ${unit.toLowerCase().replace("_", " ")}`;
 }
 
 function LeadsPage() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.role !== "PARTNER" && user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [loading, isAuthenticated, user, navigate]);
+
   const [leads, setLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null);
 
@@ -111,8 +111,12 @@ function LeadsPage() {
       setLoadingList(true);
       setError(null);
 
+      const token = localStorage.getItem("auth_token");
+
       const res = await fetch(`/api/vendor/leads/?page=${page}`, {
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed request");
@@ -156,8 +160,12 @@ function LeadsPage() {
       setLoadingDetails(true);
       setError(null);
 
+      const token = localStorage.getItem("auth_token");
+
       const res = await fetch(`/api/leads/${leadId}/`, {
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed request");
@@ -248,7 +256,6 @@ function LeadsPage() {
     <div className="leads-page-wrapper">
       <div className="leads-container">
         <div className={`leads-main-layout ${selectedLead ? "has-details" : ""}`}>
-          
           {/* TABLE COLUMN */}
           <div className="leads-table-column">
             <div className="leads-table-section">
@@ -261,10 +268,27 @@ function LeadsPage() {
                 <table className="leads-table">
                   <thead>
                     <tr>
-                      <th><span className="th-with-icon"><img src={dateIcon} className="th-icon" /> Date</span></th>
-                      <th><span className="th-with-icon"><img src={listingIcon} className="th-icon" /> Listing Title</span></th>
-                      <th><span className="th-with-icon"><img src={clientIcon} className="th-icon" /> Client</span></th>
-                      <th><span className="th-with-icon"><img src={phoneIcon} className="th-icon" /> Phone</span></th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={dateIcon} className="th-icon" /> Date
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={listingIcon} className="th-icon" /> Listing
+                          Title
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={clientIcon} className="th-icon" /> Client
+                        </span>
+                      </th>
+                      <th>
+                        <span className="th-with-icon">
+                          <img src={phoneIcon} className="th-icon" /> Phone
+                        </span>
+                      </th>
                     </tr>
                   </thead>
 
@@ -280,7 +304,9 @@ function LeadsPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4" className="empty-row">No leads found.</td>
+                        <td colSpan="4" className="empty-row">
+                          No leads found.
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -290,17 +316,24 @@ function LeadsPage() {
 
             {/* PAGINATION */}
             <div className="leads-pagination">
-              <button onClick={() => setCurrentPage((p) => p - 1)} disabled={currentPage === 1}>
+              <button
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
                 <img src={backButton} alt="back" />
               </button>
 
               {pageItems.map((item, idx) =>
                 typeof item === "string" ? (
-                  <button key={idx} disabled className="page-dot">...</button>
+                  <button key={idx} disabled className="page-dot">
+                    ...
+                  </button>
                 ) : (
                   <button
                     key={item}
-                    className={`page-dot ${item === currentPage ? "active" : ""}`}
+                    className={`page-dot ${
+                      item === currentPage ? "active" : ""
+                    }`}
                     onClick={() => setCurrentPage(item)}
                   >
                     {item}
@@ -308,7 +341,10 @@ function LeadsPage() {
                 )
               )}
 
-              <button onClick={() => setCurrentPage((p) => p + 1)} disabled={currentPage === totalPages}>
+              <button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
                 <img src={nextPage} alt="next" />
               </button>
             </div>
@@ -328,14 +364,18 @@ function LeadsPage() {
                   <>
                     {/* CLIENT INFO */}
                     <div className="lead-client-info">
-                      <h2 className="lead-client-name">{selectedLead.clientFullName}</h2>
+                      <h2 className="lead-client-name">
+                        {selectedLead.clientFullName}
+                      </h2>
 
                       <p className="lead-client-phone">
-                        <img src={PanelcallIcon} alt="" /> {selectedLead.phoneNumber}
+                        <img src={PanelcallIcon} alt="" />{" "}
+                        {selectedLead.phoneNumber}
                       </p>
 
                       <p className="lead-client-email">
-                        <img src={PanelMessagesIcon} alt="" /> {selectedLead.email}
+                        <img src={PanelMessagesIcon} alt="" />{" "}
+                        {selectedLead.email}
                       </p>
                     </div>
 
@@ -368,7 +408,8 @@ function LeadsPage() {
                           {selectedLead.property.price.toLocaleString()} DZD
                           {selectedLead.property.priceUnit && (
                             <span className="lead-property-price-unit">
-                              {" "}{selectedLead.property.priceUnit}
+                              {" "}
+                              {selectedLead.property.priceUnit}
                             </span>
                           )}
                         </p>
@@ -377,28 +418,36 @@ function LeadsPage() {
                           {selectedLead.property.type && (
                             <div className="meta-card">
                               <div className="meta-label">Type</div>
-                              <div className="meta-value">{selectedLead.property.type}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.type}
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.area && (
                             <div className="meta-card">
                               <div className="meta-label">Area</div>
-                              <div className="meta-value">{selectedLead.property.area} m²</div>
+                              <div className="meta-value">
+                                {selectedLead.property.area} m²
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.bedrooms && (
                             <div className="meta-card">
                               <div className="meta-label">Bedrooms</div>
-                              <div className="meta-value">{selectedLead.property.bedrooms}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.bedrooms}
+                              </div>
                             </div>
                           )}
 
                           {selectedLead.property.bathrooms && (
                             <div className="meta-card">
                               <div className="meta-label">Bathrooms</div>
-                              <div className="meta-value">{selectedLead.property.bathrooms}</div>
+                              <div className="meta-value">
+                                {selectedLead.property.bathrooms}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -409,7 +458,6 @@ function LeadsPage() {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>

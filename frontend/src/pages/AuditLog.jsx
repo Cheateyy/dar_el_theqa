@@ -1,8 +1,9 @@
-// src/pages/AuditLog.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import "../assets/styles/AuditLog.css";
-import { useAuth } from "../contexts/AuthContext"; 
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "/src/config/env.js";
+import { TokenManager } from "../services/authService";
 
 import nextPage from "../assets/icons/nextPage.svg";
 import backButton from "../assets/icons/back.svg";
@@ -17,57 +18,54 @@ import Section from "../components/common/Section.jsx";
 const USE_MOCK_AUDIT = false;
 
 function AuditLog() {
-
   const navigate = useNavigate();
-  const { auth } = useAuth();  
+  const { user, isAuthenticated, loading } = useAuth();
 
+  /* ---------------- AUTH GUARD (ADMIN ONLY) ---------------- */
   useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate("/login");
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login", { replace: true });
       return;
     }
-    if (auth.user.role !== "ADMIN") {
-      navigate("/not-authorized");
+
+    if (!user || user.role !== "ADMIN") {
+      navigate("/not-authorized", { replace: true });
     }
-  }, [auth]);
+  }, [loading, isAuthenticated, user, navigate]);
 
-
-  const [entries, setEntries] = useState(() => {
-    if (USE_MOCK_AUDIT) {
-      const stored = localStorage.getItem("auditLog");
-      try {
-        const parsed = stored ? JSON.parse(stored) : [];
-        return parsed;
-      } catch {
-        return [];
-      }
-    }
-    
-    return [];
-  });
-
+  /* ---------------- STATE ---------------- */
+  const [entries, setEntries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE || 1));
-  const [loading, setLoading] = useState(!USE_MOCK_AUDIT);
+  const [loadingData, setLoadingData] = useState(!USE_MOCK_AUDIT);
 
-  
-  useEffect(() => {
-    if (!USE_MOCK_AUDIT) return;
-    localStorage.setItem("auditLog", JSON.stringify(entries));
-  }, [entries]);
+  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
 
-  
+  /* ---------------- FETCH AUDIT LOGS ---------------- */
   useEffect(() => {
-    if (USE_MOCK_AUDIT) return;
+    if (USE_MOCK_AUDIT || loading || !isAuthenticated || user?.role !== "ADMIN")
+      return;
 
     const fetchAuditLogs = async () => {
       try {
-        const res = await fetch("/admin/audit-logs/", {
-          credentials: "include",
-        });
+        const token = TokenManager.get();
+
+        const res = await fetch(
+          `${API_BASE_URL}/api/admin/audit-logs/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch audit logs");
+        }
+
         const data = await res.json();
-        
         const list = Array.isArray(data) ? data : data.results || [];
 
         const mapped = list.map((e) => {
@@ -83,7 +81,7 @@ function AuditLog() {
 
           return {
             id: e.id,
-            adminName: e.admin_name,
+            adminName: e.admin_name || "Admin",
             date,
             time,
             action: `${e.action_type} – ${e.description}`,
@@ -94,19 +92,19 @@ function AuditLog() {
       } catch (err) {
         console.error("Failed to load audit logs:", err);
       } finally {
-        setLoading(false);
+        setLoadingData(false);
       }
     };
 
     fetchAuditLogs();
-  }, []);
+  }, [USE_MOCK_AUDIT, loading, isAuthenticated, user]);
 
-  
+  /* ---------------- PAGINATION ---------------- */
   const currentPageItems = useMemo(() => {
     const sorted = [...entries].sort((a, b) => {
       const aTs = new Date(`${a.date} ${a.time}`).getTime();
       const bTs = new Date(`${b.date} ${b.time}`).getTime();
-      return bTs - aTs; 
+      return bTs - aTs;
     });
 
     const start = (currentPage - 1) * PAGE_SIZE;
@@ -127,44 +125,26 @@ function AuditLog() {
       return pages;
     }
 
-    const firstPage = 1;
-    const lastPage = totalPages;
+    pages.push(1);
 
-    let start = currentPage - 1;
-    let end = currentPage + 1;
+    if (currentPage > 3) pages.push("left");
 
-    if (start < 2) {
-      start = 2;
-      end = start + (maxVisible - 2);
-    }
-    if (end > lastPage - 1) {
-      end = lastPage - 1;
-      start = end - (maxVisible - 2);
-      if (start < 2) start = 2;
-    }
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
 
-    pages.push(firstPage);
+    for (let i = start; i <= end; i++) pages.push(i);
 
-    if (start > 2) {
-      pages.push("left-ellipsis");
-    }
+    if (currentPage < totalPages - 2) pages.push("right");
 
-    for (let i = start; i <= end && i < lastPage; i++) {
-      pages.push(i);
-    }
-
-    if (end < lastPage - 1) {
-      pages.push("right-ellipsis");
-    }
-
-    pages.push(lastPage);
-
+    pages.push(totalPages);
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
-  
+  /* ---------------- RENDER ---------------- */
+  if (loading) return null;
+
   return (
     <div className="audit-page-wrapper">
       <div className="audit-container">
@@ -174,7 +154,7 @@ function AuditLog() {
 
         <Section>
           <div className="audit-table-wrapper">
-            {loading && !USE_MOCK_AUDIT ? (
+            {loadingData ? (
               <p className="empty-row">Loading audit events...</p>
             ) : (
               <table className="audit-table">
@@ -234,43 +214,29 @@ function AuditLog() {
       <div className="audit-pagination">
         <button
           className="paging-button"
-          type="button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <img src={backButton} alt="back" />
         </button>
 
-        {pageItems.map((item, idx) => {
-          if (typeof item === "string") {
-            return (
-              <button
-                key={item + idx}
-                type="button"
-                className="page-dot"
-                disabled
-              >
-                ...
-              </button>
-            );
-          }
-          const page = item;
-          return (
-            <button
-              key={page}
-              type="button"
-              className={`page-dot ${
-                page === currentPage ? "active" : ""
-              }`}
-              onClick={() => goToPage(page)}
-            >
-              {page}
+        {pageItems.map((item, idx) =>
+          typeof item === "string" ? (
+            <button key={idx} className="page-dot" disabled>
+              ...
             </button>
-          );
-        })}
+          ) : (
+            <button
+              key={item}
+              className={`page-dot ${item === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(item)}
+            >
+              {item}
+            </button>
+          )
+        )}
 
         <button
-          type="button"
           className="paging-button"
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
