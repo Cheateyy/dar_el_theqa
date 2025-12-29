@@ -2,18 +2,44 @@ import "./Listing.css";
 import NavBar from '../../components/common/NavBarv1/NavBar.jsx';
 import LeftSection from './LeftSectionListing.jsx';
 import RightSection from './RightSectionListing.jsx';
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import legalDocIcon from '../../assets/images/legal_doc.png';
 
 import {
   getListingDetails,
+  getListingDocuments,
   updateSellerListing,
   pauseSellerListing,
   deleteSellerListing,
   activateSellerListing,
 } from "../../lib/api_3.js";
+
+const formatDocumentLabel = (value, fallback) => {
+  if (!value || typeof value !== "string") return fallback;
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+};
+
+const mapListingDocuments = (docs = []) => {
+  const safeDocs = Array.isArray(docs) ? docs : [];
+  return safeDocs.map((doc, index) => ({
+    id: doc.id ?? index,
+    name:
+      doc.name ||
+      doc.file_name ||
+      formatDocumentLabel(doc.document_type, `Document ${index + 1}`),
+    url: doc.url || doc.file_url || doc.file || "",
+    icon: legalDocIcon,
+    status: (doc.status || "PENDING").toUpperCase(),
+    adminNote: doc.admin_note || "",
+  }));
+};
 
 export default function Listing() {
   const { listingId } = useParams();
@@ -27,7 +53,7 @@ export default function Listing() {
   const [formData, setFormData] = useState({
     wilaya: "",
     region: "",
-    street_address: "",
+    address: "",
     transaction_type: "", // RENT / BUY
     price: "",
     rent_unit: "",        // MONTH / DAY / etc.
@@ -45,6 +71,8 @@ export default function Listing() {
   const [activating, setActivating] = useState(false);
   const [error, setError] = useState(null);
   const [statusCode, setStatusCode] = useState("INACTIVE");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const deriveStatusCode = (payload) => {
     const rawStatus =
@@ -58,7 +86,13 @@ export default function Listing() {
   const handleAddDocument = () => {
     setDocuments((prev) => [
       ...prev,
-      { name: "NewDocument.pdf", url: "", icon: legalDocIcon },
+      {
+        name: "NewDocument.pdf",
+        url: "",
+        icon: legalDocIcon,
+        status: "PENDING",
+        adminNote: "",
+      },
     ]);
   };
 
@@ -81,6 +115,12 @@ export default function Listing() {
       try {
         setLoading(true);
         const data = await getListingDetails(listingId);
+        let docPayload = [];
+        try {
+          docPayload = await getListingDocuments(listingId);
+        } catch (docErr) {
+          console.error("Failed to fetch listing documents", docErr);
+        }
 
         if (isCancelled) return;
 
@@ -94,20 +134,14 @@ export default function Listing() {
             "", // last resort
         });
 
-        const mappedDocs = (data.documents || []).map((doc, index) => ({
-          name: doc.document_type || doc.label || `Document ${index + 1}`,
-          url: doc.file || doc.url || "",
-          icon: legalDocIcon,
-          status: doc.status || "PENDING",
-          id: doc.id || index,
-        }));
-        setDocuments(mappedDocs);
+        const normalizedDocuments = mapListingDocuments(docPayload);
+        setDocuments(normalizedDocuments);
 
         // Right section fields mapped from API response
         setFormData({
           wilaya: data.wilaya || "",
           region: data.region || "",
-          street_address: data.street_address || "",
+          address: data.address || "",
           transaction_type: data.transaction_type || "", // RENT / BUY
           price: data.price ? String(data.price) : "",
           rent_unit: data.rent_unit || "",
@@ -127,6 +161,7 @@ export default function Listing() {
       } catch (err) {
         console.error("Failed to load listing for edit", err);
         setError("Impossible de charger l'annonce.");
+        setDocuments([]);
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -156,7 +191,7 @@ export default function Listing() {
         transaction_type: formData.transaction_type || null, // RENT / BUY
         wilaya: formData.wilaya || null,
         region: formData.region || null,
-        street_address: formData.street_address || null,
+        address: formData.address || null,
         price: formData.price ? Number(formData.price) : null,
         rent_unit: formData.rent_unit || null,
         property_type: formData.property_type || null,
@@ -169,8 +204,9 @@ export default function Listing() {
       };
 
       const response = await updateSellerListing(listingId, payload);
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Changes saved. Waiting for Admin approval.");
     } catch (err) {
@@ -185,8 +221,9 @@ export default function Listing() {
     try {
       setPausing(true);
       const response = await pauseSellerListing(listingId, { reason: "OTHER" });
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Listing paused.");
     } catch (err) {
@@ -201,8 +238,9 @@ export default function Listing() {
     try {
       setActivating(true);
       const response = await activateSellerListing(listingId);
-      if (response?.new_status) {
-        setStatusCode(response.new_status.toUpperCase());
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        setStatusCode(nextStatus.toUpperCase());
       }
       alert(response?.message || "Listing activated.");
     } catch (err) {
@@ -213,22 +251,34 @@ export default function Listing() {
     }
   };
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
-    if (!confirmDelete) return;
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDelete = async (reason) => {
     try {
-      await deleteSellerListing(listingId, "SOLD");
+      setIsDeleting(true);
+      await deleteSellerListing(listingId, reason || "SOLD");
       alert("Listing deleted.");
       setStatusCode("DELETED");
-      // optional: navigate away
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Failed to delete listing", err);
       alert("Failed to delete listing.");
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  if (!loading && error) {
+    return <Navigate to="/404" replace />;
+  }
 
   return (
     <>
@@ -237,9 +287,6 @@ export default function Listing() {
       </nav>
 
       {loading && <p className="listingdetails-loading">Loading...</p>}
-      {error && !loading && (
-        <p className="listingdetails-error">{error}</p>
-      )}
 
       {!loading && !error && (
         <div className="seller-update-Listing">
@@ -257,14 +304,27 @@ export default function Listing() {
             onSave={handleSave}
             onPause={handlePause}
             onActivate={handleActivate}
-            onDelete={handleDelete}
+            onDelete={handleOpenDeleteModal}
             saving={saving}
             statusCode={statusCode}
             isPausing={pausing}
             isActivating={activating}
+            isDeleting={isDeleting}
           />
         </div>
       )}
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDelete}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let us know why you are removing this listing so we can keep your account history accurate."
+        placeholder="Example: Property sold, duplicate entry, incorrect information, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
     </>
   );
 }

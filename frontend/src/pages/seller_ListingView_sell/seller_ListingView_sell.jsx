@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "./LoginModal.jsx";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 import img1 from "../../assets/images/dummyPropertyImages/image1.jpg";
 import img2 from "../../assets/images/dummyPropertyImages/image2.jpg";
@@ -12,13 +13,14 @@ import img4 from "../../assets/images/dummyPropertyImages/image4.jpg";
 import img5 from "../../assets/images/dummyPropertyImages/image5.jpg";
 import img6 from "../../assets/images/dummyPropertyImages/image6.jpg";
 import img7 from "../../assets/images/dummyPropertyImages/image7.png";
-import certifiedIcon from "../../assets/icons/certified_button.png";
 import legalDocIcon from "../../assets/images/legal_doc.png";
+import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
 import "./ListingDetails.css";
 
 import {
   getListingDetails,
+  getListingDocuments,
   getMyListings,
   getListingReviews,
   activateSellerListing,
@@ -26,11 +28,36 @@ import {
   deleteSellerListing,
 } from "../../lib/api_3.js";
 
+const formatDocumentLabel = (value, fallback) => {
+  if (!value || typeof value !== "string") return fallback;
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+};
+
+const mapListingDocuments = (docs = []) => {
+  const safeDocs = Array.isArray(docs) ? docs : [];
+  return safeDocs.map((doc, index) => ({
+    id: doc.id ?? index,
+    name:
+      doc.name ||
+      doc.file_name ||
+      formatDocumentLabel(doc.document_type, `Document ${index + 1}`),
+    url: doc.url || doc.file_url || doc.file || "",
+    icon: legalDocIcon,
+    status: (doc.status || "PENDING").toUpperCase(),
+    adminNote: doc.admin_note || "",
+  }));
+};
+
 export default function ListingDetails_sell() {
   const { listingId } = useParams(); // must match :listingId in route
   const [showLogin, setShowLogin] = useState(false);
 
   const [listing, setListing] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [moreListings, setMoreListings] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +65,7 @@ export default function ListingDetails_sell() {
   const [isActivating, setIsActivating] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleLoginClick = () => setShowLogin(true);
   const handleCloseModal = () => setShowLogin(false);
@@ -64,6 +92,12 @@ export default function ListingDetails_sell() {
         setLoading(true);
         console.log("Fetching SELL listing with id:", listingId);
         const data = await getListingDetails(listingId);
+        let docPayload = [];
+        try {
+          docPayload = await getListingDocuments(listingId);
+        } catch (docErr) {
+          console.error("Failed to fetch listing documents", docErr);
+        }
 
         if (isCancelled) return;
 
@@ -79,13 +113,8 @@ export default function ListingDetails_sell() {
           data.summary ||
           "No description available for this property.";
 
-        const documents = (data.documents || data.legal_documents || []).map(
-          (doc) => ({
-            name: doc.name || doc.file_name || doc.document_type || "Document",
-            url: doc.url || doc.file_url || doc.file || "",
-            icon: legalDocIcon,
-          })
-        );
+        const normalizedDocuments = mapListingDocuments(docPayload);
+        setDocuments(normalizedDocuments);
 
         const listingStatus = (
           data.status_label ||
@@ -93,6 +122,7 @@ export default function ListingDetails_sell() {
           data.verification_status ||
           "PENDING"
         ).toUpperCase();
+        const verificationStatus = data.verification_status || data.status;
         const property = {
           type: data.property_type || "Apartment",
           area: data.area ? `${data.area} m²` : "0 m²",
@@ -102,7 +132,7 @@ export default function ListingDetails_sell() {
             typeof data.price === "number"
               ? data.price
               : Number(data.price) || 0,
-          address: data.street_address || "No address provided",
+          address: data.address || "No address provided",
           region: data.region || data.city || "Region, Wilaya",
           description,
           status: listingStatus,
@@ -112,14 +142,14 @@ export default function ListingDetails_sell() {
           title,
           description,
           images,
-          documents,
           property,
-          verificationStatus: data.verification_status || data.status,
+          verificationStatus,
         });
         setError(null);
       } catch (err) {
         console.error("Failed to fetch sell listing details", err);
         setError("Impossible de charger l'annonce.");
+        setDocuments([]);
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -188,8 +218,9 @@ export default function ListingDetails_sell() {
     try {
       setIsActivating(true);
       const response = await activateSellerListing(listingId);
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing activated.");
     } catch (err) {
@@ -205,8 +236,9 @@ export default function ListingDetails_sell() {
     try {
       setIsPausing(true);
       const response = await pauseSellerListing(listingId, { reason: "OTHER" });
-      if (response?.new_status) {
-        updateListingStatus(response.new_status);
+      const nextStatus = response?.status || response?.new_status || response?.listing_status;
+      if (nextStatus) {
+        updateListingStatus(nextStatus);
       }
       window.alert(response?.message || "Listing paused.");
     } catch (err) {
@@ -217,18 +249,26 @@ export default function ListingDetails_sell() {
     }
   };
 
-  const handleDeleteListing = async () => {
+  const handleOpenDeleteModal = () => {
     if (!listingId) return;
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
-    if (!confirmDelete) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteListing = async (reason) => {
+    if (!listingId) return;
 
     try {
       setIsDeleting(true);
-      await deleteSellerListing(listingId, "SOLD");
+      await deleteSellerListing(listingId, reason || "SOLD");
       updateListingStatus("DELETED");
       window.alert("Listing deleted.");
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Failed to delete listing", err);
       window.alert("Impossible de supprimer l'annonce.");
@@ -238,6 +278,7 @@ export default function ListingDetails_sell() {
   };
 
   const normalizedStatus = (listing?.property?.status || "").toUpperCase();
+  const verificationIcon = getVerificationIcon(listing?.verificationStatus);
   const shouldActivateStatus =
     normalizedStatus === "" ||
     normalizedStatus === "PAUSED" ||
@@ -250,6 +291,10 @@ export default function ListingDetails_sell() {
     ? handleActivateListing
     : handlePauseListing;
   const statusActionLoading = shouldActivateStatus ? isActivating : isPausing;
+
+  if (!loading && !listing) {
+    return <Navigate to="/404" replace />;
+  }
 
   return (
     <>
@@ -265,10 +310,10 @@ export default function ListingDetails_sell() {
         {!loading && !error && listing && (
           <>
             <LeftSection
-              certifiedIcon={certifiedIcon}
+              certifiedIcon={verificationIcon}
               images={listing.images}
               description={listing.description}
-              documents={listing.documents}
+              documents={documents}
               title={listing.title}
               verificationStatus={listing.verificationStatus}
               reviews={reviews}
@@ -280,12 +325,24 @@ export default function ListingDetails_sell() {
               onToggleStatus={statusActionHandler}
               statusActionLabel={statusActionLabel}
               isStatusLoading={statusActionLoading}
-              onDeleteListing={handleDeleteListing}
+                onDeleteListing={handleOpenDeleteModal}
               isDeletingListing={isDeleting}
             />
           </>
         )}
       </div>
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDeleteListing}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let us know why you're removing this listing so we can keep your account history accurate."
+        placeholder="Example: Property sold, duplicate entry, incorrect details, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
 
       <LoginModal show={showLogin} onClose={handleCloseModal} />
     </>

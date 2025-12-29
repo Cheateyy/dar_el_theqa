@@ -1,0 +1,158 @@
+.reason-modal__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 18, 40, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 1200;
+}
+
+.reason-modal__panel {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1.75rem;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
+    animation: reason-modal-pop 220ms ease-out;
+}
+
+.reason-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.reason-modal__header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #0f172a;
+}
+
+.reason-modal__close {
+    border: none;
+    background: #f1f5f9;
+    color: #0f172a;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.reason-modal__close:hover:not(:disabled) {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.reason-modal__close:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.reason-modal__subtitle {
+    margin: 0 0 1rem;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.reason-modal__label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: #0f172a;
+}
+
+.reason-modal__textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 140px;
+    border: 1px solid #cbd5f5;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.reason-modal__textarea:focus {
+    outline: none;
+    border-color: #051a47;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.reason-modal__textarea:disabled {
+    opacity: 0.6;
+}
+
+.reason-modal__error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin: 0.35rem 0 0;
+}
+
+.reason-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.reason-modal__button {
+    border: none;
+    border-radius: 999px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reason-modal__button--secondary {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.reason-modal__button--secondary:hover:not(:disabled) {
+    background: #cbd5f5;
+}
+
+.reason-modal__button--primary {
+    background: linear-gradient(135deg, #051a47, #051a47);
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+}
+
+.reason-modal__button--primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.45);
+}
+
+.reason-modal__button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+@keyframes reason-modal-pop {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

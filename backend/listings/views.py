@@ -1,9 +1,13 @@
 from rest_framework import generics, views, permissions, status, filters, serializers
 from rest_framework.response import Response
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
+
+
 from drf_spectacular.utils import extend_schema, inline_serializer
 
 class FeaturedListingsView(generics.ListAPIView):
@@ -97,8 +101,7 @@ class MyListingsView(generics.ListAPIView):
         return queryset
 
 class ListingPauseView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=inline_serializer(
@@ -128,8 +131,7 @@ class ListingPauseView(views.APIView):
         
         ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
 class ListingActivateView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=None,
@@ -177,31 +179,39 @@ class ListingDocumentUpdateView(views.APIView):
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+class SimilarListingsView(generics.ListAPIView):
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        base_listing = get_object_or_404(Listing, id=self.kwargs.get('id'))
+        queryset = Listing.objects.filter(status=Listing.Status.APPROVED).exclude(id=base_listing.id)
+        if base_listing.property_type:
+            queryset = queryset.filter(property_type=base_listing.property_type)
+        return queryset.order_by('?')[:3]
+
+
 # Admin Views
 class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
-#10.2
-class AdminListingViewDetailed(generics.RetrieveAPIView):
-    queryset = Listing.objects.all()
-    serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-    lookup_field = "id"
 
-#10.2
-class AdminListingViewDetailed(generics.RetrieveAPIView):
+class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = [permissions.IsAdminUser]
     lookup_field = "id"
 
+    def delete(self, request, *args, **kwargs):
+        listing = self.get_object()
+        listing.delete()
+        return Response({"status": "DELETED"}, status=status.HTTP_200_OK)
+
+
 class AdminListingApproveView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=None,
@@ -212,16 +222,37 @@ class AdminListingApproveView(views.APIView):
     )
     def post(self, request, id):
         try:
-            listing = Listing.objects.get(id=id)
+            listing = Listing.objects.prefetch_related('documents').get(id=id)
             listing.status = Listing.Status.APPROVED
             listing.save()
-            return Response({"status": "APPROVED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        documents = listing.documents.all()
+
+        # If there are no documents, you may want to decide how to handle this
+        if not documents.exists():
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+            listing.save()
+            return Response({"status": listing.verification_status})
+
+        approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+        total_docs = documents.count()
+
+        if approved_docs == total_docs:
+            listing.verification_status = Listing.VerificationStatus.VERIFIED
+        else:
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+        listing.save()
+
+        return Response({"status": listing.verification_status})
+    
+
+
 class AdminListingRejectView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=inline_serializer(
@@ -246,8 +277,42 @@ class AdminListingRejectView(views.APIView):
 #used by both admins and users
 class ListingViewDocuments(generics.ListAPIView):
     serializer_class = ListingDocumentSerializer
-    permission_classes = [permissions.AllowAny]   # or IsAdminUser 3lahseb.. but notyet
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         listing_id = self.kwargs.get('id')
         return ListingDocument.objects.filter(listing_id=listing_id)
+
+
+class ListingDocumentRejectView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingDocumentRejectRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="ListingDocumentRejectResponse",
+            fields={
+                "status": serializers.CharField(),
+                "document_id": serializers.IntegerField(),
+                "admin_note": serializers.CharField(allow_blank=True, required=False),
+            },
+        ),
+    )
+    def post(self, request, id, docId):
+        try:
+            document = ListingDocument.objects.get(id=docId, listing_id=id)
+        except ListingDocument.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        document.status = ListingDocument.Status.REJECTED
+        document.admin_note = request.data.get('reason')
+        document.save()
+
+        return Response({
+            "status": "REJECTED",
+            "document_id": document.id,
+            "admin_note": document.admin_note,
+        })

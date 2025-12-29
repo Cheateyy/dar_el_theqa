@@ -1,10 +1,20 @@
 import deleteBtnIcon from "../../assets/images/delete-btn-icon.png";
 
-export default function UpperSection({ address, region }) {
+const noop = () => {};
+
+export default function UpperSection({ address, region, onDeleteListing = noop, isDeleting = false }) {
     return (
         <div className="admin-UpperRightSection">
             <div className="admin-updateButtons">
-                <button className="admin-deleteButton">
+                <button
+                    type="button"
+                    className="admin-deleteButton"
+                    onClick={onDeleteListing}
+                    disabled={isDeleting}
+                    title="Delete listing"
+                    aria-label="Delete listing"
+                    aria-busy={isDeleting}
+                >
                     <img src={deleteBtnIcon} alt="Delete" />
                 </button>
             </div>

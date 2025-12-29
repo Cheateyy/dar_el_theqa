@@ -704,13 +704,9 @@
   align-items: center;
 }
 
-.admin-rent-interestButton{
-  background-color: grey;
-
-}
 .admin-rent-interestButton.Reject{
   margin-top: 3rem;
-  background-color: red;
+  background-color: rgb(223, 89, 89);
 }
 
 .admin-rent-legal-documents h3{
