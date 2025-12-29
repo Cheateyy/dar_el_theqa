@@ -27,7 +27,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class OwnerLeadListSerializer(serializers.ModelSerializer):
-    date = serializers.DateField(source='created_at', format='%Y-%m-%d')
+    date = serializers.DateTimeField(source='created_at', format='%Y-%m-%d', read_only=True)
     client_name = serializers.CharField(source='user.get_full_name')
     client_phone = serializers.CharField(source='user.phone_number')
     listing_title = serializers.CharField(source='listing.title')
@@ -74,7 +74,7 @@ class LeadPropertySerializer(serializers.ModelSerializer):
 class LeadDetailSerializer(serializers.ModelSerializer):
     client = LeadClientSerializer(source='*', read_only=True)
     property = LeadPropertySerializer(source='listing', read_only=True)
-    date = serializers.DateField(source='created_at', format='%Y-%m-%d', read_only=True)
+    date = serializers.DateTimeField(source='created_at', format='%Y-%m-%d', read_only=True)
 
     class Meta:
         model = Lead
