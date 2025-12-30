@@ -65,7 +65,7 @@ class OwnerLeadListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Only leads for listings owned by the current user
-        return Lead.objects.filter(listing__user=self.request.user).order_by('-created_at')
+        return Lead.objects.filter(listing__owner=self.request.user).order_by('-created_at')
 
 # ----------------------------
 class LeadDetailView(generics.RetrieveAPIView):
@@ -76,7 +76,7 @@ class LeadDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         # Only allow leads for listings owned by current user
-        return Lead.objects.filter(listing__user=self.request.user)
+        return Lead.objects.filter(listing__owner=self.request.user)
 
 
 

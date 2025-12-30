@@ -39,10 +39,11 @@ class ListingCreateDocumentNotesTests(APITestCase):
 			"bathrooms": 1,
 			"floors": 1,
 			"description": "Nice place",
-			"document_notes": json.dumps({
-				"docidentity": "will provide later",
-				"docregister": "pending renewal",
-			}),
+			"doc_identity_note": "will provide later",
+			"doc_assurance_note": "will provide later",
+			"doc_register_note": "pending renewal",
+			"doc_silbiya_note": "will provide later",
+			"doc_ownership_note": "ownership docs pending",
 		}
 
 		res = self.client.post(url, payload, format="multipart")
@@ -50,7 +51,8 @@ class ListingCreateDocumentNotesTests(APITestCase):
 		self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 		listing = Listing.objects.get(id=res.data["id"]) if "id" in res.data else Listing.objects.order_by("-id").first()
 		self.assertTrue(bool(listing.slug))
-		self.assertEqual(listing.document_notes.get("docidentity"), "will provide later")
+		# Notes are stored on ListingDocument.owner_note rows when the file is missing.
+		self.assertTrue(listing.documents.filter(owner_note__isnull=False).exists())
 
 
 class ListingSlugGenerationTests(APITestCase):
