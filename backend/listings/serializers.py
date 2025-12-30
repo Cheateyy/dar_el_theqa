@@ -1,7 +1,11 @@
 from typing import Optional
 import json
+import json
 
 from rest_framework import serializers
+from django.utils.text import slugify
+from django.utils.crypto import get_random_string
+
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
 
@@ -10,13 +14,18 @@ from users.serializers import PartnerSerializer
 from locations.models import Wilaya, Region
 
 
+
+# ---------------- Images ----------------
 # ---------------- Images ----------------
 class ListingImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListingImage
         fields = ["id", "image", "label", "order"]
 
+        fields = ["id", "image", "label", "order"]
 
+
+# ---------------- Documents ----------------
 # ---------------- Documents ----------------
 class ListingDocumentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,7 +42,11 @@ class ListingDocumentSerializer(serializers.ModelSerializer):
 
 
 # ---------------- Listing (read) ----------------
+
+# ---------------- Listing (read) ----------------
 class ListingSerializer(serializers.ModelSerializer):
+    wilaya_name = serializers.CharField(source="wilaya.name", read_only=True)
+    region_name = serializers.CharField(source="region.name", read_only=True)
     wilaya_name = serializers.CharField(source="wilaya.name", read_only=True)
     region_name = serializers.CharField(source="region.name", read_only=True)
     cover_image = serializers.SerializerMethodField()
@@ -71,13 +84,43 @@ class ListingSerializer(serializers.ModelSerializer):
             "status",
             "rejection_reason",
             "created_at",
+            "id",
+            "slug",
+            "title",
+            "transaction_type",
+            "price",
+            "rent_unit",
+            "wilaya",
+            "wilaya_name",
+            "region",
+            "region_name",
+            "cover_image",
+            "verification_status",
+            "is_liked",
+            "partner",
+            "property_type",
+            "area",
+            "bedrooms",
+            "bathrooms",
+            "floors",
+            "description",
+            "address",
+            "rental_status",
+            "available_date",
+            "images",
+            "status",
+            "rejection_reason",
+            "created_at",
         ]
 
     def get_cover_image(self, obj) -> Optional[str]:
         first = obj.images.first()
         return first.image.url if first else None
+        first = obj.images.first()
+        return first.image.url if first else None
 
     def get_is_liked(self, obj) -> bool:
+        request = self.context.get("request")
         request = self.context.get("request")
         if request and request.user.is_authenticated:
             return obj.favorited_by.filter(user=request.user).exists()
@@ -85,7 +128,11 @@ class ListingSerializer(serializers.ModelSerializer):
 
 
 # ---------------- Listing (create/update) ----------------
+
+# ---------------- Listing (create/update) ----------------
 class ListingCreateSerializer(serializers.ModelSerializer):
+
+    # Accept single file or list
 
     # Accept single file or list
     class FlexibleFileListField(serializers.ListField):
@@ -99,13 +146,24 @@ class ListingCreateSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(), write_only=True, required=False
     )
+    images = serializers.ListField(
+        child=serializers.ImageField(), write_only=True, required=False
+    )
     image_labels = serializers.CharField(write_only=True, required=False)
 
+    # frontend aliases
     # frontend aliases
     wilaya_id = serializers.IntegerField(write_only=True, required=False)
     region_id = serializers.IntegerField(write_only=True, required=False)
     street_address = serializers.CharField(write_only=True, required=False)
 
+    # documents (canonical)
+    doc_identity = FlexibleFileListField(child=serializers.FileField(), required=False)
+    doc_assurance = FlexibleFileListField(child=serializers.FileField(), required=False)
+    doc_ownership_1 = FlexibleFileListField(child=serializers.FileField(), required=False)
+    doc_ownership_2 = FlexibleFileListField(child=serializers.FileField(), required=False)
+    doc_register = FlexibleFileListField(child=serializers.FileField(), required=False)
+    doc_silbiya = FlexibleFileListField(child=serializers.FileField(), required=False)
     # documents (canonical)
     doc_identity = FlexibleFileListField(child=serializers.FileField(), required=False)
     doc_assurance = FlexibleFileListField(child=serializers.FileField(), required=False)
@@ -164,6 +222,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
         ]
 
     # ---------------- VALIDATION ----------------
+    # ---------------- VALIDATION ----------------
     def validate(self, attrs):
         request = self.context["request"]
 
@@ -171,6 +230,8 @@ class ListingCreateSerializer(serializers.ModelSerializer):
         if "address" not in attrs and "street_address" in attrs:
             attrs["address"] = attrs.pop("street_address")
 
+        if "wilaya" not in attrs and "wilaya_id" in attrs:
+            attrs["wilaya"] = Wilaya.objects.get(pk=attrs.pop("wilaya_id"))
         if "wilaya" not in attrs and "wilaya_id" in attrs:
             attrs["wilaya"] = Wilaya.objects.get(pk=attrs.pop("wilaya_id"))
 
@@ -205,10 +266,40 @@ class ListingCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     # ---------------- CREATE ----------------
+    # ---------------- CREATE ----------------
     def create(self, validated_data):
         images_data = validated_data.pop("images", [])
         image_labels_json = validated_data.pop("image_labels", "{}")
+        images_data = validated_data.pop("images", [])
+        image_labels_json = validated_data.pop("image_labels", "{}")
 
+        # extract alias docs
+        alias_docs = {
+            k: validated_data.pop(k, [])
+            for k in [
+                "docidentity",
+                "docassurance",
+                "docownership1",
+                "docownership2",
+                "docownership3",
+                "docownership4",
+                "docownership5",
+                "docregister",
+                "docsilbiya",
+            ]
+        }
+
+        docs_data = {
+            k: validated_data.pop(k, [])
+            for k in [
+                "doc_identity",
+                "doc_assurance",
+                "doc_ownership_1",
+                "doc_ownership_2",
+                "doc_register",
+                "doc_silbiya",
+            ]
+        }
         # extract alias docs
         alias_docs = {
             k: validated_data.pop(k, [])
@@ -257,11 +348,35 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             while Listing.objects.filter(slug=slug).exists():
                 slug = f"{base}-{get_random_string(6)}"
             validated_data["slug"] = slug
+        # merge aliases
+        docs_data["doc_identity"].extend(alias_docs["docidentity"])
+        docs_data["doc_assurance"].extend(alias_docs["docassurance"])
+        docs_data["doc_register"].extend(alias_docs["docregister"])
+        docs_data["doc_silbiya"].extend(alias_docs["docsilbiya"])
+        docs_data["doc_ownership_1"].extend(
+            alias_docs["docownership1"]
+            + alias_docs["docownership2"]
+            + alias_docs["docownership3"]
+            + alias_docs["docownership4"]
+            + alias_docs["docownership5"]
+        )
+
+        # slug
+        if not validated_data.get("slug"):
+            base = slugify(validated_data.get("title", "")) or "listing"
+            slug = base
+            while Listing.objects.filter(slug=slug).exists():
+                slug = f"{base}-{get_random_string(6)}"
+            validated_data["slug"] = slug
 
         listing = Listing.objects.create(**validated_data)
 
         # images
+        # images
         try:
+            labels = json.loads(image_labels_json)
+        except Exception:
+            labels = {}
             labels = json.loads(image_labels_json)
         except Exception:
             labels = {}
@@ -324,8 +439,12 @@ class ListingCreateSerializer(serializers.ModelSerializer):
 
 
 # ---------------- Listing (detail) ----------------
+
+# ---------------- Listing (detail) ----------------
 class ListingDetailSerializer(ListingSerializer):
     documents = ListingDocumentSerializer(many=True, read_only=True)
 
+
     class Meta(ListingSerializer.Meta):
+        fields = ListingSerializer.Meta.fields + ["documents"]
         fields = ListingSerializer.Meta.fields + ["documents"]
