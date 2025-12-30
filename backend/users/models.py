@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 from core.models import TimeStampedModel
+
+import random
+from datetime import timedelta
 
 class User(AbstractUser, TimeStampedModel):
     class Role(models.TextChoices):
@@ -31,3 +35,27 @@ class Partner(TimeStampedModel):
 
     def __str__(self):
         return self.company_name
+
+
+class ActivationOTP(TimeStampedModel):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='activation_otps')
+    code = models.CharField(max_length=6, db_index=True)
+    expires_at = models.DateTimeField(db_index=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    @classmethod
+    def create_for_user(cls, user, *, ttl_minutes: int = 10) -> 'ActivationOTP':
+        code = f"{random.randint(0, 999999):06d}"
+        expires_at = timezone.now() + timedelta(minutes=ttl_minutes)
+        return cls.objects.create(user=user, code=code, expires_at=expires_at)
+
+    def is_expired(self) -> bool:
+        return timezone.now() >= self.expires_at
+
+    def mark_used(self) -> None:
+        if self.used_at is None:
+            self.used_at = timezone.now()
+            self.save(update_fields=['used_at'])

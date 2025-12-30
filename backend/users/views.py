@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, inline_serializer
 from .serializers import (
@@ -17,8 +18,7 @@ from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
 )
-from .models import Partner
-import random
+from .models import Partner, ActivationOTP
 
 User = get_user_model()
 
@@ -41,10 +41,8 @@ class RegisterView(views.APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # Mock OTP generation
-            otp = random.randint(100000, 999999)
-            print(f"OTP for {user.email}: {otp}") # Console print as requested
-            # In real app, save OTP to DB/Cache
+            otp_obj = ActivationOTP.create_for_user(user)
+            print(f"OTP for {user.email}: {otp_obj.code}") # Console print as requested
             return Response({
                 "id": user.id,
                 "email": user.email,
@@ -81,11 +79,43 @@ class ActivationView(views.APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         code = serializer.validated_data['code']
-        # Mock verification
+
         try:
             user = User.objects.get(email=email)
+            if user.is_active:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    "status": "success",
+                    "message": "Account already activated.",
+                    "token": str(refresh.access_token),
+                    "user": {"id": user.id, "name": user.get_full_name()}
+                })
+
+            otp = (
+                ActivationOTP.objects.filter(
+                    user=user,
+                    used_at__isnull=True,
+                    expires_at__gt=timezone.now(),
+                )
+                .order_by('-created_at')
+                .first()
+            )
+            if otp is None:
+                return Response(
+                    {"status": "error", "message": "No valid activation code found. Please request a new one."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if str(code).strip() != otp.code:
+                return Response(
+                    {"status": "error", "message": "Invalid activation code."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             user.is_active = True
             user.save()
+
+            otp.mark_used()
             
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -119,8 +149,8 @@ class ActivationResendView(views.APIView):
         try:
             user = User.objects.get(email=email)
             if not user.is_active:
-                otp = random.randint(100000, 999999)
-                print(f"Activation resend OTP for {email}: {otp}")
+                otp_obj = ActivationOTP.create_for_user(user)
+                print(f"Activation resend OTP for {email}: {otp_obj.code}")
         except User.DoesNotExist:
             pass
 
