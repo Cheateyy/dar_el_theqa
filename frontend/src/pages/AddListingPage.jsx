@@ -217,6 +217,7 @@ function AddListingPage() {
               value={formData.title}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter a title for your listing"
             />
             {errors.title && <p className="error-text">{errors.title}</p>}
 
@@ -226,6 +227,7 @@ function AddListingPage() {
               value={formData.description}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Provide a detailed description of the property"
             />
             {errors.description && <p className="error-text">{errors.description}</p>}
           </Section>
@@ -237,6 +239,7 @@ function AddListingPage() {
               value={formData.wilaya}
               onChange={handleChange}
               onBlur={handleBlur}
+              
             >
               <option value="">Select wilaya</option>
               {wilayas.map((w) => (
@@ -270,6 +273,7 @@ function AddListingPage() {
               value={formData.address}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter the full address of the property"
             />
             {errors.address && <p className="error-text">{errors.address}</p>}
           </Section>
@@ -291,6 +295,7 @@ function AddListingPage() {
               value={formData.price}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter the price of the property"
             />
             {errors.price && <p className="error-text">{errors.price}</p>}
 

@@ -248,7 +248,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setIdentity({ ...identity, notes: e.target.value })
                 }
-                placeholder="Write explanation if no document provided..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 
@@ -362,7 +362,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setRegister({ ...register, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 
@@ -418,7 +418,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setAssurance({ ...assurance, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
             {/* ---------------- Silbiya ---------------- */}
@@ -473,7 +473,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setSilbiya({ ...silbiya, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 

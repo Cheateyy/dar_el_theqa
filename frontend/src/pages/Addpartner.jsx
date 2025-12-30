@@ -48,6 +48,7 @@ function AddPartner() {
     wilaya: "",
     region: "",
     address: "",
+    website: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -106,6 +107,19 @@ function AddPartner() {
         if (!v) return "Required";
         if (v.length < 10 || v.length > 200) return "Must be 10-200 characters";
         return "";
+      case "website":
+        if (!v) return ""; // optional
+
+        if (!/^https?:\/\//i.test(v)) {
+          return "Enter a valid URL (must start with http:// or https://)";
+        }
+
+        try {
+          new URL(v);
+          return "";
+        } catch {
+          return "Enter a valid URL";
+        }
 
       default:
         return "";
@@ -156,43 +170,45 @@ function AddPartner() {
   }, [formData, logoFile]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const newErrors = validateForm();
-  setErrors(newErrors);
-  if (Object.keys(newErrors).length > 0) return;
+    const newErrors = validateForm();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
-  const payload = new FormData();
-  payload.append("company_name", formData.companyName);
-  payload.append("email", formData.email);
-  payload.append("phone_number", formData.phoneNumber);
-  payload.append("wilaya", formData.wilaya);
-  payload.append("region", formData.region);
-  payload.append("listing_address", formData.address);
-  payload.append("logo", logoFile);
+    const payload = new FormData();
+    payload.append("company_name", formData.companyName);
+    payload.append("email", formData.email);
+    payload.append("phone_number", formData.phoneNumber);
+    payload.append("wilaya", formData.wilaya);
+    payload.append("region", formData.region);
+    payload.append("listing_address", formData.address);
+    if (formData.website.trim()) {
+      payload.append("website", formData.website.trim());
+    }
+    payload.append("logo", logoFile);
 
-  setSubmitting(true);
+    setSubmitting(true);
 
-  const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("auth_token");
 
-  const res = await fetch(`${API_BASE_URL}/api/admin/partners/`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: payload,
-  });
+    const res = await fetch(`${API_BASE_URL}/api/admin/partners/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: payload,
+    });
 
-  setSubmitting(false);
+    setSubmitting(false);
 
-  if (!res.ok) {
-    console.error(await res.text());
-    return;
-  }
+    if (!res.ok) {
+      console.error(await res.text());
+      return;
+    }
 
-  navigate("/forms-tables/partner-accounts");
-};
-
+    navigate("/forms-tables/partner-accounts");
+  };
 
   if (loading) return null;
 
@@ -213,6 +229,7 @@ function AddPartner() {
               name="companyName"
               value={formData.companyName}
               onChange={handleChange}
+              placeholder="Enter the company name"
             />
             {errors.companyName && (
               <span className="error-text">{errors.companyName}</span>
@@ -223,6 +240,7 @@ function AddPartner() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter the contact email"
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
 
@@ -231,6 +249,7 @@ function AddPartner() {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
+              placeholder="Enter the contact phone number"
             />
             {errors.phoneNumber && (
               <span className="error-text">{errors.phoneNumber}</span>
@@ -278,9 +297,21 @@ function AddPartner() {
               name="address"
               value={formData.address}
               onChange={handleChange}
+              placeholder="Enter the full address"
             />
             {errors.address && (
               <span className="error-text">{errors.address}</span>
+            )}
+
+            <Input
+              label="Website (optional)"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              placeholder="https://example.com"
+            />
+            {errors.website && (
+              <span className="error-text">{errors.website}</span>
             )}
           </Section>
 
