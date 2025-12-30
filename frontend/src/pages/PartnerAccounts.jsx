@@ -105,7 +105,7 @@ function PartnerAccounts() {
   };
 
   const handleAddProperty = (id) => {
-    navigate(`/forms-tables/add-listing?partnerId=${id}`);
+    navigate(`/forms-tables/add-listing?partner_id=${id}`);
   };
 
   const goToPage = (page) => {

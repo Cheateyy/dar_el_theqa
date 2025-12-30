@@ -163,12 +163,12 @@ function AddPartner() {
   if (Object.keys(newErrors).length > 0) return;
 
   const payload = new FormData();
-  payload.append("name", formData.companyName);
+  payload.append("company_name", formData.companyName);
   payload.append("email", formData.email);
   payload.append("phone_number", formData.phoneNumber);
   payload.append("wilaya", formData.wilaya);
   payload.append("region", formData.region);
-  payload.append("address", formData.address);
+  payload.append("listing_address", formData.address);
   payload.append("logo", logoFile);
 
   setSubmitting(true);
