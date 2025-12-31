@@ -11,6 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'role', 'is_active']
         read_only_fields = ['id', 'email', 'role', 'is_active']
 
+
+class AdminUserStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'role', 'is_active']
+        read_only_fields = ['id', 'email', 'role']
+
 class RegisterSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(write_only=True)
     re_password = serializers.CharField(write_only=True)
@@ -76,6 +83,45 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 
 class PartnerSerializer(serializers.ModelSerializer):
+    # Backward-compatible aliases for existing frontend payloads
+    name = serializers.CharField(source='company_name', required=False, write_only=True)
+    address = serializers.CharField(source='listing_address', required=False, write_only=True)
+
+    # Backward-compatible aliases for existing frontend reads
+    legacy_name = serializers.CharField(source='company_name', read_only=True)
+    legacy_address = serializers.CharField(source='listing_address', read_only=True)
+
     class Meta:
         model = Partner
-        fields = '__all__'
+        fields = [
+            'id',
+            'company_name',
+            'email',
+            'phone_number',
+            'wilaya',
+            'region',
+            'listing_address',
+            'website',
+            'logo',
+            # aliases
+            'name',
+            'address',
+            'legacy_name',
+            'legacy_address',
+        ]
+        extra_kwargs = {
+            'company_name': {'required': True},
+            'email': {'required': True},
+            'phone_number': {'required': True},
+            'wilaya': {'required': True},
+            'region': {'required': True},
+            'listing_address': {'required': True},
+            'website': {'required': False, 'allow_null': True},
+        }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Keep existing frontend reads working (expects `name`/`address`)
+        data.setdefault('name', data.get('company_name'))
+        data.setdefault('address', data.get('listing_address'))
+        return data

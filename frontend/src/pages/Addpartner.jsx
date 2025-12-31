@@ -1,8 +1,11 @@
 // src/pages/AddPartner.jsx
+import { API_BASE_URL } from "/src/config/env.js";
+
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+
 import "../assets/styles/Addpartner.css";
-import { wilayas, regions } from "../utils/algeria.js";
 
 import Input from "../components/common/Input.jsx";
 import Select from "../components/common/Select.jsx";
@@ -13,12 +16,30 @@ import BackIcon from "@/assets/icons/back.svg";
 import removeIcon from "../assets/icons/removeimage.png";
 import imageIcon from "../assets/icons/imageicon.svg";
 
-const USE_MOCK_PARTNERS = true; 
-
 function AddPartner() {
   const navigate = useNavigate();
+  const { user, isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (!user || user.role == null) return;
+
+    const role = String(user.role).toUpperCase();
+    if (!role.includes("ADMIN")) {
+      navigate("/", { replace: true });
+    }
+  }, [loading, isAuthenticated, user, navigate]);
+
   const logoInputRef = useRef(null);
 
+  const [wilayas, setWilayas] = useState([]);
+  const [regions, setRegions] = useState([]);
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -27,7 +48,6 @@ function AddPartner() {
     wilaya: "",
     region: "",
     address: "",
-    logo: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -36,182 +56,151 @@ function AddPartner() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/choices/wilayas/`)
+      .then((res) => res.json())
+      .then((data) => setWilayas(Array.isArray(data) ? data : []))
+      .catch(() => setWilayas([]));
+  }, []);
+
+  useEffect(() => {
+    if (!formData.wilaya) {
+      setRegions([]);
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/api/choices/regions/?wilaya_id=${formData.wilaya}`)
+      .then((res) => res.json())
+      .then((data) => setRegions(Array.isArray(data) ? data : []))
+      .catch(() => setRegions([]));
+  }, [formData.wilaya]);
+
   const validateField = (name, value) => {
+    const v = value?.toString().trim();
+
     switch (name) {
-      case "companyName": {
-        const v = value.trim();
+      case "companyName":
         if (!v) return "Required";
         if (v.length < 2 || v.length > 100) return "Must be 2-100 characters";
         return "";
-      }
-      case "email": {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!value) return "Required";
-        if (!emailRegex.test(value)) return "Invalid email format";
+
+      case "email":
+        if (!v) return "Required";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
+          return "Invalid email format";
         return "";
-      }
-      case "phoneNumber": {
-        const phoneRegex = /^(00213|\+213|0)(5|6|7)[0-9]{8}$/;
-        if (!value) return "Required";
-        if (!phoneRegex.test(value)) return "Invalid Algerian phone number";
+
+      case "phoneNumber":
+        if (!v) return "Required";
+        if (!/^(00213|\+213|0)(5|6|7)[0-9]{8}$/.test(v))
+          return "Invalid Algerian phone number";
         return "";
-      }
+
       case "wilaya":
-        return value ? "" : "Required";
+        return v ? "" : "Required";
+
       case "region":
-        return value ? "" : "Required";
-      case "address": {
-        const v = value.trim();
+        return v ? "" : "Required";
+
+      case "address":
         if (!v) return "Required";
         if (v.length < 10 || v.length > 200) return "Must be 10-200 characters";
         return "";
-      }
-      case "logo":
-        return value ? "" : "Required";
+
       default:
         return "";
     }
   };
 
-
   const validateForm = () => {
     const newErrors = {};
     Object.entries(formData).forEach(([name, value]) => {
-      const fieldError = validateField(name, value);
-      if (fieldError) newErrors[name] = fieldError;
+      const err = validateField(name, value);
+      if (err) newErrors[name] = err;
     });
+
+    if (!logoFile) newErrors.logo = "Required";
     return newErrors;
   };
 
- 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setTouched((prev) => ({ ...prev, [name]: true }));
-
-    const fieldError = validateField(name, value);
-    setErrors((prev) => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: fieldError,
+      [name]: value,
+      ...(name === "wilaya" ? { region: "" } : {}),
     }));
-  };
 
-  const openLogoPicker = () => {
-    if (logoInputRef.current) {
-      logoInputRef.current.value = "";
-      logoInputRef.current.click();
-    }
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      setFormData((prev) => ({ ...prev, logo: file.name }));
-      setTouched((prev) => ({ ...prev, logo: true }));
+    if (!file) return;
 
-      const fieldError = validateField("logo", file.name);
-      setErrors((prev) => ({ ...prev, logo: fieldError }));
-    }
+    setLogoFile(file);
+    setTouched((prev) => ({ ...prev, logo: true }));
+    setErrors((prev) => ({ ...prev, logo: "" }));
   };
 
   const removeLogo = () => {
     setLogoFile(null);
-    setFormData((prev) => ({ ...prev, logo: "" }));
-    setTouched((prev) => ({ ...prev, logo: true }));
-
-    const fieldError = validateField("logo", "");
-    setErrors((prev) => ({ ...prev, logo: fieldError }));
+    setErrors((prev) => ({ ...prev, logo: "Required" }));
   };
 
-  
   useEffect(() => {
-    const hasErrors = Object.values(errors).some((msg) => msg);
-
-    const allRequiredFilled =
-      formData.companyName &&
-      formData.email &&
-      formData.phoneNumber &&
-      formData.wilaya &&
-      formData.region &&
-      formData.address &&
-      formData.logo;
-
-    setIsFormValid(!hasErrors && !!allRequiredFilled);
-  }, [errors, formData]);
+    const validationErrors = validateForm();
+    setIsFormValid(Object.keys(validationErrors).length === 0);
+  }, [formData, logoFile]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const newErrors = validateForm();
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      setIsFormValid(false);
-      return;
-    }
+  const newErrors = validateForm();
+  setErrors(newErrors);
+  if (Object.keys(newErrors).length > 0) return;
 
-   
-    if (USE_MOCK_PARTNERS) {
-      const newPartner = {
-        id: Date.now(),
-        companyName: formData.companyName,
-        address: `${formData.address}, ${formData.region}, ${formData.wilaya}`,
-        phoneNumber: formData.phoneNumber,
-        email: formData.email,
-      };
+  const payload = new FormData();
+  payload.append("name", formData.companyName);
+  payload.append("email", formData.email);
+  payload.append("phone_number", formData.phoneNumber);
+  payload.append("wilaya", formData.wilaya);
+  payload.append("region", formData.region);
+  payload.append("address", formData.address);
+  payload.append("logo", logoFile);
 
-      const stored = localStorage.getItem("partners");
-      const partners = stored ? JSON.parse(stored) : [];
-      partners.push(newPartner);
-      localStorage.setItem("partners", JSON.stringify(partners));
+  setSubmitting(true);
 
-      navigate("/forms-tables/partner-accounts");
-      return; 
-    }
+  const token = localStorage.getItem("auth_token");
 
-    
-    const payload = new FormData();
-    payload.append("name", formData.companyName);
-    payload.append("email", formData.email);
-    payload.append("phone_number", formData.phoneNumber);
-    payload.append(
-      "address",
-      `${formData.address}, ${formData.region}, ${formData.wilaya}`
-    );
-    if (logoFile) {
-      payload.append("logo", logoFile);
-    }
+  const res = await fetch(`${API_BASE_URL}/api/admin/partners/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: payload,
+  });
 
-    const res = await fetch("/api/admin/partners/", {
-      method: "POST",
-      body: payload,
-      credentials: "include",
-    });
+  setSubmitting(false);
 
-    if (!res.ok) {
-      console.error("Failed to create partner", await res.text());
-      return;
-    }
+  if (!res.ok) {
+    console.error(await res.text());
+    return;
+  }
 
-    navigate("/forms-tables/partner-accounts");
-  };
+  navigate("/forms-tables/partner-accounts");
+};
 
+
+  if (loading) return null;
 
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
-        <button
-          className="back-button"
-          type="button"
-          onClick={() => navigate(-1)}
-        >
-          <img
-            src={BackIcon}
-            className="back-icon"
-            alt="Back"
-          />
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <img src={BackIcon} className="back-icon" alt="Back" />
           Back
         </button>
 
@@ -223,48 +212,28 @@ function AddPartner() {
               label="Company Name *"
               name="companyName"
               value={formData.companyName}
-              placeholder="Enter company name"
               onChange={handleChange}
             />
-            {errors.companyName ? (
+            {errors.companyName && (
               <span className="error-text">{errors.companyName}</span>
-            ) : (
-              touched.companyName &&
-              formData.companyName && (
-                <span className="success-text">Valid!</span>
-              )
             )}
 
             <Input
               label="Email *"
               name="email"
-              type="email"
               value={formData.email}
-              placeholder="Enter company email"
               onChange={handleChange}
             />
-            {errors.email ? (
-              <span className="error-text">{errors.email}</span>
-            ) : (
-              touched.email &&
-              formData.email && <span className="success-text">Valid!</span>
-            )}
+            {errors.email && <span className="error-text">{errors.email}</span>}
 
             <Input
               label="Phone Number *"
               name="phoneNumber"
-              type="tel"
               value={formData.phoneNumber}
-              placeholder="Enter phone number"
               onChange={handleChange}
             />
-            {errors.phoneNumber ? (
+            {errors.phoneNumber && (
               <span className="error-text">{errors.phoneNumber}</span>
-            ) : (
-              touched.phoneNumber &&
-              formData.phoneNumber && (
-                <span className="success-text">Valid!</span>
-              )
             )}
           </Section>
 
@@ -277,16 +246,13 @@ function AddPartner() {
             >
               <option value="">Select wilaya</option>
               {wilayas.map((w) => (
-                <option key={w} value={w}>
-                  {w}
+                <option key={w.id} value={w.id}>
+                  {w.name}
                 </option>
               ))}
             </Select>
-            {errors.wilaya ? (
+            {errors.wilaya && (
               <span className="error-text">{errors.wilaya}</span>
-            ) : (
-              touched.wilaya &&
-              formData.wilaya && <span className="success-text">Valid!</span>
             )}
 
             <Select
@@ -297,32 +263,24 @@ function AddPartner() {
               onChange={handleChange}
             >
               <option value="">Select region</option>
-              {formData.wilaya &&
-                regions[formData.wilaya]?.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
             </Select>
-            {errors.region ? (
+            {errors.region && (
               <span className="error-text">{errors.region}</span>
-            ) : (
-              touched.region &&
-              formData.region && <span className="success-text">Valid!</span>
             )}
 
             <Input
               label="Listing Address *"
               name="address"
               value={formData.address}
-              placeholder="Enter street address"
               onChange={handleChange}
             />
-            {errors.address ? (
+            {errors.address && (
               <span className="error-text">{errors.address}</span>
-            ) : (
-              touched.address &&
-              formData.address && <span className="success-text">Valid!</span>
             )}
           </Section>
 
@@ -331,8 +289,8 @@ function AddPartner() {
               <span className="section-title">Company Logo *</span>
               <button
                 type="button"
-                onClick={openLogoPicker}
-                className={`add-document-btn ${logoFile ? "added" : ""}`}
+                onClick={() => logoInputRef.current.click()}
+                className={`add-logo-btn ${logoFile ? "added" : ""}`}
                 disabled={!!logoFile}
               >
                 +
@@ -348,9 +306,9 @@ function AddPartner() {
             />
 
             {logoFile && (
-              <div className="document-card">
-                <div className="document-file-row">
-                  <span className="document-filename">
+              <div className="logo-card">
+                <div className="logo-file-row">
+                  <span className="logo-filename">
                     <img
                       src={imageIcon}
                       className="small-pdf-icon"
@@ -360,7 +318,7 @@ function AddPartner() {
                   </span>
                   <button
                     type="button"
-                    className="remove-document-btn"
+                    className="remove-logo-btn"
                     onClick={removeLogo}
                   >
                     <img
@@ -372,12 +330,7 @@ function AddPartner() {
                 </div>
               </div>
             )}
-            {errors.logo ? (
-              <span className="error-text">{errors.logo}</span>
-            ) : (
-              touched.logo &&
-              formData.logo && <span className="success-text">Valid!</span>
-            )}
+            {errors.logo && <span className="error-text">{errors.logo}</span>}
           </Section>
 
           <div className="form-footer">
@@ -385,7 +338,6 @@ function AddPartner() {
               type="submit"
               variant="primary"
               disabled={!isFormValid || submitting}
-              className={!isFormValid ? "disabled-btn" : ""}
             >
               {submitting ? "Saving..." : "Save"}
             </Button>

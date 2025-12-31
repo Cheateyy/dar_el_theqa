@@ -10,8 +10,7 @@ from django.db.models import Avg, Count
 from django.shortcuts import get_object_or_404
 
 class FavoriteToggleView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=None,
@@ -36,16 +35,14 @@ class FavoriteToggleView(views.APIView):
 
 class FavoriteListView(generics.ListAPIView):
     serializer_class = ListingSerializer # Returns full listing details
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Listing.objects.filter(favorited_by__user=self.request.user).order_by('-favorited_by__created_at')
 
 class LeadCreateView(generics.CreateAPIView):
     serializer_class = LeadSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -59,24 +56,22 @@ class OwnerLeadPagination(PageNumberPagination):
 # ----------------------------
 class OwnerLeadListView(generics.ListAPIView):
     serializer_class = OwnerLeadListSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = OwnerLeadPagination
 
     def get_queryset(self):
         # Only leads for listings owned by the current user
-        return Lead.objects.filter(listing__user=self.request.user).order_by('-created_at')
+        return Lead.objects.filter(listing__owner=self.request.user).order_by('-created_at')
 
 # ----------------------------
 class LeadDetailView(generics.RetrieveAPIView):
     serializer_class = LeadDetailSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = 'lead_id'
 
     def get_queryset(self):
         # Only allow leads for listings owned by current user
-        return Lead.objects.filter(listing__user=self.request.user)
+        return Lead.objects.filter(listing__owner=self.request.user)
 
 
 

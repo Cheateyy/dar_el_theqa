@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 from core.models import TimeStampedModel
 
 class Listing(TimeStampedModel):
@@ -66,6 +68,21 @@ class Listing(TimeStampedModel):
     rental_status = models.CharField(max_length=10, choices=RentalStatus.choices, default=RentalStatus.AVAILABLE)
     available_date = models.DateField(null=True, blank=True)
 
+    # Stores per-document notes (e.g. reasons a required document is missing)
+    # Example: {"docidentity": "will upload later", "docregister": "pending"}
+    document_notes = models.JSONField(default=dict, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Enforce a unique, non-empty slug even if some caller forgets to set it.
+        if not self.slug:
+            base_slug = slugify(self.title or '') or 'listing'
+            candidate = base_slug
+            while Listing.objects.exclude(pk=self.pk).filter(slug=candidate).exists():
+                candidate = f"{base_slug}-{get_random_string(6)}"
+            self.slug = candidate
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
@@ -94,7 +111,7 @@ class ListingDocument(TimeStampedModel):
 
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='documents')
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
-    file = models.FileField(upload_to='listings/documents/')
+    file = models.FileField(upload_to='listings/documents/', null=True, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING ,null=True, blank=True)
     admin_note = models.TextField(null=True, blank=True)
     #added owner note to justify and stuff

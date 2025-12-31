@@ -101,8 +101,7 @@ class MyListingsView(generics.ListAPIView):
         return queryset
 
 class ListingPauseView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=inline_serializer(
@@ -132,8 +131,7 @@ class ListingPauseView(views.APIView):
         
         ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
 class ListingActivateView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=None,
@@ -197,16 +195,7 @@ class SimilarListingsView(generics.ListAPIView):
 class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-
-#10.2
-class AdminListingViewDetailed(generics.RetrieveAPIView):
-    queryset = Listing.objects.all()
-    serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-    lookup_field = "id"
+    permission_classes = [permissions.IsAdminUser]
 
 
 class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
@@ -219,11 +208,10 @@ class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
         listing = self.get_object()
         listing.delete()
         return Response({"status": "DELETED"}, status=status.HTTP_200_OK)
-        
+
 
 class AdminListingApproveView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=None,
@@ -264,8 +252,7 @@ class AdminListingApproveView(views.APIView):
 
 
 class AdminListingRejectView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=inline_serializer(
@@ -297,62 +284,35 @@ class ListingViewDocuments(generics.ListAPIView):
         return ListingDocument.objects.filter(listing_id=listing_id)
 
 
-
-class RejectDocumentView(views.APIView):
+class ListingDocumentRejectView(views.APIView):
     permission_classes = [permissions.IsAdminUser]
 
-    def post(self, request, listing_id, document_id):
-        document = get_object_or_404(
-            ListingDocument,
-            id=document_id,
-            listing_id=listing_id
-        )
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingDocumentRejectRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="ListingDocumentRejectResponse",
+            fields={
+                "status": serializers.CharField(),
+                "document_id": serializers.IntegerField(),
+                "admin_note": serializers.CharField(allow_blank=True, required=False),
+            },
+        ),
+    )
+    def post(self, request, id, docId):
+        try:
+            document = ListingDocument.objects.get(id=docId, listing_id=id)
+        except ListingDocument.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         document.status = ListingDocument.Status.REJECTED
-
-        admin_note = request.data.get("reason", "Document rejected.")
-        document.admin_note = admin_note
-
+        document.admin_note = request.data.get('reason')
         document.save()
 
-        return Response(
-            {
-                "reason": admin_note,
-                "admin_note": admin_note,
-                "status": "REJECTED",
-                "message": "Document rejected",
-                "doc_id": document_id,
-            },
-            status=status.HTTP_200_OK
-        )
-
-
-class ListingDocumentApproveView(views.APIView):
-    permission_classes = [permissions.IsAdminUser]
-
-    def post(self, request, listing_id, document_id):
-        document = get_object_or_404(
-            ListingDocument,
-            id=document_id,
-            listing_id=listing_id
-        )
-
-        document.status = ListingDocument.Status.APPROVED
-        admin_note = request.data.get("reason", "doc approved")
-
-        if admin_note:
-            document.admin_note = admin_note
-
-        document.save()
-
-        return Response(
-            {
-                "message": "Document approved successfully.",
-                "doc_id": ListingDocumentSerializer(document).data["id"],
-                "status": "APPROVED",
-                "admin_note": admin_note,
-            },
-            
-            status=status.HTTP_200_OK
-        )
-
+        return Response({
+            "status": "REJECTED",
+            "document_id": document.id,
+            "admin_note": document.admin_note,
+        })
