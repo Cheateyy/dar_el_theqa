@@ -1,4 +1,3 @@
-// src/pages/PartnerAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,22 +8,27 @@ import backButton from "../assets/icons/back.svg";
 import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
 import deleteIcon from "../assets/icons/Delete.svg";
+
 import Section from "../components/common/Section.jsx";
 import companyIcon from "../assets/icons/companyIcon.svg";
 import addressIcon from "../assets/icons/AddressIcon.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
 import actionsIcon from "../assets/icons/Actions.svg";
+
 import { API_BASE_URL } from "/src/config/env.js";
 
 function PartnerAccounts() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading } = useAuth();
 
-  const [partners, setPartners] = useState([]);
   const PAGE_SIZE = 10;
+
+  const [partners, setPartners] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  /* ===================== AUTH GUARD ===================== */
   useEffect(() => {
     if (loading) return;
 
@@ -38,6 +42,7 @@ function PartnerAccounts() {
     }
   }, [loading, isAuthenticated, user, navigate]);
 
+  /* ===================== FETCH PARTNERS ===================== */
   useEffect(() => {
     if (!isAuthenticated || !user || user.role !== "ADMIN") return;
 
@@ -48,15 +53,35 @@ function PartnerAccounts() {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Unauthorized");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         setPartners(Array.isArray(data) ? data : []);
       })
       .catch(() => setPartners([]));
   }, [isAuthenticated, user]);
+
+  /* ===================== FETCH USERS ===================== */
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.role !== "ADMIN") return;
+
+    const token = localStorage.getItem("auth_token");
+
+    fetch(`${API_BASE_URL}/api/admin/users/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data.results || [];
+        setUsers(list);
+      })
+      .catch(() => setUsers([]));
+  }, [isAuthenticated, user]);
+
+  /* ===================== HELPERS ===================== */
+  const getPartnerUser = (partner) =>
+    users.find((u) => u.email === partner.email);
 
   const totalPages = Math.max(1, Math.ceil(partners.length / PAGE_SIZE));
 
@@ -65,11 +90,18 @@ function PartnerAccounts() {
     return partners.slice(start, start + PAGE_SIZE);
   }, [partners, currentPage]);
 
+  /* ===================== ACTIONS ===================== */
   const handleAddPartner = () => {
     navigate("/forms-tables/add-partner");
   };
 
+  const handleAddProperty = (partnerId) => {
+    navigate(`/forms-tables/add-listing?partner_id=${partnerId}`);
+  };
+
   const handleDelete = async (id) => {
+    if (!window.confirm("Delete this partner permanently?")) return;
+
     const token = localStorage.getItem("auth_token");
 
     await fetch(`${API_BASE_URL}/api/admin/partners/${id}/`, {
@@ -82,32 +114,45 @@ function PartnerAccounts() {
     setPartners((prev) => prev.filter((p) => p.id !== id));
   };
 
+  /* ===================== STATUS TOGGLE (REAL FIX) ===================== */
   const toggleStatus = async (partner) => {
+    const partnerUser = getPartnerUser(partner);
+
+    if (!partnerUser) {
+      alert("No user account linked to this partner.");
+      return;
+    }
+
     const token = localStorage.getItem("auth_token");
-    const newStatus = partner.status === "active" ? "suspended" : "active";
+    const newIsActive = !partnerUser.is_active;
 
-    const res = await fetch(`${API_BASE_URL}/api/admin/partners/${partner.id}/`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/api/admin/users/${partnerUser.id}/`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_active: newIsActive }),
+      }
+    );
 
-    if (!res.ok) return;
+    if (!res.ok) {
+      console.error("Failed to update partner user status");
+      return;
+    }
 
-    setPartners((prev) =>
-      prev.map((p) =>
-        p.id === partner.id ? { ...p, status: newStatus } : p
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === partnerUser.id
+          ? { ...u, is_active: newIsActive }
+          : u
       )
     );
   };
 
-  const handleAddProperty = (id) => {
-    navigate(`/forms-tables/add-listing?partner_id=${id}`);
-  };
-
+  /* ===================== PAGINATION ===================== */
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -122,27 +167,19 @@ function PartnerAccounts() {
       return pages;
     }
 
-    const first = 1;
-    const last = totalPages;
-    let start = currentPage - 1;
-    let end = currentPage + 1;
+    pages.push(1);
+    if (currentPage > 3) pages.push("...");
 
-    if (start < 2) {
-      start = 2;
-      end = start + (maxVisible - 2);
-    }
-    if (end > last - 1) {
-      end = last - 1;
-      start = end - (maxVisible - 2);
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      pages.push(i);
     }
 
-    pages.push(first);
-    if (start > 2) pages.push("left");
-
-    for (let i = start; i <= end && i < last; i++) pages.push(i);
-
-    if (end < last - 1) pages.push("right");
-    pages.push(last);
+    if (currentPage < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
 
     return pages;
   };
@@ -151,6 +188,7 @@ function PartnerAccounts() {
 
   if (loading) return null;
 
+  /* ===================== RENDER ===================== */
   return (
     <div className="partner-page-wrapper">
       <div className="add-partner-container">
@@ -166,78 +204,59 @@ function PartnerAccounts() {
             <table className="partners-table">
               <thead>
                 <tr>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={companyIcon} alt="" className="th-icon" />
-                      Company Name
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={addressIcon} alt="" className="th-icon" />
-                      Address
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={phoneIcon} alt="" className="th-icon" />
-                      Phone
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={emailIcon} alt="" className="th-icon" />
-                      Email
-                    </span>
-                  </th>
-                  <th className="actions-col-header">
-                    <span className="th-with-icon">
-                      <img src={actionsIcon} alt="" className="th-icon" />
-                      Actions
-                    </span>
-                  </th>
+                  <th><img src={companyIcon} alt="" /> Company</th>
+                  <th><img src={addressIcon} alt="" /> Address</th>
+                  <th><img src={phoneIcon} alt="" /> Phone</th>
+                  <th><img src={emailIcon} alt="" /> Email</th>
+                  <th><img src={actionsIcon} alt="" /> Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-                {currentPageItems.map((partner) => (
-                  <tr key={partner.id}>
-                    <td>{partner.name}</td>
-                    <td>{partner.address}</td>
-                    <td>{partner.phone_number}</td>
-                    <td>{partner.email}</td>
+                {currentPageItems.map((partner) => {
+                  const partnerUser = getPartnerUser(partner);
 
-                    <td className="actions-col">
-                      <button
-                        className="row-action-btn row-action-add"
-                        onClick={() => handleAddProperty(partner.id)}
-                      >
-                        +
-                      </button>
+                  return (
+                    <tr key={partner.id}>
+                      <td>{partner.name}</td>
+                      <td>{partner.address || "-"}</td>
+                      <td>{partner.phone_number}</td>
+                      <td>{partner.email}</td>
 
-                      <button
-                        className="row-action-btn row-action-status"
-                        onClick={() => toggleStatus(partner)}
-                      >
-                        <img
-                          src={
-                            partner.status === "suspended"
-                              ? suspendIcon
-                              : activateIcon
-                          }
-                          alt=""
-                        />
-                      </button>
+                      <td className="actions-col">
+                        <button
+                          className="row-action-btn row-action-add"
+                          onClick={() => handleAddProperty(partner.id)}
+                        >
+                          +
+                        </button>
 
-                      <button
-                        className="row-action-btn row-action-delete"
-                        onClick={() => handleDelete(partner.id)}
-                      >
-                        <img src={deleteIcon} alt="" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <button
+                          className="row-action-btn row-action-status"
+                          onClick={() => toggleStatus(partner)}
+                          disabled={!partnerUser}
+                          title={!partnerUser ? "No linked user" : ""}
+                        >
+                          <img
+                            src={
+                              partnerUser?.is_active
+                                ? activateIcon
+                                : suspendIcon
+                            }
+                            alt=""
+                          />
+                        </button>
+
+                        <button
+                          className="row-action-btn row-action-delete"
+                          onClick={() => handleDelete(partner.id)}
+                        >
+                          <img src={deleteIcon} alt="" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {currentPageItems.length === 0 && (
                   <tr>
@@ -261,18 +280,16 @@ function PartnerAccounts() {
           <img src={backButton} alt="" />
         </button>
 
-        {pageItems.map((item, idx) =>
-          typeof item === "string" ? (
-            <button key={idx} className="page-dot" disabled>
-              ...
-            </button>
+        {pageItems.map((p, i) =>
+          p === "..." ? (
+            <button key={i} className="page-dot" disabled>…</button>
           ) : (
             <button
-              key={item}
-              className={`page-dot ${item === currentPage ? "active" : ""}`}
-              onClick={() => goToPage(item)}
+              key={p}
+              className={`page-dot ${p === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(p)}
             >
-              {item}
+              {p}
             </button>
           )
         )}
