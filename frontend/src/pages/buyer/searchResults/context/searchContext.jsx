@@ -49,7 +49,7 @@ export function SearchProvider({ children }) {
     /**@type {InputControl<SearchFilters>} */
     const [filters, set_filters] = useState({
         wilaya_id: search_params.get("wilaya_id"),
-        region_id: search_params.get("region"),
+        region_id: search_params.get("region_id"),
         property_type: search_params.get("property_type"),
         price_range: search_params.get("price_range") ?? [MIN_PRICE, MAX_PRICE],
     })

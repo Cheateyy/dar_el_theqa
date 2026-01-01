@@ -9,6 +9,6 @@ export function useWilayaOptions() {
 
 export function useRegionOptions() {
     const { regions } = useSearch()
-    const region_options = regions.map((region) => ({ label: region.name, value: region.name }))
+    const region_options = regions.map((region) => ({ label: region.name, value: region.id }))
     return region_options;
 }
