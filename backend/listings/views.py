@@ -1,19 +1,48 @@
 from rest_framework import generics, views, permissions, status, filters, serializers
 from rest_framework.response import Response
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.shortcuts import get_object_or_404
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
-
-
 from drf_spectacular.utils import extend_schema, inline_serializer
+from interactions.leads.models import Lead
+
+
+
+class ContactedListingsView(generics.ListAPIView):
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Listing.objects
+            .filter(leads__user=self.request.user)
+            .annotate(last_contacted_at=Max('leads__created_at'))
+            .order_by('-last_contacted_at')
+            .distinct()
+        )
+
+
+from .choices import PROPERTY_TYPES
+
+
+class PropertyTypeChoicesView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        return Response(PROPERTY_TYPES)
 
 class FeaturedListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Listing.objects.filter(status=Listing.Status.APPROVED)[:6] # Example limit
+
+    def get_queryset(self):
+        qs = Listing.objects.filter(
+            status=Listing.Status.APPROVED
+        ).order_by('-created_at')
+        return qs[:6]
 
 class SearchListingsView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -46,6 +75,8 @@ class SearchListingsView(views.APIView):
         # Filters
         if data.get('wilaya_id'):
             queryset = queryset.filter(wilaya_id=data['wilaya_id'])
+        if data.get('region_id'):
+            queryset = queryset.filter(region_id=data['region_id'])
         if data.get('transaction_type'):
             queryset = queryset.filter(transaction_type=data['transaction_type'])
         if data.get('property_type'):
