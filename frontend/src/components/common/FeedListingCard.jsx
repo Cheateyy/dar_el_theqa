@@ -8,6 +8,9 @@ import heartEmptySvg from '@/assets/icons/heart_empty.svg'
 import isVerifiedSvg from '@/assets/icons/is_verified.svg'
 import isPartiallyVerifiedSvg from '@/assets/icons/is_partially_verified.svg'
 import { toggle_like } from "@/pages/buyer/lib/api"
+import { useNavigate } from "react-router-dom"
+import { useSearch } from "@/pages/buyer/searchResults/context/searchContext"
+import { OFFER_TYPE } from "@/pages/buyer/enum"
 
 /** @typedef {import("@/types/ListingModel")}*/
 
@@ -17,6 +20,9 @@ import { toggle_like } from "@/pages/buyer/lib/api"
  * @returns 
  */
 export function FeedListingCard({ listing }) {
+    const navigate = useNavigate()
+    const { selected_offer_type } = useSearch()
+
     let verification_status_icon;
     switch (listing.verification_status) {
         case "VERIFIED":
@@ -37,10 +43,17 @@ export function FeedListingCard({ listing }) {
         return;
     }
 
+    function handle_click() {
+        console.log("button clicked")
+        const url = `/details/property-details-${selected_offer_type == OFFER_TYPE.BUY ? "sell" : "rent"}/${listing.id}`
+        navigate(url)
+    }
+
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
             className="relative bg-cover bg-center rounded-4xl w-full sm:w-64 md:w-74 lg:w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
+            onClick={handle_click}
         >
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4">
@@ -54,8 +67,7 @@ export function FeedListingCard({ listing }) {
 
             {/* gradient overlay for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-            <div className="mb-3 text-white px-4 py-3 sm:px-5 sm:py-4 relative z-10" role="listing info">
+            <div role="listing info" className="mb-3 text-white px-4 py-3 sm:px-5 sm:py-4 relative z-10">
                 <div className="flex items-start gap-3">
                     <div className="min-w-0">
                         <p className="text-sm sm:text-base font-medium truncate">{listing.title}</p>

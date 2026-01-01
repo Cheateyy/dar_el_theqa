@@ -13,6 +13,9 @@ import { useListingsMessaging } from "@/pages/buyer/context/ListingsMessagingCon
 import { CustomDropdownMenu } from "./DropDownMenu"
 
 import deleteSvg from "@/assets/icons/Delete.svg"
+import { useSearch } from "@/pages/buyer/searchResults/context/searchContext"
+import { useNavigate } from "react-router-dom"
+import { OFFER_TYPE } from "@/pages/buyer/enum"
 
 /** @typedef {import("@/types/ListingModel")}*/
 
@@ -24,6 +27,9 @@ import deleteSvg from "@/assets/icons/Delete.svg"
 export function SellerListingCard({ listing }) {
     const { open_update_listing_dlg } = useListingsMessaging()
     const { open_delete_listing_dlg } = useListingsMessaging()
+
+    const navigate = useNavigate()
+    const { selected_offer_type } = useSearch()
 
     let verification_status_icon;
     let verification_status_str;
@@ -49,10 +55,17 @@ export function SellerListingCard({ listing }) {
             console.error("ListingCard: unsupported verification status")
     }
 
+    function handle_click() {
+        console.log("button clicked")
+        const url = `/details/sellerListing-${selected_offer_type == OFFER_TYPE.BUY ? "sell" : "rent"}/${listing.id}`
+        navigate(url)
+    }
+
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
             className="relative bg-cover bg-center rounded-4xl w-full sm:w-64 md:w-74 lg:w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
+            onClick={handle_click}
         >
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex gap-2">
