@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { FeedListingCard } from "./FeedListingCard"
 import { CustomPagination } from "@/components/common/Pagination"
 import { SellerListingCard } from "./SellerListingCard";
+import { CARD_TYPE } from "@/pages/buyer/enum";
+import { AdminListingCard } from "./AdminListingCard";
 
 /**
  * 
@@ -36,7 +38,21 @@ function ControlledListingGrid({ listings, page_control, card_type }) {
     if (!listings) {
         return null;
     }
-    const ListingCard = card_type == "feed" ? FeedListingCard : SellerListingCard;
+    let ListingCard;
+    switch (card_type) {
+        case CARD_TYPE.FEED:
+            ListingCard = FeedListingCard
+            break
+        case CARD_TYPE.SELLER:
+            ListingCard = SellerListingCard
+            break
+        case CARD_TYPE.ADMIN:
+            ListingCard = AdminListingCard
+            break
+        default:
+            console.error(`Invalid card type: ${card_type}`)
+            break;
+    }
 
     return (
         <div className="mt-8">
@@ -68,7 +84,21 @@ function UncontrolledListingGrid({ listings, card_type }) {
     if (!listings) {
         return null;
     }
-    const ListingCard = card_type == "feed" ? FeedListingCard : SellerListingCard;
+    let ListingCard;
+    switch (card_type) {
+        case CARD_TYPE.FEED:
+            ListingCard = FeedListingCard
+            break
+        case CARD_TYPE.SELLER:
+            ListingCard = SellerListingCard
+            break
+        case CARD_TYPE.ADMIN:
+            ListingCard = AdminListingCard
+            break
+        default:
+            console.error(`Invalid card type: ${card_type}`)
+            break;
+    }
 
     return (
         <div className="mt-8">

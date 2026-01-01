@@ -159,12 +159,13 @@ export async function pause_listing(listing_id, payload) {
     if (!res.ok) {
         const error = await res.text();
         console.error(error)
+        return
     }
     const data = await res.json();
     return data
 }
 
-// ---------- DELETE Listing
+// DELETE Listing
 /**
  * @typedef DeleteListingUpload
  * @property {string} reason
@@ -178,4 +179,24 @@ export async function pause_listing(listing_id, payload) {
 export async function delete_listing(listing_id, payload) {
     const res = await authApi.delete(`/api/listings/${listing_id}/`, payload)
     return res.status == 204; // No content
+}
+
+// ----------  ADMIN
+
+// Get all listings
+
+/**
+ * @typedef {Listing[]} GetAllListingsResponse 
+ */
+
+export async function get_all_listings() {
+    const res = await authApi.get("/api/admin/listings/")
+    if (!res.ok) {
+        const error = await res.text();
+        console.error(error)
+        return []
+    }
+    /**@type {GetAllListingsResponse} */
+    const data = await res.json();
+    return data;
 }

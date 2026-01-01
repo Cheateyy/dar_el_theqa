@@ -36,6 +36,7 @@ import LeadMessages from "../pages/LeadMessages.jsx";
 import Navbar from "../components/Navbar.jsx";
 import NavbarAdmin from "../components/NavbarAdmin.jsx";
 import MyListings from '@/pages/my_listings/page';
+import AllListings from '@/pages/all_listings/AllListings';
 
 function AppRouter() {
   return (
@@ -46,6 +47,10 @@ function AppRouter() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+      <Route path="/admin">
+        <Route path='all-listings' element={<AllListings />} />
+      </Route>
+
 
       {/* Property Details Routes */}
       <Route path="/details" element={<Outlet />}>

@@ -2,7 +2,8 @@ import { Combobox } from "@/components/common/Combobox";
 import addSvg from "@/assets/icons/add.svg"
 import { ListingGrid } from "@/components/common/ListingGrid";
 import { useListings } from "../buyer/context/ListingsContext";
-
+import { OFFER_TYPE } from "../buyer/enum";
+OFFER_TYPE
 export default function MyListings() {
     const { listings } = useListings()
 

@@ -1,8 +1,8 @@
 import logoSvg from "@/assets/images/logo.svg";
-import { LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "./Actions";
+import { LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "../../pages/buyer/components/Actions";
 import { useAuth } from "@/contexts/AuthContext";
 
-export function BuyerHeader() {
+export function Header() {
     const { isAuthenticated, user, } = useAuth()
 
     return <header>

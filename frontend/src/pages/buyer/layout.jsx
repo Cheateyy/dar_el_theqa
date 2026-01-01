@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { BuyerHeader } from "./components/Header";
+import { Header } from "../../components/common/Header";
 import { ListingProvider } from "./context/ListingsContext";
 import { AuthMessagingProvider } from "./context/AuthMessagingContext";
 import { ListingsMessagingProvider } from "./context/ListingsMessagingContext";
@@ -10,7 +10,7 @@ export function BuyerLayout() {
         <ListingProvider>
             <AuthMessagingProvider>
                 <ListingsMessagingProvider>
-                    <BuyerHeader />
+                    <Header />
                     <SearchProvider>
                         <Outlet />
                     </SearchProvider>
