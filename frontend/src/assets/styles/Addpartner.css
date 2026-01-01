@@ -1,43 +1,40 @@
-
-
-.add-document-btn {
-  height: 38px;
-  width: 38px;
+.add-logo-btn {
+  width: 36px;
+  height: 36px;
   border: 1.5px solid #0E4466;
   background: #0E4466;
-  border-radius: 100px;
+  border-radius: 50%;
   color: #ffffff; 
   font-size: 1.3rem;
   cursor: pointer;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: border-color 0.2s, background-color 0.2s, opacity 0.2s;
 }
 
 /* Hover effect (only when enabled) */
-.add-document-btn:hover:not(:disabled) {
+.add-logo-btn:hover:not(:disabled) {
   background-color: #083a58;
 }
 
 /* Disabled state (no hover) */
-.add-document-btn:disabled {
-  background: #dedfe4; 
+.add-logo-btn:disabled {
+  background: #cdcfd6; 
   border-color: #99a2b3;
   border-style: dashed;
-  color: #000000;
+  color: #222222;
   cursor: not-allowed;
   opacity: 1; 
 }
 
 /* Additional visual hint when a doc/logo has been added */
-.add-document-btn.added {
+.add-logo-btn.added {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
 /* Card containing uploaded logo/file */
-.document-card {
+.logo-card {
   width: 100%;
   background: #ffffff;
   border-radius: 16px;
@@ -46,14 +43,14 @@
 }
 
 /* Row: icon + filename on the left, remove button on the right */
-.document-file-row {
+.logo-file-row {
   display: flex;
   justify-content: space-between;
   align-items: center; /* vertically center icon and text */
 }
 
 /* Icon + filename */
-.document-filename {
+.logo-filename {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -69,7 +66,7 @@
 }
 
 /* Remove button (icon only) */
-.remove-document-btn {
+.remove-logo-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -130,10 +127,10 @@
   .logo-header .section-title {
     font-size: 20px;
   }
-  .document-card {
+  .logo-card {
     padding: 14px;
   }
-  .add-document-btn {
+  .add-logo-btn {
     height: 36px;
     width: 36px;
     font-size: 18px;
@@ -144,18 +141,18 @@
   .logo-header .section-title {
     font-size: 18px;
   }
-  .document-card {
+  .logo-card {
     padding: 12px;
     border-radius: 14px;
   }
-  .document-filename {
+  .logo-filename {
     font-size: 14px;
   }
   .small-pdf-icon {
     width: 36px;
     height: 36px;
   }
-  .add-document-btn {
+  .add-logo-btn {
     height: 32px;
     width: 32px;
     font-size: 16px;
@@ -172,11 +169,11 @@
   .logo-header .section-title {
     font-size: 14px;
   }
-  .document-card {
+  .logo-card {
     padding: 10px;
     border-radius: 12px;
   }
-  .document-filename {
+  .logo-filename {
     font-size: 12px;
   }
   .small-pdf-icon {
@@ -187,7 +184,7 @@
     width: 24px;
     height: 24px;
   }
-  .add-document-btn {
+  .add-logo-btn {
     height: 28px;
     width: 28px;
     font-size: 14px;
@@ -198,10 +195,10 @@
   .logo-header .section-title {
     font-size: 13px;
   }
-  .document-card {
+  .logo-card {
     padding: 8px;
   }
-  .document-filename {
+  .logo-filename {
     font-size: 11px;
   }
   .small-pdf-icon {

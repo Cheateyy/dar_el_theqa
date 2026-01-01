@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "./LoginModal.jsx";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 import img1 from "../../assets/images/dummyPropertyImages/image1.jpg";
 import img2 from "../../assets/images/dummyPropertyImages/image2.jpg";
@@ -64,6 +65,7 @@ export default function ListingDetails_sell() {
   const [isActivating, setIsActivating] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleLoginClick = () => setShowLogin(true);
   const handleCloseModal = () => setShowLogin(false);
@@ -247,18 +249,26 @@ export default function ListingDetails_sell() {
     }
   };
 
-  const handleDeleteListing = async () => {
+  const handleOpenDeleteModal = () => {
     if (!listingId) return;
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
-    if (!confirmDelete) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteListing = async (reason) => {
+    if (!listingId) return;
 
     try {
       setIsDeleting(true);
-      await deleteSellerListing(listingId, "SOLD");
+      await deleteSellerListing(listingId, reason || "SOLD");
       updateListingStatus("DELETED");
       window.alert("Listing deleted.");
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Failed to delete listing", err);
       window.alert("Impossible de supprimer l'annonce.");
@@ -281,6 +291,10 @@ export default function ListingDetails_sell() {
     ? handleActivateListing
     : handlePauseListing;
   const statusActionLoading = shouldActivateStatus ? isActivating : isPausing;
+
+  if (!loading && !listing) {
+    return <Navigate to="/404" replace />;
+  }
 
   return (
     <>
@@ -311,12 +325,24 @@ export default function ListingDetails_sell() {
               onToggleStatus={statusActionHandler}
               statusActionLabel={statusActionLabel}
               isStatusLoading={statusActionLoading}
-              onDeleteListing={handleDeleteListing}
+                onDeleteListing={handleOpenDeleteModal}
               isDeletingListing={isDeleting}
             />
           </>
         )}
       </div>
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDeleteListing}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let us know why you're removing this listing so we can keep your account history accurate."
+        placeholder="Example: Property sold, duplicate entry, incorrect details, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
 
       <LoginModal show={showLogin} onClose={handleCloseModal} />
     </>

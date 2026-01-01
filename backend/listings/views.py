@@ -132,8 +132,7 @@ class MyListingsView(generics.ListAPIView):
         return queryset
 
 class ListingPauseView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=inline_serializer(
@@ -163,8 +162,7 @@ class ListingPauseView(views.APIView):
         
         ### IM TRYING TO PUSH AND GIT IS TELLING ME EVERYTHING IS UP TO DATE!!! BUT IN GITHUB THERE IS NO CHANGE!!! TRYING TO ADD THIS COMMENT MAYBE IT SENCES A CHANGE AND ACTUALLY PUSHED THIS!!!!
 class ListingActivateView(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
         request=None,
@@ -228,16 +226,7 @@ class SimilarListingsView(generics.ListAPIView):
 class AdminListingListView(generics.ListAPIView):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-
-#10.2
-class AdminListingViewDetailed(generics.RetrieveAPIView):
-    queryset = Listing.objects.all()
-    serializer_class = ListingSerializer
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-    lookup_field = "id"
+    permission_classes = [permissions.IsAdminUser]
 
 
 class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
@@ -253,8 +242,7 @@ class AdminListingViewDetailed(generics.RetrieveDestroyAPIView):
 
 
 class AdminListingApproveView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=None,
@@ -265,16 +253,37 @@ class AdminListingApproveView(views.APIView):
     )
     def post(self, request, id):
         try:
-            listing = Listing.objects.get(id=id)
+            listing = Listing.objects.prefetch_related('documents').get(id=id)
             listing.status = Listing.Status.APPROVED
             listing.save()
-            return Response({"status": "APPROVED"})
         except Listing.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        documents = listing.documents.all()
+
+        # If there are no documents, you may want to decide how to handle this
+        if not documents.exists():
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+            listing.save()
+            return Response({"status": listing.verification_status})
+
+        approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+        total_docs = documents.count()
+
+        if approved_docs == total_docs:
+            listing.verification_status = Listing.VerificationStatus.VERIFIED
+        else:
+            listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+        listing.save()
+
+        return Response({"status": listing.verification_status})
+    
+
+
 class AdminListingRejectView(views.APIView):
-    #permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     @extend_schema(
         request=inline_serializer(
@@ -306,59 +315,35 @@ class ListingViewDocuments(generics.ListAPIView):
         return ListingDocument.objects.filter(listing_id=listing_id)
 
 
-
-class RejectDocumentView(views.APIView):
+class ListingDocumentRejectView(views.APIView):
     permission_classes = [permissions.IsAdminUser]
 
-    def post(self, request, listing_id, document_id):
-        document = get_object_or_404(
-            ListingDocument,
-            id=document_id,
-            listing_id=listing_id
-        )
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingDocumentRejectRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="ListingDocumentRejectResponse",
+            fields={
+                "status": serializers.CharField(),
+                "document_id": serializers.IntegerField(),
+                "admin_note": serializers.CharField(allow_blank=True, required=False),
+            },
+        ),
+    )
+    def post(self, request, id, docId):
+        try:
+            document = ListingDocument.objects.get(id=docId, listing_id=id)
+        except ListingDocument.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        document.status = ListingDocument.STATUS_REJECTED
-
-        admin_message = request.data.get("reason", "Document rejected.")
-        document.admin_message = admin_message
-
+        document.status = ListingDocument.Status.REJECTED
+        document.admin_note = request.data.get('reason')
         document.save()
 
-        return Response(
-            {
-                "reason": admin_message,
-                "status": "REJECTED",
-                "message": "Document rejected",
-                "doc_id": document_id,
-            },
-            status=status.HTTP_200_OK
-        )
-
-
-class ListingDocumentApproveView(views.APIView):
-    permission_classes = [permissions.IsAdminUser]
-
-    def post(self, request, listing_id, document_id):
-        document = get_object_or_404(
-            ListingDocument,
-            id=document_id,
-            listing_id=listing_id
-        )
-
-        document.status = ListingDocument.STATUS_APPROVED
-        admin_message = request.data.get("reason", "doc approved")
-
-        if admin_message:
-            document.admin_message = admin_message
-
-        document.save()
-
-        return Response(
-            {
-                "message": "Document approved successfully.",
-                "doc_id": ListingDocumentSerializer(document).data["id"],
-                "status": "APPROVED"
-            },
-            status=status.HTTP_200_OK
-        )
-
+        return Response({
+            "status": "REJECTED",
+            "document_id": document.id,
+            "admin_note": document.admin_note,
+        })

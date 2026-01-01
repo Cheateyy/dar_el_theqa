@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import NavBar from "../../components/common/NavBarv1/NavBar.jsx";
 import LeftSection from "./LeftSection.jsx";
 import RightSection from "./RightSection.jsx";
 import LoginModal from "../../components/common/LoginPopUp/LoginModal.jsx";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 import document_icon from "../../assets/images/legal_doc.png";
 import { getVerificationIcon } from "../../utils/verificationIcon.js";
 
@@ -33,6 +34,8 @@ export default function AdminReviewSell() {
   const [isDeleted, setIsDeleted] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("Listing processed successfully.");
   const [reviews, setReviews] = useState([]);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleLoginClick = () => setShowLogin(true);
   const handleCloseModal = () => setShowLogin(false);
@@ -128,14 +131,23 @@ export default function AdminReviewSell() {
     }
   };
 
-  const handleRejectListing = async () => {
-    const reason = window.prompt("Enter rejection reason (optional):", "");
-    if (reason === null) return;
+  const handleOpenRejectModal = () => {
+    setIsRejectModalOpen(true);
+  };
+
+  const handleCloseRejectModal = () => {
+    if (!isRejecting) {
+      setIsRejectModalOpen(false);
+    }
+  };
+
+  const handleRejectListing = async (reason) => {
     try {
       setIsRejecting(true);
       await rejectAdminListing(listingId, reason || "");
       setFeedbackMessage("Listing rejected successfully.");
       setIsDeleted(true);
+      setIsRejectModalOpen(false);
     } catch (err) {
       console.error("Error rejecting listing:", err);
     } finally {
@@ -143,13 +155,23 @@ export default function AdminReviewSell() {
     }
   };
 
-  const handleDeleteListing = async () => {
-    if (!window.confirm("Delete this listing?")) return;
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteListing = async (reason) => {
     try {
       setIsDeleting(true);
-      await deleteAdminListing(listingId);
+      await deleteAdminListing(listingId, reason || "");
       setFeedbackMessage("Listing deleted successfully.");
       setIsDeleted(true);
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Error deleting listing:", err);
     } finally {
@@ -169,7 +191,7 @@ export default function AdminReviewSell() {
       </>
     );
   }
-  if (!listing || Object.keys(listing).length === 0) return <div>Listing not found</div>;
+  if (!listing || Object.keys(listing).length === 0) return <Navigate to="/404" replace />;
 
   const normalizedStatus = listing.listing_status || listing.status || "PENDING";
   const verificationStatus = listing.verification_status || normalizedStatus;
@@ -206,13 +228,36 @@ export default function AdminReviewSell() {
           bedrooms={listing.bedrooms || 0}
           bathrooms={listing.bathrooms || 0}
           onApprove={handleApproveListing}
-          onReject={handleRejectListing}
-          onDelete={handleDeleteListing}
+          onReject={handleOpenRejectModal}
+          onDelete={handleOpenDeleteModal}
           isApproving={isApproving}
           isRejecting={isRejecting}
           isDeleting={isDeleting}
         />
       </div>
+
+      <ReasonModal
+        open={isRejectModalOpen}
+        onClose={handleCloseRejectModal}
+        onSubmit={handleRejectListing}
+        isSubmitting={isRejecting}
+        title="Reject Listing"
+        description="Share a quick note so the owner understands what needs to be improved. This message will be attached to the rejection email."
+        placeholder="Example: Missing ownership document or unclear pricing details."
+        confirmLabel="Confirm rejection"
+      />
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDeleteListing}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let the owner know why this listing is being removed."
+        placeholder="Example: Duplicate entry, sold offline, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
 
       <LoginModal show={showLogin} onClose={handleCloseModal} />
     </>

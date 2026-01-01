@@ -1,6 +1,6 @@
-// src/pages/PartnerAccounts.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../assets/styles/PartnerAccounts.css";
 
 import nextPage from "../assets/icons/nextPage.svg";
@@ -8,6 +8,7 @@ import backButton from "../assets/icons/back.svg";
 import activateIcon from "../assets/icons/active.svg";
 import suspendIcon from "../assets/icons/suspended.svg";
 import deleteIcon from "../assets/icons/Delete.svg";
+
 import Section from "../components/common/Section.jsx";
 import companyIcon from "../assets/icons/companyIcon.svg";
 import addressIcon from "../assets/icons/AddressIcon.svg";
@@ -15,36 +16,73 @@ import phoneIcon from "../assets/icons/Call.svg";
 import emailIcon from "../assets/icons/email.svg";
 import actionsIcon from "../assets/icons/Actions.svg";
 
-const USE_MOCK_PARTNERS = true;
+import { API_BASE_URL } from "/src/config/env.js";
 
 function PartnerAccounts() {
   const navigate = useNavigate();
-
-  // ---------------------------
-  // LOAD PARTNERS
-  // ---------------------------
-  const [partners, setPartners] = useState(() => {
-    if (!USE_MOCK_PARTNERS) return [];
-
-    try {
-      const stored = JSON.parse(localStorage.getItem("partners") || "[]");
-
-      return stored.map((p) => ({
-        id: p.id,
-        name: p.companyName,
-        email: p.email,
-        phone_number: p.phoneNumber,
-        address: p.address,
-        logo: null,
-        status: p.status || "active",
-      }));
-    } catch {
-      return [];
-    }
-  });
+  const { user, isAuthenticated, loading } = useAuth();
 
   const PAGE_SIZE = 10;
+
+  const [partners, setPartners] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  /* ===================== AUTH GUARD ===================== */
+  useEffect(() => {
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (!user || user.role !== "ADMIN") {
+      navigate("/not-authorized");
+    }
+  }, [loading, isAuthenticated, user, navigate]);
+
+  /* ===================== FETCH PARTNERS ===================== */
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.role !== "ADMIN") return;
+
+    const token = localStorage.getItem("auth_token");
+
+    fetch(`${API_BASE_URL}/api/admin/partners/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setPartners(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setPartners([]));
+  }, [isAuthenticated, user]);
+
+  /* ===================== FETCH USERS ===================== */
+  useEffect(() => {
+    if (!isAuthenticated || !user || user.role !== "ADMIN") return;
+
+    const token = localStorage.getItem("auth_token");
+
+    fetch(`${API_BASE_URL}/api/admin/users/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data.results || [];
+        setUsers(list);
+      })
+      .catch(() => setUsers([]));
+  }, [isAuthenticated, user]);
+
+  /* ===================== HELPERS ===================== */
+  const getPartnerUser = (partner) =>
+    users.find((u) => u.email === partner.email);
+
   const totalPages = Math.max(1, Math.ceil(partners.length / PAGE_SIZE));
 
   const currentPageItems = useMemo(() => {
@@ -52,53 +90,69 @@ function PartnerAccounts() {
     return partners.slice(start, start + PAGE_SIZE);
   }, [partners, currentPage]);
 
-  // Sync storage in mock mode
-  useEffect(() => {
-    if (!USE_MOCK_PARTNERS) return;
-
-    const normalized = partners.map((p) => ({
-      id: p.id,
-      companyName: p.name,
-      email: p.email,
-      phoneNumber: p.phone_number,
-      address: p.address,
-      status: p.status,
-    }));
-
-    localStorage.setItem("partners", JSON.stringify(normalized));
-  }, [partners]);
-
-  // ---------------------------
-  // ACTIONS
-  // ---------------------------
+  /* ===================== ACTIONS ===================== */
   const handleAddPartner = () => {
     navigate("/forms-tables/add-partner");
   };
 
-  const toggleStatus = (id) => {
-    setPartners((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, status: p.status === "active" ? "suspended" : "active" } : p
+  const handleAddProperty = (partnerId) => {
+    navigate(`/forms-tables/add-listing?partner_id=${partnerId}`);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this partner permanently?")) return;
+
+    const token = localStorage.getItem("auth_token");
+
+    await fetch(`${API_BASE_URL}/api/admin/partners/${id}/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setPartners((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  /* ===================== STATUS TOGGLE (REAL FIX) ===================== */
+  const toggleStatus = async (partner) => {
+    const partnerUser = getPartnerUser(partner);
+
+    if (!partnerUser) {
+      alert("No user account linked to this partner.");
+      return;
+    }
+
+    const token = localStorage.getItem("auth_token");
+    const newIsActive = !partnerUser.is_active;
+
+    const res = await fetch(
+      `${API_BASE_URL}/api/admin/users/${partnerUser.id}/`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_active: newIsActive }),
+      }
+    );
+
+    if (!res.ok) {
+      console.error("Failed to update partner user status");
+      return;
+    }
+
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === partnerUser.id
+          ? { ...u, is_active: newIsActive }
+          : u
       )
     );
   };
 
-  const handleDelete = async (id) => {
-    setPartners((prev) => prev.filter((p) => p.id !== id));
-
-    if (!USE_MOCK_PARTNERS) {
-      await fetch(`/api/admin/partners/${id}/`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-    }
-  };
-
-  const handleAddProperty = (id) => {
-    navigate(`/forms-tables/add-listing?partnerId=${id}`);
-  };
-
-  // Pagination
+  /* ===================== PAGINATION ===================== */
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -113,44 +167,34 @@ function PartnerAccounts() {
       return pages;
     }
 
-    const first = 1;
-    const last = totalPages;
-    let start = currentPage - 1;
-    let end = currentPage + 1;
+    pages.push(1);
+    if (currentPage > 3) pages.push("...");
 
-    if (start < 2) {
-      start = 2;
-      end = start + (maxVisible - 2);
-    }
-    if (end > last - 1) {
-      end = last - 1;
-      start = end - (maxVisible - 2);
-    }
-
-    pages.push(first);
-    if (start > 2) pages.push("left-ellipsis");
-
-    for (let i = start; i <= end && i < last; i++) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
       pages.push(i);
     }
 
-    if (end < last - 1) pages.push("right-ellipsis");
-    pages.push(last);
+    if (currentPage < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
 
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
-  // ---------------------------
-  // RENDER
-  // ---------------------------
+  if (loading) return null;
+
+  /* ===================== RENDER ===================== */
   return (
     <div className="partner-page-wrapper">
       <div className="add-partner-container">
         <div className="partners-header">
           <h1 className="page-title">Partners</h1>
-          <button type="button" className="add-partner-main-btn" onClick={handleAddPartner}>
+          <button className="add-partner-main-btn" onClick={handleAddPartner}>
             +
           </button>
         </div>
@@ -160,77 +204,59 @@ function PartnerAccounts() {
             <table className="partners-table">
               <thead>
                 <tr>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={companyIcon} alt="" className="th-icon" />
-                      Company Name
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={addressIcon} alt="" className="th-icon" />
-                      Address
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={phoneIcon} alt="" className="th-icon" />
-                      Phone
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-with-icon">
-                      <img src={emailIcon} alt="" className="th-icon" />
-                      Email
-                    </span>
-                  </th>
-                  <th className="actions-col-header">
-                    <span className="th-with-icon">
-                      <img src={actionsIcon} alt="" className="th-icon" />
-                      Actions
-                    </span>
-                  </th>
+                  <th><img src={companyIcon} alt="" /> Company</th>
+                  <th><img src={addressIcon} alt="" /> Address</th>
+                  <th><img src={phoneIcon} alt="" /> Phone</th>
+                  <th><img src={emailIcon} alt="" /> Email</th>
+                  <th><img src={actionsIcon} alt="" /> Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-                {currentPageItems.map((partner) => (
-                  <tr key={partner.id}>
-                    <td>{partner.name}</td>
-                    <td>{partner.address}</td>
-                    <td>{partner.phone_number}</td>
-                    <td>{partner.email}</td>
+                {currentPageItems.map((partner) => {
+                  const partnerUser = getPartnerUser(partner);
 
-                    <td className="actions-col">
-                      <button
-                        type="button"
-                        className="row-action-btn row-action-add"
-                        onClick={() => handleAddProperty(partner.id)}
-                      >
-                        +
-                      </button>
+                  return (
+                    <tr key={partner.id}>
+                      <td>{partner.name}</td>
+                      <td>{partner.address || "-"}</td>
+                      <td>{partner.phone_number}</td>
+                      <td>{partner.email}</td>
 
-                      <button
-                        type="button"
-                        className="row-action-btn row-action-status"
-                        onClick={() => toggleStatus(partner.id)}
-                      >
-                        <img
-                          src={partner.status === "suspended" ? suspendIcon : activateIcon}
-                          alt={partner.status === "suspended" ? "Activate" : "Suspend"}
-                        />
-                      </button>
+                      <td className="actions-col">
+                        <button
+                          className="row-action-btn row-action-add"
+                          onClick={() => handleAddProperty(partner.id)}
+                        >
+                          +
+                        </button>
 
-                      <button
-                        type="button"
-                        className="row-action-btn row-action-delete"
-                        onClick={() => handleDelete(partner.id)}
-                      >
-                        <img src={deleteIcon} alt="Delete" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <button
+                          className="row-action-btn row-action-status"
+                          onClick={() => toggleStatus(partner)}
+                          disabled={!partnerUser}
+                          title={!partnerUser ? "No linked user" : ""}
+                        >
+                          <img
+                            src={
+                              partnerUser?.is_active
+                                ? activateIcon
+                                : suspendIcon
+                            }
+                            alt=""
+                          />
+                        </button>
+
+                        <button
+                          className="row-action-btn row-action-delete"
+                          onClick={() => handleDelete(partner.id)}
+                        >
+                          <img src={deleteIcon} alt="" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {currentPageItems.length === 0 && (
                   <tr>
@@ -245,28 +271,25 @@ function PartnerAccounts() {
         </Section>
       </div>
 
-      {/* Pagination */}
       <div className="partners-pagination">
         <button
           className="paging-button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <img src={backButton} alt="back" />
+          <img src={backButton} alt="" />
         </button>
 
-        {pageItems.map((item, idx) =>
-          typeof item === "string" ? (
-            <button key={idx} className="page-dot" disabled>
-              ...
-            </button>
+        {pageItems.map((p, i) =>
+          p === "..." ? (
+            <button key={i} className="page-dot" disabled>…</button>
           ) : (
             <button
-              key={item}
-              className={`page-dot ${item === currentPage ? "active" : ""}`}
-              onClick={() => goToPage(item)}
+              key={p}
+              className={`page-dot ${p === currentPage ? "active" : ""}`}
+              onClick={() => goToPage(p)}
             >
-              {item}
+              {p}
             </button>
           )
         )}
@@ -276,7 +299,7 @@ function PartnerAccounts() {
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <img src={nextPage} alt="next" />
+          <img src={nextPage} alt="" />
         </button>
       </div>
     </div>

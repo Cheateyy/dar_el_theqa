@@ -2,9 +2,10 @@ import "./Listing.css";
 import NavBar from '../../components/common/NavBarv1/NavBar.jsx';
 import LeftSection from './LeftSectionListing.jsx';
 import RightSection from './RightSectionListing.jsx';
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import legalDocIcon from '../../assets/images/legal_doc.png';
 
 import {
@@ -70,6 +71,8 @@ export default function Listing() {
   const [activating, setActivating] = useState(false);
   const [error, setError] = useState(null);
   const [statusCode, setStatusCode] = useState("INACTIVE");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const deriveStatusCode = (payload) => {
     const rawStatus =
@@ -248,22 +251,34 @@ export default function Listing() {
     }
   };
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
-    if (!confirmDelete) return;
+  const handleOpenDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleDelete = async (reason) => {
     try {
-      await deleteSellerListing(listingId, "SOLD");
+      setIsDeleting(true);
+      await deleteSellerListing(listingId, reason || "SOLD");
       alert("Listing deleted.");
       setStatusCode("DELETED");
-      // optional: navigate away
+      setIsDeleteModalOpen(false);
     } catch (err) {
       console.error("Failed to delete listing", err);
       alert("Failed to delete listing.");
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  if (!loading && error) {
+    return <Navigate to="/404" replace />;
+  }
 
   return (
     <>
@@ -272,9 +287,6 @@ export default function Listing() {
       </nav>
 
       {loading && <p className="listingdetails-loading">Loading...</p>}
-      {error && !loading && (
-        <p className="listingdetails-error">{error}</p>
-      )}
 
       {!loading && !error && (
         <div className="seller-update-Listing">
@@ -292,14 +304,27 @@ export default function Listing() {
             onSave={handleSave}
             onPause={handlePause}
             onActivate={handleActivate}
-            onDelete={handleDelete}
+            onDelete={handleOpenDeleteModal}
             saving={saving}
             statusCode={statusCode}
             isPausing={pausing}
             isActivating={activating}
+            isDeleting={isDeleting}
           />
         </div>
       )}
+
+      <ReasonModal
+        open={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onSubmit={handleDelete}
+        isSubmitting={isDeleting}
+        title="Delete Listing"
+        description="Let us know why you are removing this listing so we can keep your account history accurate."
+        placeholder="Example: Property sold, duplicate entry, incorrect information, etc."
+        confirmLabel="Delete listing"
+        requireReason
+      />
     </>
   );
 }

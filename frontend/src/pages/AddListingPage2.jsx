@@ -1,6 +1,7 @@
 // src/pages/AddListingPage2.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";   
 
 import "../assets/styles/addListing2.css";
 
@@ -20,6 +21,13 @@ const MAX_IMAGES = 20;
 function AddListingPage2() {
   const navigate = useNavigate();
 
+  const { isAuthenticated, loading } = useAuth();
+    
+    useEffect(() => {
+      if (!loading && !isAuthenticated) {
+        navigate("/login");
+      }
+    }, [loading, isAuthenticated, navigate]);
   
   const [propertyType, setPropertyType] = useState("");
   const [listingPurpose, setListingPurpose] = useState("");
@@ -101,6 +109,21 @@ function AddListingPage2() {
     "Urban Land",
     "Agricultural Land",
   ].includes(propertyType);
+
+
+   useEffect(() => {
+  // Reset fields that no longer apply when property type changes
+  if (isLandType) {
+    setFloors("");
+    setBedrooms("");
+    setBathrooms("");
+  }
+
+  if (hideRooms) {
+    setBedrooms("");
+    setBathrooms("");
+  }
+}, [propertyType]);
 
   const validateField = (name, value) => {
     if (name === "propertyType") {
@@ -221,19 +244,20 @@ function AddListingPage2() {
 
   
   const mapPropertyType = (label) => {
-    const map = {
-      Apartment: "apartment",
-      "House/Villa": "villa",
-      "Urban Land": "urban_land",
-      "Agricultural Land": "agricultural_land",
-      Shop: "shop",
-      Office: "office",
-      Warehouse: "warehouse",
-      Flat: "apartment",
-      "Studio/Room": "studio",
-    };
-    return map[label] || label?.toLowerCase?.() || "";
+  const map = {
+    Apartment: "APARTMENT",
+    "House/Villa": "VILLA",
+    "Urban Land": "LAND",
+    "Agricultural Land": "LAND",
+    Shop: "SHOP",
+    Office: "OFFICE",
+    Warehouse: "WAREHOUSE",
+    Flat: "APARTMENT",
+    "Studio/Room": "STUDIO",
   };
+  return map[label] || "";
+};
+
 
   const handleSubmit = () => {
     if (!isFormValid) return;
@@ -243,6 +267,7 @@ function AddListingPage2() {
     navigate("/forms-tables/add-listing/step-2/step-3");
   };
 
+   if (loading) return null;
   return (
     <div className="page-wrapper">
       <div className="add-listing-container">
@@ -499,8 +524,6 @@ function AddListingPage2() {
               ))}
           </div>
         </Section>
-
-        
         <div className="form-footer">
           <Button
             variant="primary"
