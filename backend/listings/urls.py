@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    PropertyTypeChoicesView,
     FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
     MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
     AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
@@ -7,6 +8,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path('choices/property-types/', PropertyTypeChoicesView.as_view(), name='property-type-choices'),
     path('listings/featured/', FeaturedListingsView.as_view(), name='featured-listings'),
     path('listings/search/', SearchListingsView.as_view(), name='search-listings'),
     path('listings/create/', ListingCreateView.as_view(), name='create-listing'),

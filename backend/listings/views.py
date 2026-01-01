@@ -10,6 +10,26 @@ from django.shortcuts import get_object_or_404
 
 from drf_spectacular.utils import extend_schema, inline_serializer
 
+
+class PropertyTypeChoicesView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="PropertyTypeChoicesResponse",
+            fields={
+                "value": serializers.CharField(),
+                "label": serializers.CharField(),
+            },
+            many=True,
+        ),
+    )
+    def get(self, request):
+        return Response(
+            [{"value": value, "label": label} for value, label in Listing.PropertyType.choices]
+        )
+
 class FeaturedListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
     permission_classes = [permissions.AllowAny]
