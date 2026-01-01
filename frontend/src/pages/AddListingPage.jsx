@@ -1,5 +1,6 @@
 // src/pages/AddListingPage.jsx
 import { API_BASE_URL } from "/src/config/env.js";
+import { useSearchParams } from "react-router-dom";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,8 @@ const DRAFT_KEY = "createListingDraft";
 
 function AddListingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const partnerId = searchParams.get("partner_id");
   const { isAuthenticated, loading } = useAuth();
 
   /* ================= AUTH GUARD ================= */
@@ -166,20 +169,25 @@ function AddListingPage() {
   };
 
   const saveDraftStep1 = (data) => {
-    const existing = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
+  const existing = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
 
-    localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify({
-        ...existing,
-        step: 1,
-        stepData: {
-          ...(existing.stepData || {}),
-          step1: data,
-        },
-      })
-    );
+  const nextDraft = {
+    ...existing,
+    step: 1,
+    stepData: {
+      ...(existing.stepData || {}),
+      step1: data,
+    },
   };
+
+  
+  if (partnerId) {
+    nextDraft.partner_id = partnerId;
+  }
+
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(nextDraft));
+};
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -209,6 +217,7 @@ function AddListingPage() {
               value={formData.title}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter a title for your listing"
             />
             {errors.title && <p className="error-text">{errors.title}</p>}
 
@@ -218,6 +227,7 @@ function AddListingPage() {
               value={formData.description}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Provide a detailed description of the property"
             />
             {errors.description && <p className="error-text">{errors.description}</p>}
           </Section>
@@ -229,6 +239,7 @@ function AddListingPage() {
               value={formData.wilaya}
               onChange={handleChange}
               onBlur={handleBlur}
+              
             >
               <option value="">Select wilaya</option>
               {wilayas.map((w) => (
@@ -262,6 +273,7 @@ function AddListingPage() {
               value={formData.address}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter the full address of the property"
             />
             {errors.address && <p className="error-text">{errors.address}</p>}
           </Section>
@@ -283,6 +295,7 @@ function AddListingPage() {
               value={formData.price}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Enter the price of the property"
             />
             {errors.price && <p className="error-text">{errors.price}</p>}
 
