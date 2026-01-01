@@ -2,10 +2,11 @@ import { Combobox } from "@/components/common/Combobox";
 import addSvg from "@/assets/icons/add.svg"
 import { ListingGrid } from "@/components/common/ListingGrid";
 import { useListings } from "../buyer/context/ListingsContext";
-import { OFFER_TYPE } from "../buyer/enum";
-OFFER_TYPE
+import { useNavigate } from "react-router-dom";
+
 export default function MyListings() {
     const { listings } = useListings()
+    const navigate = useNavigate()
 
     return (
         <div className="px-20">
@@ -14,7 +15,7 @@ export default function MyListings() {
                 <div className="flex items-center justify-end mt-11">
                     <Combobox className="h-18" label="Status" options={[{ label: "All", value: "All" }]} />
                     <div className="p-4 bg-primary rounded-full ml-8">
-                        <img src={addSvg} alt="add" />
+                        <img src={addSvg} alt="add" onClick={() => navigate("/forms-tables/add-listing")} />
                     </div>
                 </div>
             </section>

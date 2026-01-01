@@ -28,9 +28,6 @@ export default function AllListings() {
                     <h1 className="h1 text-center">All Listings</h1>
                     <div className="flex items-center justify-end mt-11">
                         <Combobox className="h-18" label="Status" options={[{ label: "All", value: "All" }]} />
-                        <div className="p-4 bg-primary rounded-full ml-8">
-                            <img src={addSvg} alt="add" />
-                        </div>
                     </div>
                 </section>
                 <ListingGrid listings={listings} card_type={CARD_TYPE.ADMIN} />

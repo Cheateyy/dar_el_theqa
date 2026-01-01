@@ -15,7 +15,6 @@ import { useState } from "react"
 import { Combobox } from "@/components/common/Combobox"
 import { useAuthMessaging } from "../context/AuthMessagingContext"
 import { useNavigate } from "react-router-dom"
-import AuthService from "@/services/authService"
 import { useAuth } from "@/contexts/AuthContext"
 
 function LanguageSelector({ className }) {
@@ -50,7 +49,7 @@ function MenuButton() {
             variant="ghost"
             options={options}
         >
-            <img src={HamburgerSvg} alt="menu" className="w-6 h-6" />
+            <img src={HamburgerSvg} alt="menu" className="w-10 h-10" />
         </CustomDropdownMenu>
     )
 }
