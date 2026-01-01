@@ -1,19 +1,76 @@
 from rest_framework import generics, views, permissions, status, filters, serializers
 from rest_framework.response import Response
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.shortcuts import get_object_or_404
 from .models import Listing, ListingDocument
 from .serializers import ListingSerializer, ListingCreateSerializer, ListingDetailSerializer, ListingDocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
-
-
 from drf_spectacular.utils import extend_schema, inline_serializer
+
+from .choices import PROPERTY_TYPES
+
+
+
+class ContactedListingsView(generics.ListAPIView):
+    serializer_class = ListingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Listing.objects
+            .filter(leads__user=self.request.user)
+            .annotate(last_contacted_at=Max('leads__created_at'))
+            .order_by('-last_contacted_at')
+            .distinct()
+        )
+
+
+class PropertyTypeChoicesView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=None,
+        responses=inline_serializer(
+            name="PropertyTypeChoicesResponse",
+            fields={
+                "value": serializers.CharField(),
+                "label": serializers.CharField(),
+            },
+            many=True,
+        ),
+    )
+    def get(self, request):
+        return Response(PROPERTY_TYPES)
+
+
+def _recalculate_verification_status(listing: Listing) -> None:
+    documents = listing.documents.all()
+
+    if not documents.exists():
+        listing.verification_status = Listing.VerificationStatus.PARTIAL
+        listing.save(update_fields=["verification_status"])
+        return
+
+    total_docs = documents.count()
+    approved_docs = documents.filter(status=ListingDocument.Status.APPROVED).count()
+
+    if approved_docs == total_docs:
+        listing.verification_status = Listing.VerificationStatus.VERIFIED
+    else:
+        listing.verification_status = Listing.VerificationStatus.PARTIAL
+
+    listing.save(update_fields=["verification_status"])
 
 class FeaturedListingsView(generics.ListAPIView):
     serializer_class = ListingSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Listing.objects.filter(status=Listing.Status.APPROVED)[:6] # Example limit
+
+    def get_queryset(self):
+        qs = Listing.objects.filter(
+            status=Listing.Status.APPROVED
+        ).order_by('-created_at')
+        return qs[:6]
 
 class SearchListingsView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -46,6 +103,8 @@ class SearchListingsView(views.APIView):
         # Filters
         if data.get('wilaya_id'):
             queryset = queryset.filter(wilaya_id=data['wilaya_id'])
+        if data.get('region_id'):
+            queryset = queryset.filter(region_id=data['region_id'])
         if data.get('transaction_type'):
             queryset = queryset.filter(transaction_type=data['transaction_type'])
         if data.get('property_type'):
@@ -311,8 +370,88 @@ class ListingDocumentRejectView(views.APIView):
         document.admin_note = request.data.get('reason')
         document.save()
 
+        _recalculate_verification_status(document.listing)
+
         return Response({
             "status": "REJECTED",
             "document_id": document.id,
             "admin_note": document.admin_note,
+        })
+
+
+class ListingDocumentApproveView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    @extend_schema(
+        request=inline_serializer(
+            name="ListingDocumentApproveRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="ListingDocumentApproveResponse",
+            fields={
+                "status": serializers.CharField(),
+                "document_id": serializers.IntegerField(),
+                "admin_note": serializers.CharField(allow_blank=True, required=False),
+            },
+        ),
+    )
+    def post(self, request, listing_id, document_id):
+        try:
+            document = ListingDocument.objects.select_related('listing').get(
+                id=document_id,
+                listing_id=listing_id,
+            )
+        except ListingDocument.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        document.status = ListingDocument.Status.APPROVED
+        document.admin_note = request.data.get('reason')
+        document.save(update_fields=["status", "admin_note"])
+
+        _recalculate_verification_status(document.listing)
+
+        return Response({
+            "status": "APPROVED",
+            "document_id": document.id,
+            "admin_note": document.admin_note or "",
+        })
+
+
+class RejectDocumentView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    @extend_schema(
+        request=inline_serializer(
+            name="RejectDocumentRequest",
+            fields={"reason": serializers.CharField(allow_blank=True, required=False)},
+        ),
+        responses=inline_serializer(
+            name="RejectDocumentResponse",
+            fields={
+                "status": serializers.CharField(),
+                "document_id": serializers.IntegerField(),
+                "admin_note": serializers.CharField(allow_blank=True, required=False),
+            },
+        ),
+    )
+    def post(self, request, listing_id, document_id):
+        try:
+            document = ListingDocument.objects.select_related('listing').get(
+                id=document_id,
+                listing_id=listing_id,
+            )
+        except ListingDocument.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        document.status = ListingDocument.Status.REJECTED
+        document.admin_note = request.data.get('reason')
+        document.save(update_fields=["status", "admin_note"])
+
+        _recalculate_verification_status(document.listing)
+
+        return Response({
+            "status": "REJECTED",
+            "document_id": document.id,
+            "admin_note": document.admin_note or "",
         })

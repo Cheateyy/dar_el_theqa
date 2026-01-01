@@ -1,12 +1,28 @@
 from django.urls import path
 from .views import (
-    FeaturedListingsView, ListingActivateView, SearchListingsView, ListingCreateView, ListingDetailView,
-    MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
-    AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
-    ListingViewDocuments,  AdminListingRejectView,
+    PropertyTypeChoicesView,
+    ContactedListingsView,
+    FeaturedListingsView,
+    ListingActivateView,
+    SearchListingsView,
+    ListingCreateView,
+    ListingDetailView,
+    MyListingsView,
+    ListingPauseView,
+    ListingDocumentUpdateView,
+    SimilarListingsView,
+    AdminListingListView,
+    AdminListingApproveView,
+    AdminListingRejectView,
+    AdminListingViewDetailed,
+    ListingViewDocuments,
+    ListingDocumentApproveView,
+    RejectDocumentView,
 )
 
 urlpatterns = [
+    path('choices/property-types/', PropertyTypeChoicesView.as_view(), name='property-type-choices'),
+
     path('listings/featured/', FeaturedListingsView.as_view(), name='featured-listings'),
     path('listings/search/', SearchListingsView.as_view(), name='search-listings'),
     path('listings/create/', ListingCreateView.as_view(), name='create-listing'),
@@ -16,6 +32,7 @@ urlpatterns = [
     path('listings/<int:id>/activate/', ListingActivateView.as_view(), name='activate-listing'),
     path('listings/<int:id>/similar/', SimilarListingsView.as_view(), name='similar-listings'),
     path('listings/<int:id>/documents/', ListingDocumentUpdateView.as_view(), name='update-documents'),
+    path('listings/contacted/', ContactedListingsView.as_view(), name='contacted-listings'),
 
     # Admin URLs
     path('admin/listings/', AdminListingListView.as_view(), name='admin-listing-list'),
@@ -27,8 +44,9 @@ urlpatterns = [
     #Gets you the id's documents
     path('listings/documents/<int:id>/fetch/', ListingViewDocuments.as_view(), name="get-listing-document"),
 
-    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/reject/',  AdminListingRejectView.as_view(), name="reject-doc"),
-    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/approve/', AdminListingApproveView.as_view(), name="reject-doc"),
+    # NOTE: Leading '/' preserved for compatibility with frontend calling '/api//admin/...'
+    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/reject/', RejectDocumentView.as_view(), name="reject-doc"),
+    path('/admin/listings/<int:listing_id>/documents/<int:document_id>/approve/', ListingDocumentApproveView.as_view(), name="approve-doc"),
     
 
 ]

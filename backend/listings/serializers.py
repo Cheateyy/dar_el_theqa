@@ -125,10 +125,6 @@ class ListingCreateSerializer(serializers.ModelSerializer):
     docregister = FlexibleFileListField(child=serializers.FileField(), required=False)
     docsilbiya = FlexibleFileListField(child=serializers.FileField(), required=False)
 
-    # Optional: allow frontend to send a single JSON blob with notes
-    # Example: {"docidentity": "missing", "docregister": "pending"}
-    document_notes = serializers.JSONField(write_only=True, required=False)
-
     class Meta:
         model = Listing
         fields = [
@@ -137,6 +133,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             "property_type",
             "price",
             "rent_unit",
+            "partner",
             "wilaya",
             "region",
             "address",
@@ -165,40 +162,11 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             "docownership5",
             "docregister",
             "docsilbiya",
-            "document_notes",
         ]
 
     # ---------------- VALIDATION ----------------
     def validate(self, attrs):
         request = self.context["request"]
-
-        notes_blob = request.data.get("document_notes")
-        if isinstance(notes_blob, str):
-            try:
-                notes_blob = json.loads(notes_blob)
-            except Exception:
-                notes_blob = None
-        if not isinstance(notes_blob, dict):
-            notes_blob = {}
-
-        def note_for(canonical_field: str) -> str | None:
-            # First, explicit *_note wins
-            explicit = request.data.get(f"{canonical_field}_note")
-            if explicit:
-                return str(explicit).strip() or None
-
-            # Then, try common keys from the frontend
-            mapping = {
-                "doc_identity": ["docidentity", "doc_identity"],
-                "doc_assurance": ["docassurance", "doc_assurance"],
-                "doc_register": ["docregister", "doc_register"],
-                "doc_silbiya": ["docsilbiya", "doc_silbiya"],
-            }
-            for key in mapping.get(canonical_field, []):
-                val = notes_blob.get(key)
-                if val:
-                    return str(val).strip() or None
-            return None
 
         # aliases
         if "address" not in attrs and "street_address" in attrs:
@@ -213,7 +181,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
         # strict documents
         for field in ["doc_identity", "doc_assurance", "doc_register", "doc_silbiya"]:
             files = attrs.get(field)
-            note = note_for(field)
+            note = request.data.get(f"{field}_note")
             if not files and not note:
                 raise serializers.ValidationError(
                     {field: "Either a document file or a note is required."}
@@ -224,23 +192,6 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             attrs.get("doc_ownership_1", []) + attrs.get("doc_ownership_2", [])
         )
         ownership_note = request.data.get("doc_ownership_note")
-        if not ownership_note:
-            # Combine any ownership notes from the blob (docownership1..5)
-            ownership_candidates = []
-            for key in [
-                "doc_ownership",
-                "docownership1",
-                "docownership2",
-                "docownership3",
-                "docownership4",
-                "docownership5",
-            ]:
-                val = notes_blob.get(key)
-                if val:
-                    ownership_candidates.append(str(val).strip())
-            ownership_candidates = [x for x in ownership_candidates if x]
-            if ownership_candidates:
-                ownership_note = "\n".join(dict.fromkeys(ownership_candidates))
 
         if len(ownership_files) > 2:
             raise serializers.ValidationError(
@@ -326,50 +277,9 @@ class ListingCreateSerializer(serializers.ModelSerializer):
 
         request = self.context["request"]
 
-        notes_blob = request.data.get("document_notes")
-        if isinstance(notes_blob, str):
-            try:
-                notes_blob = json.loads(notes_blob)
-            except Exception:
-                notes_blob = None
-        if not isinstance(notes_blob, dict):
-            notes_blob = {}
-
-        def note_for(canonical_field: str) -> str | None:
-            explicit = request.data.get(f"{canonical_field}_note")
-            if explicit:
-                return str(explicit).strip() or None
-            mapping = {
-                "doc_identity": ["docidentity", "doc_identity"],
-                "doc_assurance": ["docassurance", "doc_assurance"],
-                "doc_register": ["docregister", "doc_register"],
-                "doc_silbiya": ["docsilbiya", "doc_silbiya"],
-            }
-            for key in mapping.get(canonical_field, []):
-                val = notes_blob.get(key)
-                if val:
-                    return str(val).strip() or None
-            return None
-
         # ----- OWNERSHIP -----
         ownership_files = docs_data["doc_ownership_1"] + docs_data["doc_ownership_2"]
         ownership_note = request.data.get("doc_ownership_note")
-        if not ownership_note:
-            ownership_candidates = []
-            for key in [
-                "doc_ownership",
-                "docownership1",
-                "docownership2",
-                "docownership3",
-                "docownership4",
-                "docownership5",
-            ]:
-                val = notes_blob.get(key)
-                if val:
-                    ownership_candidates.append(str(val).strip())
-            ownership_candidates = [x for x in ownership_candidates if x]
-            if ownership_candidates:
-                ownership_note = "\n".join(dict.fromkeys(ownership_candidates))
 
         for f in ownership_files:
             ListingDocument.objects.create(
@@ -394,7 +304,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             "doc_silbiya": ListingDocument.DocumentType.SILBIYA,
         }.items():
             files = docs_data.get(field, [])
-            note = note_for(field)
+            note = request.data.get(f"{field}_note")
 
             for f in files:
                 ListingDocument.objects.create(

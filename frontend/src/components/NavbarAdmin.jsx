@@ -34,7 +34,7 @@ function Navbar() {
   const closeMenu = () => setShowMenu(false);
 
   const handleExploreClick = () => {
-    navigate("/explore-properties");
+    navigate("/");
   };
 
   const handleLogout = () => {

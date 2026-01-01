@@ -31,4 +31,7 @@ urlpatterns = [
     path("api/", include("locations.urls")),
     path("api/", include("listings.urls")),
     path("api/", include("interactions.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
