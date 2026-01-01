@@ -64,7 +64,7 @@ export function SellerListingCard({ listing }) {
     return (
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
-            className="relative bg-cover bg-center rounded-4xl w-full sm:w-64 md:w-74 lg:w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
+            className="relative bg-cover bg-center rounded-4xl max-w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
             onClick={handle_click}
         >
             {/* top-right action */}
