@@ -101,7 +101,7 @@ export async function get_regions({ wilaya_id }) {
     return data;
 }
 
-/**@returns {Promise<Paginated<Listing>>} */
+/**@returns {Promise<<Listing[]>>} */
 export async function get_favorites() {
     const res = await authApi.get("/api/listings/favorites/");
     if (!res.ok) {
