@@ -1,13 +1,14 @@
 import { useListings } from "../context/ListingsContext"
+import { useSearch } from "../searchResults/context/searchContext";
 
 export function useWilayaOptions() {
     const { wilayas } = useListings()
-    const wilayas_option = wilayas.map((wilaya) => ({ label: wilaya.name, value: wilaya.name }))
+    const wilayas_option = wilayas.map((wilaya) => ({ label: wilaya.name, value: wilaya.id }))
     return wilayas_option;
 }
 
 export function useRegionOptions() {
-    const { regions } = useListings()
-    const wilayas_option = regions.map((region) => ({ label: region.name, value: region.name }))
-    return wilayas_option;
+    const { regions } = useSearch()
+    const region_options = regions.map((region) => ({ label: region.name, value: region.id }))
+    return region_options;
 }

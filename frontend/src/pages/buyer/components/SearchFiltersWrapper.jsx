@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { OFFER_TYPE } from "../enum"
+import { useSearch } from "../searchResults/context/searchContext"
 
 /**
  * contains Buy/Rent options
  */
-export function SearchFiltersWrapper({ className, selectedOfferType, setSelectedOfferType, children }) {
+export function SearchFiltersWrapper({ className, children }) {
+    const { selected_offer_type, set_selected_offer_type } = useSearch()
     return (
         <div className={className}>
             {/* this div is reponsible for inner stacking context */}
@@ -13,18 +15,18 @@ export function SearchFiltersWrapper({ className, selectedOfferType, setSelected
                 <div className="flex justify-end relative z-10">
                     <ButtonGroup className={'relative top-11 w-104 h-28'}>
                         <Button
-                            variant={selectedOfferType == OFFER_TYPE.RENT ? 'secondary' : 'default'}
+                            variant={selected_offer_type == OFFER_TYPE.RENT ? 'secondary' : 'default'}
                             size={'lg'}
                             className={'flex-1 h-full items-start'}
-                            onClick={() => setSelectedOfferType(OFFER_TYPE.BUY)}
+                            onClick={() => set_selected_offer_type(OFFER_TYPE.BUY)}
                         >
                             <p className="mt-3 w-18 h-15 px-4 py-3">Rent</p>
                         </Button>
                         <Button
-                            variant={selectedOfferType == OFFER_TYPE.BUY ? 'secondary' : 'default'}
+                            variant={selected_offer_type == OFFER_TYPE.BUY ? 'secondary' : 'default'}
                             size={'lg'}
                             className={'flex-1 h-full items-start'}
-                            onClick={() => setSelectedOfferType(OFFER_TYPE.RENT)}
+                            onClick={() => set_selected_offer_type(OFFER_TYPE.RENT)}
                         >
                             <p className="mt-3 w-18 h-15 px-4 py-3 ">Buy</p>
                         </Button>

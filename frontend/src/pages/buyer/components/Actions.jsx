@@ -14,9 +14,11 @@ import logoutSvg from '../assets/logout.svg'
 import { useState } from "react"
 import { Combobox } from "@/components/common/Combobox"
 import { useAuthMessaging } from "../context/AuthMessagingContext"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 function LanguageSelector({ className }) {
-    const langs = ["arabic", "english", "language"];
+    const langs = ["arabic", "english", "french"];
     const [language, set_language] = useState(langs[0])
 
     return (
@@ -31,12 +33,15 @@ function LanguageSelector({ className }) {
 }
 
 function MenuButton() {
+    const navigate = useNavigate()
+    const { logout } = useAuth()
+    /**@type {import("@/components/common/DropDownMenu").DropDownMenuOption[]} */
     const options = [
-        { label: "Home", icon: homeSvg, },
-        { label: "Find a Property", icon: searchSvg, },
-        { label: "Favorites", icon: menuHeartSvg, },
-        { label: "Contacted Properties", icon: messageSvg, },
-        { label: "Log out", icon: logoutSvg, },
+        { label: "Home", icon: homeSvg, onClick: () => navigate("/") },
+        { label: "Find a Property", icon: searchSvg, onClick: () => navigate("/search-results") },
+        { label: "Favorites", icon: menuHeartSvg, onClick: () => navigate("/favorites") },
+        { label: "Contacted Properties", icon: messageSvg, onClick: () => navigate("/interests") },
+        { label: "Log out", icon: logoutSvg, onClick: async () => await logout() },
     ]
 
     return (
@@ -44,7 +49,7 @@ function MenuButton() {
             variant="ghost"
             options={options}
         >
-            <img src={HamburgerSvg} alt="menu" className="w-6 h-6" />
+            <img src={HamburgerSvg} alt="menu" className="w-10 h-10" />
         </CustomDropdownMenu>
     )
 }
@@ -67,6 +72,8 @@ export function NotLoggedInActions() {
 }
 
 export function LoggedInBuyerActions() {
+    const navigate = useNavigate()
+
     return (
         <div className="flex items-center gap-3">
             {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
@@ -76,6 +83,7 @@ export function LoggedInBuyerActions() {
             <Button
                 className="ml-0 sm:ml-4 flex items-center gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-md"
                 variant='outline'
+                onClick={() => navigate("/forms-tables/add-listing")}
             >
                 <img src={dashboardSvg} alt="list" className="w-5 h-5" />
                 <span className="hidden sm:inline">List your property</span>
@@ -95,6 +103,8 @@ export function LoggedInBuyerActions() {
 }
 
 export function LoggedInSellerActions() {
+    const navigate = useNavigate()
+
     return (
         <div className="flex items-center gap-3">
             {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
@@ -104,6 +114,7 @@ export function LoggedInSellerActions() {
             <Button
                 className="ml-0 sm:ml-4 flex items-center gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-md"
                 variant="outline"
+                onClick={() => navigate("/my-listings")}
             >
                 <img src={dashboardSvg} alt="dashboard" className="w-5 h-5" />
                 <span className="hidden sm:inline">Dashboard</span>
