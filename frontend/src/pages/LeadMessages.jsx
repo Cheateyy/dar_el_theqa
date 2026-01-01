@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "/src/config/env.js";
 import React, { useState, useEffect } from "react";
 import "../assets/styles/LeadMessages.css";
 
@@ -13,39 +14,12 @@ import clientIcon from "../assets/icons/fullname.svg";
 import phoneIcon from "../assets/icons/Call.svg";
 import closeIcon from "../assets/icons/removeimage.png";
 
-import propertyImage from "../assets/images/propertyimage.jpg";
 import PanelcallIcon from "../assets/icons/PanelCall.svg";
 import PanelMessagesIcon from "../assets/icons/PanelMessages.svg";
 
-const USE_MOCK_DATA = false;
-
-const MOCK_LEADS = [
-  {
-    id: 1,
-    date: "2025-11-22",
-    listingTitle: "FreeBlood",
-    clientFullName: "George Martin",
-    phoneNumber: "+213 560 30 47 77",
-    email: "client@mail.com",
-    message:
-      "message from client lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    property: {
-      title: "Property title",
-      address: "Hydra, Alger",
-      price: 40000,
-      priceUnit: "per month",
-      type: "Appartement",
-      bedrooms: 4,
-      bathrooms: 4,
-      area: 300,
-      imageUrl: propertyImage,
-    },
-  },
-];
-
+/* ---------------- UTIL ---------------- */
 function formatRentUnit(unit) {
   if (!unit) return null;
-
   const map = {
     MONTH: "per month",
     YEAR: "per year",
@@ -53,7 +27,6 @@ function formatRentUnit(unit) {
     WEEK: "per week",
     DAY: "per day",
   };
-
   return map[unit] || `per ${unit.toLowerCase().replace("_", " ")}`;
 }
 
@@ -61,6 +34,7 @@ function LeadsPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
+  /* ---------------- AUTH GUARD ---------------- */
   useEffect(() => {
     if (loading) return;
 
@@ -69,11 +43,12 @@ function LeadsPage() {
       return;
     }
 
-    if (user.role !== "PARTNER" && user.role !== "ADMIN") {
+    if (!["USER", "PARTNER", "ADMIN"].includes(user?.role)) {
       navigate("/not-authorized");
     }
   }, [loading, isAuthenticated, user, navigate]);
 
+  /* ---------------- STATE ---------------- */
   const [leads, setLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null);
 
@@ -84,48 +59,30 @@ function LeadsPage() {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [error, setError] = useState(null);
 
-  // -------------------------------
-  // Load LEADS LIST
-  // -------------------------------
+  /* ---------------- LOAD LEADS (OWNER BASED) ---------------- */
   const fetchLeads = async (page = 1) => {
-    if (USE_MOCK_DATA) {
-      const PAGE_SIZE = 10;
-      const start = (page - 1) * PAGE_SIZE;
-      const sliced = MOCK_LEADS.slice(start, start + PAGE_SIZE);
-
-      setLeads(
-        sliced.map((m) => ({
-          id: m.id,
-          date: m.date,
-          listing_title: m.listingTitle,
-          client_name: m.clientFullName,
-          client_phone: m.phoneNumber,
-        }))
-      );
-
-      setTotalPages(Math.ceil(MOCK_LEADS.length / PAGE_SIZE));
-      return;
-    }
-
     try {
       setLoadingList(true);
       setError(null);
 
       const token = localStorage.getItem("auth_token");
 
-      const res = await fetch(`/api/vendor/leads/?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/api/vendor/leads/${user.id}/?page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed request");
 
       const data = await res.json();
 
       setLeads(data.results || []);
-      setTotalPages(data.total_pages || 1);
-    } catch (err) {
+      setTotalPages(Math.ceil((data.count || 1) / 10));
+    } catch {
       setError("Could not load leads.");
     } finally {
       setLoadingList(false);
@@ -133,40 +90,27 @@ function LeadsPage() {
   };
 
   useEffect(() => {
-    fetchLeads(currentPage);
-  }, [currentPage]);
-
-  // -------------------------------
-  // Load SINGLE LEAD DETAILS
-  // -------------------------------
-  const fetchLeadDetails = async (leadId) => {
-    if (USE_MOCK_DATA) {
-      const lead = MOCK_LEADS.find((l) => l.id === leadId);
-      if (!lead) return;
-
-      setSelectedLead({
-        id: lead.id,
-        date: lead.date,
-        clientFullName: lead.clientFullName,
-        phoneNumber: lead.phoneNumber,
-        email: lead.email,
-        message: lead.message,
-        property: lead.property,
-      });
-      return;
+    if (user?.id) {
+      fetchLeads(currentPage);
     }
+  }, [user, currentPage]);
 
+  /* ---------------- LOAD SINGLE LEAD ---------------- */
+  const fetchLeadDetails = async (leadId) => {
     try {
       setLoadingDetails(true);
       setError(null);
 
       const token = localStorage.getItem("auth_token");
 
-      const res = await fetch(`/api/leads/${leadId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/api/leads/${leadId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed request");
 
@@ -191,72 +135,34 @@ function LeadsPage() {
           imageUrl: data.property.cover_image,
         },
       });
-    } catch (err) {
+    } catch {
       setError("Could not load lead details.");
     } finally {
       setLoadingDetails(false);
     }
   };
 
-  const handleRowClick = (lead) => {
-    fetchLeadDetails(lead.id);
-  };
-
+  const handleRowClick = (lead) => fetchLeadDetails(lead.id);
   const handleClosePanel = () => setSelectedLead(null);
 
-  // -------------------------------
-  // Pagination
-  // -------------------------------
+  /* ---------------- PAGINATION ---------------- */
   const getPageNumbers = () => {
     const pages = [];
-    const max = 4;
-
-    if (totalPages <= max) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-      return pages;
-    }
-
-    const first = 1;
-    const last = totalPages;
-
-    let start = currentPage - 1;
-    let end = currentPage + 1;
-
-    if (start < 2) {
-      start = 2;
-      end = start + (max - 2);
-    }
-
-    if (end > last - 1) {
-      end = last - 1;
-      start = end - (max - 2);
-    }
-
-    pages.push(first);
-
-    if (start > 2) pages.push("left-ellipsis");
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (end < last - 1) pages.push("right-ellipsis");
-
-    pages.push(last);
-
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
     return pages;
   };
 
   const pageItems = getPageNumbers();
 
-  // -------------------------------
-  // RENDER
-  // -------------------------------
+  if (loading) return null;
+
+  /* ---------------- RENDER ---------------- */
   return (
     <div className="leads-page-wrapper">
       <div className="leads-container">
         <div className={`leads-main-layout ${selectedLead ? "has-details" : ""}`}>
-          {/* TABLE COLUMN */}
+          
+          {/* TABLE */}
           <div className="leads-table-column">
             <div className="leads-table-section">
               <h1 className="page-title">Lead Messages</h1>
@@ -268,27 +174,10 @@ function LeadsPage() {
                 <table className="leads-table">
                   <thead>
                     <tr>
-                      <th>
-                        <span className="th-with-icon">
-                          <img src={dateIcon} className="th-icon" /> Date
-                        </span>
-                      </th>
-                      <th>
-                        <span className="th-with-icon">
-                          <img src={listingIcon} className="th-icon" /> Listing
-                          Title
-                        </span>
-                      </th>
-                      <th>
-                        <span className="th-with-icon">
-                          <img src={clientIcon} className="th-icon" /> Client
-                        </span>
-                      </th>
-                      <th>
-                        <span className="th-with-icon">
-                          <img src={phoneIcon} className="th-icon" /> Phone
-                        </span>
-                      </th>
+                      <th><img src={dateIcon} className="th-icon" /> Date</th>
+                      <th><img src={listingIcon} className="th-icon" /> Listing</th>
+                      <th><img src={clientIcon} className="th-icon" /> Client</th>
+                      <th><img src={phoneIcon} className="th-icon" /> Phone</th>
                     </tr>
                   </thead>
 
@@ -312,150 +201,126 @@ function LeadsPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
 
+              
+            </div>
             {/* PAGINATION */}
-            <div className="leads-pagination">
-              <button
-                onClick={() => setCurrentPage((p) => p - 1)}
-                disabled={currentPage === 1}
-              >
-                <img src={backButton} alt="back" />
-              </button>
+              <div className="leads-pagination">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <img src={backButton} alt="back" />
+                </button>
 
-              {pageItems.map((item, idx) =>
-                typeof item === "string" ? (
-                  <button key={idx} disabled className="page-dot">
-                    ...
-                  </button>
-                ) : (
+                {pageItems.map((p) => (
                   <button
-                    key={item}
-                    className={`page-dot ${
-                      item === currentPage ? "active" : ""
-                    }`}
-                    onClick={() => setCurrentPage(item)}
+                    key={p}
+                    className={`page-dot ${p === currentPage ? "active" : ""}`}
+                    onClick={() => setCurrentPage(p)}
                   >
-                    {item}
+                    {p}
                   </button>
-                )
-              )}
+                ))}
 
-              <button
-                onClick={() => setCurrentPage((p) => p + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <img src={nextPage} alt="next" />
-              </button>
-            </div>
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  <img src={nextPage} alt="next" />
+                </button>
+              </div>
           </div>
 
           {/* DETAILS PANEL */}
           {selectedLead && (
             <div className="lead-details-card">
-              <div className="lead-details-panel">
-                <button className="close-panel-btn" onClick={handleClosePanel}>
-                  <img src={closeIcon} alt="Close" />
-                </button>
+              <button className="close-panel-btn" onClick={handleClosePanel}>
+                <img src={closeIcon} alt="Close" />
+              </button>
 
-                {loadingDetails ? (
-                  <p>Loading details...</p>
-                ) : (
-                  <>
-                    {/* CLIENT INFO */}
-                    <div className="lead-client-info">
-                      <h2 className="lead-client-name">
-                        {selectedLead.clientFullName}
-                      </h2>
+              {loadingDetails ? (
+                <p>Loading details...</p>
+              ) : (
+                <>
+                  <div className="lead-client-info">
+                    <h2 className="lead-client-name">
+                      {selectedLead.clientFullName}
+                    </h2>
 
-                      <p className="lead-client-phone">
-                        <img src={PanelcallIcon} alt="" />{" "}
-                        {selectedLead.phoneNumber}
+                    <p className="lead-client-phone">
+                      <img src={PanelcallIcon} />
+                      {selectedLead.phoneNumber}
+                    </p>
+
+                    <p className="lead-client-email">
+                      <img src={PanelMessagesIcon} />
+                      {selectedLead.email}
+                    </p>
+                  </div>
+
+                  <div className="lead-message-box">
+                    <h3>Customer Message</h3>
+                    <p>{selectedLead.message}</p>
+                  </div>
+
+                  {selectedLead.property && (
+                    <div className="lead-property-summary">
+                      <img
+                        src={selectedLead.property.imageUrl}
+                        className="lead-property-image"
+                        alt=""
+                      />
+
+                      <h3 className="lead-property-title">
+                        {selectedLead.property.title}
+                      </h3>
+
+                      <p className="lead-property-price">
+                        {selectedLead.property.price} DZD
+                        {selectedLead.property.priceUnit && (
+                          <span className="lead-property-price-unit">
+                            {" "}
+                            {selectedLead.property.priceUnit}
+                          </span>
+                        )}
                       </p>
 
-                      <p className="lead-client-email">
-                        <img src={PanelMessagesIcon} alt="" />{" "}
-                        {selectedLead.email}
-                      </p>
-                    </div>
-
-                    {/* MESSAGE */}
-                    <div className="lead-message-box">
-                      <h3>Customer Message</h3>
-                      <p>{selectedLead.message}</p>
-                    </div>
-
-                    {/* PROPERTY INFO */}
-                    {selectedLead.property && (
-                      <div className="lead-property-summary">
-                        <div className="property-image-wrap">
-                          <img
-                            src={selectedLead.property.imageUrl}
-                            alt={selectedLead.property.title}
-                            className="lead-property-image"
-                          />
+                      <div className="lead-property-meta">
+                        <div className="meta-card">
+                          <span className="meta-label">Type</span>
+                          <span className="meta-value">
+                            {selectedLead.property.type}
+                          </span>
                         </div>
 
-                        <h3 className="lead-property-title">
-                          {selectedLead.property.title}
-                        </h3>
+                        <div className="meta-card">
+                          <span className="meta-label">Area</span>
+                          <span className="meta-value">
+                            {selectedLead.property.area} m²
+                          </span>
+                        </div>
 
-                        <p className="lead-property-address">
-                          {selectedLead.property.address}
-                        </p>
+                        <div className="meta-card">
+                          <span className="meta-label">Bedrooms</span>
+                          <span className="meta-value">
+                            {selectedLead.property.bedrooms}
+                          </span>
+                        </div>
 
-                        <p className="lead-property-price">
-                          {selectedLead.property.price.toLocaleString()} DZD
-                          {selectedLead.property.priceUnit && (
-                            <span className="lead-property-price-unit">
-                              {" "}
-                              {selectedLead.property.priceUnit}
-                            </span>
-                          )}
-                        </p>
-
-                        <div className="lead-property-meta">
-                          {selectedLead.property.type && (
-                            <div className="meta-card">
-                              <div className="meta-label">Type</div>
-                              <div className="meta-value">
-                                {selectedLead.property.type}
-                              </div>
-                            </div>
-                          )}
-
-                          {selectedLead.property.area && (
-                            <div className="meta-card">
-                              <div className="meta-label">Area</div>
-                              <div className="meta-value">
-                                {selectedLead.property.area} m²
-                              </div>
-                            </div>
-                          )}
-
-                          {selectedLead.property.bedrooms && (
-                            <div className="meta-card">
-                              <div className="meta-label">Bedrooms</div>
-                              <div className="meta-value">
-                                {selectedLead.property.bedrooms}
-                              </div>
-                            </div>
-                          )}
-
-                          {selectedLead.property.bathrooms && (
-                            <div className="meta-card">
-                              <div className="meta-label">Bathrooms</div>
-                              <div className="meta-value">
-                                {selectedLead.property.bathrooms}
-                              </div>
-                            </div>
-                          )}
+                        <div className="meta-card">
+                          <span className="meta-label">Bathrooms</span>
+                          <span className="meta-value">
+                            {selectedLead.property.bathrooms}
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </>
-                )}
-              </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>

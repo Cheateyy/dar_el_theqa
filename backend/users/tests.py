@@ -5,7 +5,7 @@ from datetime import timedelta
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from users.models import ActivationOTP
+from users.models import ActivationOTP, Partner
 
 User = get_user_model()
 
@@ -82,3 +82,31 @@ class ActivationOTPTests(APITestCase):
 		res = self.client.post(url, {"email": self.user.email}, format="json")
 		self.assertEqual(res.status_code, status.HTTP_200_OK)
 		self.assertTrue(ActivationOTP.objects.filter(user=self.user).exists())
+
+
+class PartnerAutoLinkTests(APITestCase):
+	def test_partner_role_user_links_existing_partner_by_email(self):
+		partner = Partner.objects.create(company_name="Acme", email="p@example.com")
+		user = User.objects.create_user(
+			email="p@example.com",
+			username="p",
+			password="pass12345",
+			role=User.Role.PARTNER,
+		)
+		user.refresh_from_db()
+		self.assertEqual(user.partner_id, partner.id)
+
+	def test_partner_role_user_auto_creates_partner_if_missing(self):
+		self.assertEqual(Partner.objects.count(), 0)
+		user = User.objects.create_user(
+			email="newpartner@example.com",
+			username="np",
+			password="pass12345",
+			role=User.Role.PARTNER,
+			first_name="New",
+			last_name="Partner",
+		)
+		user.refresh_from_db()
+		self.assertIsNotNone(user.partner_id)
+		self.assertEqual(Partner.objects.count(), 1)
+		self.assertEqual(user.partner.email, "newpartner@example.com")
