@@ -1,9 +1,9 @@
 from django.urls import path
 from .views import (
-    FeaturedListingsView, ListingActivateView, ListingDocumentApproveView, RejectDocumentView, SearchListingsView, ListingCreateView, ListingDetailView,
+    ContactedListingsView, FeaturedListingsView, ListingActivateView, ListingDocumentApproveView, RejectDocumentView, SearchListingsView, ListingCreateView, ListingDetailView,
     MyListingsView, ListingPauseView, ListingDocumentUpdateView, SimilarListingsView,
     AdminListingListView, AdminListingApproveView, AdminListingRejectView, AdminListingViewDetailed,
-    ListingViewDocuments, #ListingDocumentRejectView,
+    ListingViewDocuments, PropertyTypeChoicesView, #ListingDocumentRejectView,
 )
 
 urlpatterns = [
@@ -16,6 +16,8 @@ urlpatterns = [
     path('listings/<int:id>/activate/', ListingActivateView.as_view(), name='activate-listing'),
     path('listings/<int:id>/similar/', SimilarListingsView.as_view(), name='similar-listings'),
     path('listings/<int:id>/documents/', ListingDocumentUpdateView.as_view(), name='update-documents'),
+    path("listings/choices/property-types/",PropertyTypeChoicesView.as_view(),name="property-type-choices",),
+    path("api/listings/contacted/",ContactedListingsView.as_view(),name="contacted-listings",),
 
     # Admin URLs
     path('admin/listings/', AdminListingListView.as_view(), name='admin-listing-list'),

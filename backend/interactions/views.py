@@ -27,6 +27,7 @@ class FavoriteToggleView(views.APIView):
         try:
             listing = Listing.objects.get(id=id)
             favorite, created = Favorite.objects.get_or_create(user=request.user, listing=listing)
+            listing.is_liked
             if not created:
                 favorite.delete()
                 return Response({"status": "removed", "message": "Removed from favorites"})
