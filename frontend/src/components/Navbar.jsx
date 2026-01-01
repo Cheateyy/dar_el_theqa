@@ -39,14 +39,14 @@ function Navbar() {
   const closeMenu = () => setShowMenu(false);
 
   const handleExploreClick = () => {
-    navigate("/explore-properties");
+    navigate("/");
   };
 
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
     closeMenu();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -120,7 +120,7 @@ function Navbar() {
               <button
                 className="menu-item"
                 onClick={() => {
-                  navigate("/seller/listings");
+                  navigate("/my-listings");
                   closeMenu();
                 }}
               >

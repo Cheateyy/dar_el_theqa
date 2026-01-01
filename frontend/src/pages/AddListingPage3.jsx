@@ -16,29 +16,35 @@ const DRAFT_KEY = "createListingDraft";
 
 const loadStepData = () => {
   const raw = localStorage.getItem(DRAFT_KEY);
+
   let step1 = {};
   let step2 = {};
+  let partner_id = null;
 
   if (raw) {
     try {
       const parsed = JSON.parse(raw);
       step1 = parsed.stepData?.step1 || {};
       step2 = parsed.stepData?.step2 || {};
-    } catch {}
+      partner_id = parsed.partner_id || null; // ✅ SAFE HERE
+    } catch {
+      // ignore parsing errors
+    }
   }
 
   const images = Array.isArray(window.__CREATE_LISTING_IMAGES)
     ? window.__CREATE_LISTING_IMAGES
     : [];
 
-  return { step1, step2, images };
+  return { step1, step2, images, partner_id };
 };
+
 
 function AddListingPage3() {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
 
-  const { step1, step2, images } = loadStepData();
+  const { step1, step2, images, partner_id } = loadStepData();
   const ownershipInputRef = useRef(null);
 
   const [identity, setIdentity] = useState({ file: null, notes: "" });
@@ -116,12 +122,16 @@ function AddListingPage3() {
       payload.append("address", step1.address);
       payload.append("wilaya", step1.wilaya);
       payload.append("region", step1.region);
+      if (partner_id) {
+      payload.append("partner", partner_id);
+    }
 
       payload.append("property_type", step2.propertyTypeBackend);
       payload.append("area", Number(step2.area));
       payload.append("floors", Number(step2.floors || 0));
       payload.append("bedrooms", Number(step2.bedrooms || 0));
       payload.append("bathrooms", Number(step2.bathrooms || 0));
+      
 
       const labels = {};
       images.forEach((img, i) => {
@@ -168,6 +178,7 @@ function AddListingPage3() {
     } catch (err) {
       alert("Error submitting listing");
     }
+  
   };
 
   if (loading) return null;
@@ -237,7 +248,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setIdentity({ ...identity, notes: e.target.value })
                 }
-                placeholder="Write explanation if no document provided..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 
@@ -351,7 +362,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setRegister({ ...register, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 
@@ -407,7 +418,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setAssurance({ ...assurance, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
             {/* ---------------- Silbiya ---------------- */}
@@ -462,7 +473,7 @@ function AddListingPage3() {
                 onChange={(e) =>
                   setSilbiya({ ...silbiya, notes: e.target.value })
                 }
-                placeholder="Explain if the document is missing..."
+                placeholder="Explain if the document is missing or incomplete..."
               />
             </div>
 
