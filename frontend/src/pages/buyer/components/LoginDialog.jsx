@@ -14,6 +14,16 @@ export function LoginDialog({ state_control }) {
     const [is_dlg_open, set_is_dlg_open] = state_control
     const [inputs, set_inputs] = useState({ email: "", password: "" })
 
+    async function hanlde_confirm() {
+        /**@type {Promise<LoginResponse>} */
+        const res = await login(inputs.email, inputs.password)
+        if (res.success) {
+            set_is_dlg_open(false)
+        }
+        else {
+            console.error(res.error)
+        }
+    }
     return (
         <ReactModal
             isOpen={is_dlg_open}
@@ -86,7 +96,7 @@ export function LoginDialog({ state_control }) {
                         Cancel
                     </Button>
                     <Button
-                        onClick={() => { login(inputs.email, inputs.password) }}
+                        onClick={hanlde_confirm}
                         variant="default"
                         className="rounded-full py-4 px-8 sm:px-12 w-full sm:w-auto"
                     >
