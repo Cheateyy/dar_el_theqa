@@ -11,6 +11,7 @@ import { toggle_like } from "@/pages/buyer/lib/api"
 import { useNavigate } from "react-router-dom"
 import { useSearch } from "@/pages/buyer/searchResults/context/searchContext"
 import { OFFER_TYPE } from "@/pages/buyer/enum"
+import { exec_stop_propagation_proxy, } from "@/lib/utils"
 
 /** @typedef {import("@/types/ListingModel")}*/
 
@@ -38,9 +39,11 @@ export function FeedListingCard({ listing }) {
             console.error("ListingCard: unsupported verification status")
     }
     const heartIcon = listing.is_liked ? heartFullSvg : heartEmptySvg;
-    async function handle_like() {
-        const _ = await toggle_like(listing.id);
-        return;
+    async function handle_like(e) {
+        exec_stop_propagation_proxy(e, async () => {
+            const _ = await toggle_like(listing.id);
+        })
+
     }
 
     function handle_click() {

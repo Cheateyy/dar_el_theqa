@@ -10,6 +10,7 @@ import { toggle_like } from "@/pages/buyer/lib/api"
 import { useNavigate } from "react-router-dom"
 import { useSearch } from "@/pages/buyer/searchResults/context/searchContext"
 import { OFFER_TYPE } from "@/pages/buyer/enum"
+import { exec_stop_propagation_proxy } from "@/lib/utils"
 
 /**
  * @param {Object} props
@@ -39,10 +40,11 @@ export function AdminListingCard({ listing }) {
         return;
     }
 
-    function handle_click() {
-        console.log("button clicked")
-        const url = `/details/property-details-sell/${listing.id}`
-        navigate(url)
+    function handle_click(e) {
+        exec_stop_propagation_proxy(e, () => {
+            const url = `/details/property-details-sell/${listing.id}`
+            navigate(url)
+        })
     }
 
     return (
