@@ -200,3 +200,33 @@ export async function get_all_listings() {
     const data = await res.json();
     return data;
 }
+
+
+// ------- Seller
+/**
+ * @typedef {Listing[]} GetMyListingsResponse
+ */
+/**
+ * @param {string | null | undefined} status
+ * @returns {Promise<GetAllListingsResponse | []>}
+ */
+export async function get_my_listings(status) {
+    const params = new URLSearchParams({ page: '1' });
+
+    if (status != null) {
+        params.set('status', status);
+    }
+
+    const res = await authApi.get(`/api/listings/my-listings/?${params.toString()}`, {
+        params,
+    });
+
+    if (!res.ok) {
+        const error = await res.text().catch(() => 'Unknown error');
+        console.error('[get_my_listings]', error);
+        return [];
+    }
+
+    /** @type {GetAllListingsResponse} */
+    return await res.json();
+}
