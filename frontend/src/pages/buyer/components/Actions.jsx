@@ -60,7 +60,7 @@ export function NotLoggedInActions() {
         <div className="flex items-center gap-3">
             {/* show full language selector on md+, only icon on small */}
             <div className="flex items-center">
-                <LanguageSelector />
+                {/* <LanguageSelector /> */}
             </div>
 
             <Button className="px-3 py-2 text-sm md:px-4 md:py-3"
@@ -77,7 +77,7 @@ export function LoggedInBuyerActions() {
     return (
         <div className="flex items-center gap-3">
             {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
-            <LanguageSelector />
+            {/* <LanguageSelector /> */}
 
             {/* List button: show icon always, label appears from sm+ */}
             <Button
@@ -108,7 +108,7 @@ export function LoggedInSellerActions() {
     return (
         <div className="flex items-center gap-3">
             {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
-            <LanguageSelector />
+            {/* <LanguageSelector /> */}
 
             {/* Dashboard: show icon always, label appears from sm+ */}
             <Button
@@ -139,7 +139,7 @@ export function AdminActions() {
     return (
         <div className="flex items-center gap-3">
             {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
-            <LanguageSelector />
+            {/* <LanguageSelector /> */}
 
             {/* Dashboard: show icon always, label appears from sm+ */}
             <Button

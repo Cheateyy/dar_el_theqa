@@ -56,8 +56,7 @@ export function SellerListingCard({ listing }) {
             console.error("ListingCard: unsupported verification status")
     }
 
-    function handle_click() {
-        console.log("button clicked")
+    function handle_click(e) {
         const url = `/details/sellerListing-${selected_offer_type == OFFER_TYPE.BUY ? "sell" : "rent"}/${listing.id}`
         navigate(url)
     }
@@ -66,7 +65,7 @@ export function SellerListingCard({ listing }) {
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
             className="relative bg-cover bg-center rounded-4xl max-w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
-            onClick={handle_click}
+            onClick={(e) => handle_click(e)}
         >
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex gap-2">

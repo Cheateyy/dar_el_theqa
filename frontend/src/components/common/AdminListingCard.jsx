@@ -6,9 +6,7 @@ import listingCardImage from '@/assets/images/listing_card.jpg'
 import showSvg from '@/assets/icons/show.svg'
 import isVerifiedSvg from '@/assets/icons/is_verified.svg'
 import isPartiallyVerifiedSvg from '@/assets/icons/is_partially_verified.svg'
-import { toggle_like } from "@/pages/buyer/lib/api"
 import { useNavigate } from "react-router-dom"
-import { useSearch } from "@/pages/buyer/searchResults/context/searchContext"
 import { OFFER_TYPE } from "@/pages/buyer/enum"
 import { exec_stop_propagation_proxy } from "@/lib/utils"
 
@@ -35,14 +33,10 @@ export function AdminListingCard({ listing }) {
             console.error("ListingCard: unsupported verification status")
     }
 
-    async function handle_like() {
-        const _ = await toggle_like(listing.id);
-        return;
-    }
-
-    function handle_click(e) {
+    function handle_preview(e) {
+        const transaction_type = listing.transaction_type == OFFER_TYPE.BUY ? "Sell" : "Rent"
         exec_stop_propagation_proxy(e, () => {
-            const url = `/details/property-details-sell/${listing.id}`
+            const url = `/details/admingListing${transaction_type}/${listing.id}`
             navigate(url)
         })
     }
@@ -51,13 +45,12 @@ export function AdminListingCard({ listing }) {
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
             className="relative bg-cover bg-center rounded-4xl max-w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
-            onClick={handle_click}
         >
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700/80 flex items-center justify-center">
-                    <button className="cursor-pointer hover:opacity-75" onClick={handle_like}>
-                        <img src={showSvg} alt="favorite" className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <button className="cursor-pointer hover:opacity-75" onClick={handle_preview}>
+                        <img src={showSvg} alt="preview" className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
 
                 </div>
