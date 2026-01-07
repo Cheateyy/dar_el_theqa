@@ -9,7 +9,9 @@ import "./NavBar.css";
 export default function NavBar({ onLoginClick }) {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
+
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
@@ -21,6 +23,7 @@ export default function NavBar({ onLoginClick }) {
             console.error("Failed to logout", error);
         } finally {
             setIsLoggingOut(false);
+            setIsDropdownOpen(false);
         }
     };
 
@@ -34,16 +37,36 @@ export default function NavBar({ onLoginClick }) {
 
             <div className="rightSideNav">
                 {isAuthenticated ? (
-                    <>
-                        {/* Use same button UI as old navbar */}
+                    <div className="dropdown">
                         <button
                             className="loginButton"
-                            onClick={handleLogout}
-                            disabled={isLoggingOut}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
-                            {isLoggingOut ? "Logging out..." : "Log Out"}
+                            {""} ▾
                         </button>
-                    </>
+
+                        {isDropdownOpen && (
+                            <div className="dropdownMenu">
+                                <button
+                                    className="dropdownItem"
+                                    onClick={() => {
+                                        navigate("/");
+                                        setIsDropdownOpen(false);
+                                    }}
+                                >
+                                    Home
+                                </button>
+
+                                <button
+                                    className="dropdownItem logout"
+                                    onClick={handleLogout}
+                                    disabled={isLoggingOut}
+                                >
+                                    {isLoggingOut ? "Logging out..." : "Log Out"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <Link to="/">
                         <button className="loginButton" onClick={onLoginClick}>
