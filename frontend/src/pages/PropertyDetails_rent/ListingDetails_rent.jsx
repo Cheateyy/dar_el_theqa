@@ -102,7 +102,6 @@ export default function ListingDetails_rent() {
         setInterestLoading(true);
         try {
             await sendListingInterest(listingId, message);
-            window.alert("Message sent to the owner.");
         } catch (error) {
             console.error("Failed to send interest", error);
             window.alert("Unable to send your message right now. Please try again.");
