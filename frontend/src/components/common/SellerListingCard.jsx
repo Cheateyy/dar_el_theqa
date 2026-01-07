@@ -39,8 +39,8 @@ export function SellerListingCard({ listing }) {
     switch (listing.verification_status) {
         case "VERIFIED":
             verification_status_icon = isVerifiedSvg;
-            verification_status_str = "Pending"
-            verification_status_color = 'yellow'
+            verification_status_str = "Approved"
+            verification_status_color = 'green'
             break;
         case "PARTIAL":
             verification_status_icon = isPartiallyVerifiedSvg;
@@ -49,8 +49,8 @@ export function SellerListingCard({ listing }) {
             break;
         case "NONE":
             verification_status_icon = null;
-            verification_status_str = "Approved"
-            verification_status_color = 'green'
+            verification_status_str = null
+            verification_status_color = null
             break;
         default:
             console.error("ListingCard: unsupported verification status")

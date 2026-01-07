@@ -133,3 +133,34 @@ export function LoggedInSellerActions() {
     )
 }
 
+export function AdminActions() {
+    const navigate = useNavigate()
+
+    return (
+        <div className="flex items-center gap-3">
+            {/* keep all actions visible on all breakpoints, adapt sizing & labels */}
+            <LanguageSelector />
+
+            {/* Dashboard: show icon always, label appears from sm+ */}
+            <Button
+                className="ml-0 sm:ml-4 flex items-center gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-md"
+                variant="outline"
+                onClick={() => navigate("/admin/all-listings")}
+            >
+                <img src={dashboardSvg} alt="dashboard" className="w-5 h-5" />
+                <span className="hidden sm:inline">Explore Properties</span>
+            </Button>
+
+            <div className="flex items-center gap-2 ml-0 sm:ml-5">
+                <Button variant='ghost' size='icon' className='w-10 h-10 sm:w-12 sm:h-12'>
+                    <img src={BellSvg} alt="notifications" />
+                </Button>
+                <Button variant='ghost' size='icon' className='w-10 h-10 sm:w-12 sm:h-12'>
+                    <img src={ProfileSvg} alt="profile" />
+                </Button>
+                <MenuButton />
+            </div>
+        </div>
+    )
+}
+
