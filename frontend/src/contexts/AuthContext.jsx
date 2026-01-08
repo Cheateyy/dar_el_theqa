@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
       // Verify with backend
       const data = await AuthService.getCurrentUser();
-      
+
       if (data.isAuthenticated && data.user) {
         setUser(data.user);
         setIsAuthenticated(true);
@@ -88,13 +88,13 @@ export const AuthProvider = ({ children }) => {
   const activateAccount = async (email, code) => {
     try {
       const data = await AuthService.activateAccount({ email, code });
-      
+
       // Auto-login after successful activation
       if (data.token && data.user) {
         setUser(data.user);
         setIsAuthenticated(true);
       }
-      
+
       return { success: true, data };
     } catch (error) {
       return { success: false, error: error.message };

@@ -17,3 +17,8 @@ export function format_date(date) {
 
   return `${year}-${month}-${day}`;
 }
+
+export async function exec_stop_propagation_proxy(e, fn) {
+  e.stopPropagation()
+  await fn()
+}

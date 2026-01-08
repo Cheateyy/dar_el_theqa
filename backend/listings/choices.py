@@ -1,0 +1,7 @@
+PROPERTY_TYPES = [
+    {"value": "apartment", "label": "Appartement"},
+    {"value": "villa", "label": "Villa"},
+    {"value": "studio", "label": "Studio"},
+    {"value": "land", "label": "Terrain"},
+    {"value": "office", "label": "Bureau"},
+]

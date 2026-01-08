@@ -10,7 +10,7 @@ export function Favorites() {
     useEffect(() => {
         async function fetch_data() {
             const data = await get_favorites()
-            set_favorites(data.results)
+            set_favorites(data)
         }
         fetch_data()
     }, [])

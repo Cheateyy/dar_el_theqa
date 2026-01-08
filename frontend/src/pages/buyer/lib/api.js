@@ -1,5 +1,6 @@
 import { api } from "@/lib/api_client";
 import { format_date } from "@/lib/utils";
+import { authApi } from "@/services/authService";
 
 /**@typedef {import('@/types/ListingModel')}*/
 
@@ -8,7 +9,8 @@ export async function get_listings() {
     const res = await api.get("/api/listings/featured/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json();
     return data;
@@ -21,14 +23,14 @@ export async function get_listings() {
  */
 
 export async function toggle_like(listing_id) {
-    const res = await api.post(`/api/listings/${listing_id}/favorite/`);
+    const res = await authApi.post(`/api/listings/${listing_id}/favorite/`);
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return null;
     }
     /**@type {ToggleLikeResponse} */
     const data = await res.json();
-    console.log(`Listing like is ${data.status}`)
     return data;
 }
 
@@ -39,7 +41,8 @@ export async function get_property_types() {
     const res = await api.get("/api/choices/property-types/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return [];
     }
 
     const data = await res.json()
@@ -51,7 +54,8 @@ export async function get_wilayas() {
     const res = await api.get("/api/choices/wilayas/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -65,7 +69,8 @@ export async function search(search_payload) {
     const res = await api.post("/api/listings/search/", search_payload);
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
@@ -77,29 +82,44 @@ export async function get_partners() {
     const res = await api.get("/api/partners/")
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
 }
 
 /**@returns {Promise<Region[]>} */
-export async function get_regions() {
-    const res = await api.get("/api/choices/regions/")
+export async function get_regions({ wilaya_id }) {
+    const res = await api.get(`/api/choices/regions/?wilaya_id=${wilaya_id}`)
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
     }
     const data = await res.json()
     return data;
 }
 
-/**@returns {Promise<Paginated<Listing>>} */
+/**@returns {Promise<<Listing[]>>} */
 export async function get_favorites() {
-    const res = await api.get("/api/listings/favorites/");
+    const res = await authApi.get("/api/listings/favorites/");
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return []
+    }
+    const data = await res.json();
+    return data;
+};
+
+/**@returns {Promise<Paginated<Listing>>} */
+export async function get_contacted() {
+    const res = await authApi.get("/api/listings/contacted/");
+    if (!res.ok) {
+        const error = await res.text();
+        console.error(error)
+        return []
     }
     const data = await res.json();
     return data;
@@ -134,16 +154,18 @@ export async function pause_listing(listing_id, payload) {
     else {
         auto_activate_date_f = null;
     }
-    const res = await api.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
+
+    const res = await authApi.post(`/api/listings/${listing_id}/pause/`, { ...payload, auto_activate_date: auto_activate_date_f });
     if (!res.ok) {
         const error = await res.text();
-        throw new Error(error);
+        console.error(error)
+        return
     }
     const data = await res.json();
     return data
 }
 
-// ---------- DELETE Listing
+// DELETE Listing
 /**
  * @typedef DeleteListingUpload
  * @property {string} reason
@@ -155,6 +177,56 @@ export async function pause_listing(listing_id, payload) {
  * @returns {Promise<bool>}
  */
 export async function delete_listing(listing_id, payload) {
-    const res = await api.delete(`/api/listings/${listing_id}/`, payload)
+    const res = await authApi.delete(`/api/listings/${listing_id}/`, payload)
     return res.status == 204; // No content
+}
+
+// ----------  ADMIN
+
+// Get all listings
+
+/**
+ * @typedef {Listing[]} GetAllListingsResponse 
+ */
+
+export async function get_all_listings() {
+    const res = await authApi.get("/api/admin/listings/")
+    if (!res.ok) {
+        const error = await res.text();
+        console.error(error)
+        return []
+    }
+    /**@type {GetAllListingsResponse} */
+    const data = await res.json();
+    return data;
+}
+
+
+// ------- Seller
+/**
+ * @typedef {Listing[]} GetMyListingsResponse
+ */
+/**
+ * @param {string | null | undefined} status
+ * @returns {Promise<GetAllListingsResponse | []>}
+ */
+export async function get_my_listings(status) {
+    const params = new URLSearchParams({ page: '1' });
+
+    if (status != null) {
+        params.set('status', status);
+    }
+
+    const res = await authApi.get(`/api/listings/my-listings/?${params.toString()}`, {
+        params,
+    });
+
+    if (!res.ok) {
+        const error = await res.text().catch(() => 'Unknown error');
+        console.error('[get_my_listings]', error);
+        return [];
+    }
+
+    /** @type {GetAllListingsResponse} */
+    return await res.json();
 }

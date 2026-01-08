@@ -6,41 +6,37 @@ import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
 import { Combobox } from "@/components/common/Combobox"
-import { useListings } from "../../context/ListingsContext"
-
-/**@type {import("../../types/common")} */
+import { useSearch } from "../context/searchContext"
 
 /**
  * @param {Object} props
- * @param {StateControl<SearchFilters>} props.state_control
- * @param {StateControl<string>} props.property_type_control
  * @param {StateControl<boolean>} props.dialog_control
  */
-export function MainSearchFilters({ className, state_control, dialog_control, property_type_control }) {
-    const [filters, set_filters] = state_control
-    const [selected_property_type, set_selected_property_type] = property_type_control
-    const wilaya_options = useWilayaOptions()
+export function MainSearchFilters({ className, dialog_control }) {
+    const { filters, set_filters } = useSearch()
+    const { selected_offer_type, } = useSearch()
     const [is_dlg_open, set_is_dlg_open] = dialog_control
 
+    const wilaya_options = useWilayaOptions()
     const regions = useRegionOptions()
 
     return (
         <div>
-            <SearchFiltersWrapper className={className} selectedOfferType={selected_property_type} setSelectedOfferType={set_selected_property_type}>
+            <SearchFiltersWrapper className={className}>
                 <div className="flex flex-col items-center sm:flex-col md:flex-row overflow-auto relative gap-5">
                     <FilterCombobox
                         filtername="Wilaya"
                         input_control={
-                            [filters.wilaya,
-                            (new_wilaya) => set_filters(prev => ({ ...prev, wilaya: new_wilaya }))]}
+                            [filters.wilaya_id,
+                            (new_wilaya_id) => set_filters(prev => ({ ...prev, wilaya_id: new_wilaya_id }))]}
                         className={'rounded-2xl'}
                         options={wilaya_options}
                     />
                     <FilterCombobox
                         filtername="Region"
                         input_control={
-                            [filters.region,
-                            (new_region) => set_filters(prev => ({ ...prev, region: new_region }))]}
+                            [filters.region_id,
+                            (new_region_id) => set_filters(prev => ({ ...prev, region_id: new_region_id }))]}
                         className={'w-48 rounded-2xl'}
                         options={regions}
                     />
@@ -48,13 +44,13 @@ export function MainSearchFilters({ className, state_control, dialog_control, pr
                         filtername="Appartement"
                         input_control={
                             [filters.property_type,
-                            (new_appartement) => set_filters(prev => ({ ...prev, appartement: new_appartement }))]}
+                            (new_appartement) => set_filters(prev => ({ ...prev, property_type: new_appartement }))]}
                         className={'w-48 rounded-2xl'}
-                        options={[]}
+                        options={[{ label: "APARTMENT", value: "APARTMENT" }]}
                     />
 
                     <PriceInput
-                        offerType={selected_property_type}
+                        offerType={selected_offer_type}
                         input_control={[filters.price_range, (new_range) => set_filters(prev => ({ ...prev, price_range: new_range }))]}
                         rent_unit_control={[filters.rent_time_unit, (new_rent_unit) => set_filters(prev => ({ ...prev, rent_time_unit: new_rent_unit }))]}
                     />

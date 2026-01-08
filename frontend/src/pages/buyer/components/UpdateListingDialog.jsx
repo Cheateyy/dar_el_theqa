@@ -22,6 +22,7 @@ export function UpdateListingDialog({ listing_id, state_control }) {
         { value: "I want to pause it for now", label: "I want to pause it for now" },
         { value: "other", label: "other" },
     ]
+
     /**@returns {Promise<boolean>} */
     async function handle_pause_listing(e) {
         e.preventDefault()

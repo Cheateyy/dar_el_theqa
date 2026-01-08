@@ -16,6 +16,12 @@ class Lead(TimeStampedModel):
     listing = models.ForeignKey('listings.Listing', on_delete=models.CASCADE, related_name='leads')
     message = models.TextField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'listing']),
+            models.Index(fields=['user', 'created_at']),
+        ]
+
     def __str__(self):
         return f"Lead from {self.user} on {self.listing}"
 
