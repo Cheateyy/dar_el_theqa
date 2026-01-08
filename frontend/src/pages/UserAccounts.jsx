@@ -34,7 +34,7 @@ function UserAccounts() {
     }
   }, [loading, isAuthenticated, user, navigate]);
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 1;
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -222,39 +222,35 @@ function UserAccounts() {
             </table>
           </div>
         </Section>
-
+                </div>
         <div className="user-pagination">
           <button
             disabled={currentPage === 1}
             onClick={() => goToPage(currentPage - 1)}
+            className="paging-button"
           >
             <img src={backButton} alt="" />
           </button>
 
-          {pageItems.map((p, i) =>
-            p === "..." ? (
-              <button key={i} disabled>
-                ...
-              </button>
-            ) : (
-              <button
-                key={p}
-                className={p === currentPage ? "active" : ""}
-                onClick={() => goToPage(p)}
-              >
-                {p}
-              </button>
-            )
-          )}
+          {pageItems.map((p) => (
+                  <button
+                    key={p}
+                    className={`page-dot ${p === currentPage ? "active" : ""}`}
+                    onClick={() => setCurrentPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
 
           <button
+            className="paging-button"
             disabled={currentPage === totalPages}
             onClick={() => goToPage(currentPage + 1)}
           >
             <img src={nextPage} alt="" />
           </button>
         </div>
-      </div>
+      
     </div>
   );
 }

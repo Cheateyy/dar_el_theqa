@@ -22,7 +22,7 @@ function PartnerAccounts() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading } = useAuth();
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 1;
 
   const [partners, setPartners] = useState([]);
   const [users, setUsers] = useState([]);
