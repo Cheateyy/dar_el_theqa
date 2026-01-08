@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Navbar.css";
-
+import { useAuth } from "../contexts/AuthContext";
 import LogoIcon from "@/assets/icons/DARTHIQA.svg";
-import LanguageIcon from "@/assets/icons/language.svg";
 import ExploreIcon from "@/assets/icons/explore.svg";
 import NotifIcon from "@/assets/icons/notif.svg";
 import ProfileIcon from "@/assets/icons/profile.svg";
@@ -11,18 +10,14 @@ import MenuIcon from "@/assets/icons/Menu.svg";
 
 function Navbar() {
   const navigate = useNavigate();
-
-  const [showLangMenu, setShowLangMenu] = useState(false);
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
-  const langRef = useRef(null);
   const menuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) {
-        setShowLangMenu(false);
-      }
+      
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
       }
@@ -34,15 +29,23 @@ function Navbar() {
   const closeMenu = () => setShowMenu(false);
 
   const handleExploreClick = () => {
-    navigate("/");
+    navigate("/search-results");
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
+  const handleLogout = async () => {
+  if (isLoggingOut) return;
+  setIsLoggingOut(true);
+
+  try {
+    await logout(); 
     closeMenu();
     navigate("/");
-  };
+  } catch (error) {
+    console.error("Failed to logout", error);
+  } finally {
+    setIsLoggingOut(false);
+  }
+};
 
   return (
     <header className="navbar">
@@ -51,23 +54,6 @@ function Navbar() {
       </div>
 
       <div className="navbar-right">
-        {/* LANGUAGE MENU */}
-        <div className="navbar-lang-wrapper" ref={langRef}>
-          <button
-            className="navbar-link"
-            onClick={() => setShowLangMenu((p) => !p)}
-          >
-            <img src={LanguageIcon} alt="Language" className="navbar-icon" />
-          </button>
-
-          {showLangMenu && (
-            <div className="lang-dropdown">
-              <button className="lang-item">Arabic</button>
-              <button className="lang-item">English</button>
-              <button className="lang-item">French</button>
-            </div>
-          )}
-        </div>
 
         {/* EXPLORE PROPERTIES */}
         <button className="navbar-link" onClick={handleExploreClick}>
@@ -129,7 +115,7 @@ function Navbar() {
               <button
                 className="menu-item"
                 onClick={() => {
-                  navigate("/");
+                  navigate("/admin/all-listings");
                   closeMenu();
                 }}
               >

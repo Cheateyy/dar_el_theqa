@@ -16,7 +16,7 @@
 /* DISABLED (GLOBAL) */
 .btn:disabled {
   background: #bebbbb !important;
-  cursor: not-allowed !important;
+  cursor: default !important;
   color: #646161 !important;
   border-color: transparent !important;
 }
