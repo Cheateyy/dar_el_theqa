@@ -34,7 +34,7 @@ function UserAccounts() {
     }
   }, [loading, isAuthenticated, user, navigate]);
 
-  const PAGE_SIZE = 1;
+  const PAGE_SIZE = 10;
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingUsers, setLoadingUsers] = useState(true);
