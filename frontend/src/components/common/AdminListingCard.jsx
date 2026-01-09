@@ -62,7 +62,7 @@ export function AdminListingCard({ listing }) {
                 <div className="flex items-start gap-3">
                     <div className="min-w-0">
                         <p className="text-sm sm:text-base font-medium truncate">{listing.title}</p>
-                        <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya}</p>
+                        <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya_name}</p>
                     </div>
                     {verification_status_icon && <img src={verification_status_icon} alt="verified" className="ml-auto" />}
                 </div>
