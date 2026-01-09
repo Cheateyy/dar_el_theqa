@@ -17,6 +17,12 @@
  */
 
 /**
+ * @typedef PropertyType
+ * @property {string} label
+ * @property {string} value
+ */
+
+/**
  * @template T
  * @typedef {[T, import('react').Dispatch<import('react').SetStateAction<T>>]} InputControl
  */

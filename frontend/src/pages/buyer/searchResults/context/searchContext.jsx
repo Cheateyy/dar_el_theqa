@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { OFFER_TYPE } from "../../enum";
-import { get_regions } from "../../lib/api";
+import { get_property_types, get_regions } from "../../lib/api";
 
 
 // sentinel numbers
@@ -27,10 +27,13 @@ const MAX_AREA = 1_000_000_000
 
  * @property {Region[]} regions
  * @property {import('react').Dispatch<import('react').SetStateAction<Region[]>>} set_regions
- * 
+ * @property {PropertyType[]} property_types
+  
  * @property {SearchPayload} search_params
  * @property {import('react').Dispatch<import('react').SetStateAction<SearchPayload>>} set_search_params
- */
+ 
+ * @property {import('react').Dispatch<import('react').SetStateAction<SearchPayload>>} set_search_params
+*/
 
 
 /** @type {React.Context<SearchStore>} */
@@ -69,6 +72,10 @@ export function SearchProvider({ children }) {
     /** @type {StateControl<Region[]>} */
     const [regions, set_regions] = useState([]);
 
+    /** @type {[Option[], import('react').Dispatch<import('react').SetStateAction<Option[]>>]} */
+    const [property_types, set_property_types] = useState([]);
+
+
     // We are updating searchParams each time filter_input_values got changed
     // TODO: think of merging search_params and filter_input_values into one state (maybe using context)
 
@@ -80,8 +87,12 @@ export function SearchProvider({ children }) {
 
     useEffect(() => {
         async function fetchData() {
-            const regions = await get_regions({ wilaya_id: filters.wilaya_id })
+            const [regions, property_types,] = await Promise.all([
+                get_regions({ wilaya_id: filters.wilaya_id }),
+                get_property_types()
+            ]);
             set_regions(regions)
+            set_property_types(property_types)
         }
         fetchData()
     }, [filters.wilaya_id])
@@ -118,6 +129,7 @@ export function SearchProvider({ children }) {
             page, set_page,
 
             regions, set_regions,
+            property_types,
             search_params, set_search_params,
         }}>
             {children}
