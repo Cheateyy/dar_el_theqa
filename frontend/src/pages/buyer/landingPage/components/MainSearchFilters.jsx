@@ -4,7 +4,7 @@ import { useListings } from "../../context/ListingsContext"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import { useWilayaOptions } from "../../lib/hooks"
+import { usePropertyTypesOptions, useWilayaOptions } from "../../lib/hooks"
 import { useSearch } from "../../searchResults/context/searchContext"
 
 /**@type {import('@/types/common')} */
@@ -19,7 +19,7 @@ export default function MainSearchFilters({ className }) {
   const navigate = useNavigate()
   const { selected_offer_type, set_selected_offer_type } = useSearch()
   const { filters, set_filters, } = useSearch()
-  const { property_types } = useListings()
+  const property_types = usePropertyTypesOptions()
   const wilayas_options = useWilayaOptions()
 
   return (

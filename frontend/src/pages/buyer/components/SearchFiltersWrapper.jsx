@@ -18,7 +18,7 @@ export function SearchFiltersWrapper({ className, children }) {
                             variant={selected_offer_type == OFFER_TYPE.RENT ? 'secondary' : 'default'}
                             size={'lg'}
                             className={'flex-1 h-full items-start'}
-                            onClick={() => set_selected_offer_type(OFFER_TYPE.BUY)}
+                            onClick={() => set_selected_offer_type(OFFER_TYPE.RENT)}
                         >
                             <p className="mt-3 w-18 h-15 px-4 py-3">Rent</p>
                         </Button>
@@ -26,7 +26,7 @@ export function SearchFiltersWrapper({ className, children }) {
                             variant={selected_offer_type == OFFER_TYPE.BUY ? 'secondary' : 'default'}
                             size={'lg'}
                             className={'flex-1 h-full items-start'}
-                            onClick={() => set_selected_offer_type(OFFER_TYPE.RENT)}
+                            onClick={() => set_selected_offer_type(OFFER_TYPE.BUY)}
                         >
                             <p className="mt-3 w-18 h-15 px-4 py-3 ">Buy</p>
                         </Button>
