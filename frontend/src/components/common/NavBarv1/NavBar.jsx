@@ -6,7 +6,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import "./NavBar.css";
 
-export default function NavBar({ onLoginClick }) {
+export default function NavBar() {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
 
@@ -68,11 +68,9 @@ export default function NavBar({ onLoginClick }) {
                         )}
                     </div>
                 ) : (
-                    <Link to="/">
-                        <button className="loginButton" onClick={onLoginClick}>
-                            Log In
-                        </button>
-                    </Link>
+                    <button className="loginButton" onClick={() => navigate("/login")}>
+                        Log In
+                    </button>
                 )}
             </div>
         </div>

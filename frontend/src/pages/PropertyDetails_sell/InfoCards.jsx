@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 import ShowInterestModal from "../../components/common/showInterestModal/ShowInterestModal";
 
 export default function InfoCards({
@@ -10,6 +12,21 @@ export default function InfoCards({
     isSendingInterest = false,
 }) {
     const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { isAuthenticated } = useAuth();
+
+    const handleShowInterestClick = () => {
+        if (!isAuthenticated) {
+            navigate("/login", {
+                state: {
+                    from: location.pathname,
+                },
+            });
+            return;
+        }
+        setShowModal(true);
+    };
 
     const handleSendInterest = async (message) => {
         if (!onShowInterest) {
@@ -46,7 +63,7 @@ export default function InfoCards({
             </div>
 
             <div className="sell-showInterest">
-                <button className="sell-interestButton" onClick={() => setShowModal(true)}>
+                <button className="sell-interestButton" onClick={handleShowInterestClick}>
                     Show Interest →
                 </button>
             </div>
