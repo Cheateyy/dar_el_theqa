@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { OFFER_TYPE } from "../../enum";
-import { get_property_types, get_regions } from "../../lib/api";
+import { get_property_types, get_regions, search } from "../../lib/api";
 
 
 // sentinel numbers
@@ -41,6 +41,26 @@ const MAX_AREA = 1_000_000_000
 /** @type {React.Context<SearchStore>} */
 const SearchContext = createContext(null);
 
+function get_filters_defaults(search_params) {
+    return {
+        wilaya_id: search_params["wilaya_id"],
+        region_id: search_params["region_id"],
+        property_type: search_params["property_type"],
+        price_range: search_params["price_range"] ?? [MIN_PRICE, MAX_PRICE],
+    }
+}
+
+function get_more_filters_defaults(search_params) {
+    return {
+        is_verified_only: search_params["is_verified_only"],
+        area_range: search_params["area_range"] ?? [MIN_AREA, MAX_AREA],
+        floors: search_params["floors"],
+        bedrooms: search_params["bedrooms"],
+        bathrooms: search_params["bathrooms"],
+        rating: search_params["rating"],
+    }
+}
+
 /**
  * @param {{ children: React.ReactNode }} props
  */
@@ -54,22 +74,10 @@ export function SearchProvider({ children }) {
     const [page, set_page] = useState(1)
 
     /**@type {InputControl<SearchFilters>} */
-    const [filters, set_filters] = useState({
-        wilaya_id: search_params["wilaya_id"],
-        region_id: search_params["region_id"],
-        property_type: search_params["property_type"],
-        price_range: search_params["price_range"] ?? [MIN_PRICE, MAX_PRICE],
-    })
+    const [filters, set_filters] = useState(get_filters_defaults(search_params))
 
     /**@type {StateControl<MoreFilters>} */
-    const [more_filters, set_more_filters] = useState({
-        is_verified_only: search_params["is_verified_only"],
-        area_range: search_params["area_range"] ?? [MIN_AREA, MAX_AREA],
-        floors: search_params["floors"],
-        bedrooms: search_params["bedrooms"],
-        bathrooms: search_params["bathrooms"],
-        rating: search_params["rating"],
-    })
+    const [more_filters, set_more_filters] = useState(get_more_filters_defaults(search_params))
 
     /** @type {StateControl<Region[]>} */
     const [regions, set_regions] = useState([]);
@@ -124,7 +132,8 @@ export function SearchProvider({ children }) {
     }
 
     function clear_all() {
-        set_search_params({})
+        set_filters(get_filters_defaults(search_params))
+        set_more_filters(get_more_filters_defaults(search_params))
     }
 
     return (
