@@ -33,8 +33,8 @@ export function CustomDropdownMenu({ className, options = [], variant, children,
                 <DropdownMenuContent className="w-56" align="start">
                     <DropdownMenuGroup>
                         {options.map((option, index) =>
-                            <DropdownMenuItem key={index}>
-                                <div className="flex gap-2" onClick={option.onClick}>
+                            <DropdownMenuItem key={index} onClick={option.onClick}>
+                                <div className="flex gap-2">
                                     {option.img && <img src={option.img} />}
                                     {option.label}
                                 </div>
