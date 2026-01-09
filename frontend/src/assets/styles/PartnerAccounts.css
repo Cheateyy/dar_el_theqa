@@ -192,8 +192,8 @@
 }
 
 .paging-button {
-  height: 38px;
-  width: 38px;
+  height: 32px;
+  width: 32px;
   border-radius: 100%;
   border: 1px solid #0e4466;
   background: transparent;
@@ -205,6 +205,10 @@
   justify-content: center;
 }
 
+.paging-button:disabled {
+  opacity: 0.5;
+  cursor: default !important;
+}
 
 @media (max-width: 1024px) {
   .add-partner-container{

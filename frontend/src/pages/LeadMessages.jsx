@@ -207,6 +207,7 @@ function LeadsPage() {
             {/* PAGINATION */}
               <div className="leads-pagination">
                 <button
+                  className="paging-button"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
@@ -224,6 +225,7 @@ function LeadsPage() {
                 ))}
 
                 <button
+                  className="paging-button"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }

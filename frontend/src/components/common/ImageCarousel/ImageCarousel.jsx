@@ -28,17 +28,21 @@ export default function ImageCarousel({ images }) {
     <div className="embla">
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
-          {images.map((src, index) => (
-            <div className="embla__slide" key={index}>
-              <img
-                className="embla__slide__img"
-                src={src}
-                alt=""
-                onClick={() => openFullscreen(src)}
-                style={{ cursor: "pointer" }}
-              />
-            </div>
-          ))}
+          {images.map((img, index) => {
+            // Handle both string URLs and image objects
+            const src = typeof img === 'string' ? img : img?.image || '';
+            return (
+              <div className="embla__slide" key={index}>
+                <img
+                  className="embla__slide__img"
+                  src={src}
+                  alt=""
+                  onClick={() => openFullscreen(src)}
+                  style={{ cursor: "pointer" }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
