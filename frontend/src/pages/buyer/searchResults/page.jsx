@@ -1,13 +1,12 @@
 import heroImg from "./assets/hero.jpg"
 import { SearchFilters } from "./components/SearchFilters";
 import { ListingGrid } from "../../../components/common/ListingGrid";
-import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { search as get_search_listings } from "../lib/api";
-import { SearchProvider, useSearch } from "./context/searchContext";
+import { useSearch } from "./context/searchContext";
 
 export default function SearchResults() {
-    const [search_params, _] = useSearchParams()
+    const { search_params } = useSearch()
     const { page, set_page } = useSearch()
 
     /**@type {StateControl<Listing[]>} */

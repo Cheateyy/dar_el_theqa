@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { OFFER_TYPE } from "../../enum";
 import { get_regions } from "../../lib/api";
 
@@ -28,6 +27,9 @@ const MAX_AREA = 1_000_000_000
 
  * @property {Region[]} regions
  * @property {import('react').Dispatch<import('react').SetStateAction<Region[]>>} set_regions
+ * 
+ * @property {SearchPayload} search_params
+ * @property {import('react').Dispatch<import('react').SetStateAction<SearchPayload>>} set_search_params
  */
 
 
@@ -38,7 +40,7 @@ const SearchContext = createContext(null);
  * @param {{ children: React.ReactNode }} props
  */
 export function SearchProvider({ children }) {
-    const [search_params, set_search_params] = useSearchParams()
+    const [search_params, set_search_params] = useState({})
 
     /**@type {StateControl<string>}*/
     const [selected_offer_type, set_selected_offer_type] = useState(OFFER_TYPE.BUY)
@@ -48,20 +50,20 @@ export function SearchProvider({ children }) {
 
     /**@type {InputControl<SearchFilters>} */
     const [filters, set_filters] = useState({
-        wilaya_id: search_params.get("wilaya_id"),
-        region_id: search_params.get("region_id"),
-        property_type: search_params.get("property_type"),
-        price_range: search_params.get("price_range") ?? [MIN_PRICE, MAX_PRICE],
+        wilaya_id: search_params["wilaya_id"],
+        region_id: search_params["region_id"],
+        property_type: search_params["property_type"],
+        price_range: search_params["price_range"] ?? [MIN_PRICE, MAX_PRICE],
     })
 
     /**@type {StateControl<MoreFilters>} */
     const [more_filters, set_more_filters] = useState({
-        is_verified_only: search_params.get("is_verified_only"),
-        area_range: search_params.get("area_range") ?? [MIN_AREA, MAX_AREA],
-        floors: search_params.get("floors"),
-        bedrooms: search_params.get("bedrooms"),
-        bathrooms: search_params.get("bathrooms"),
-        rating: search_params.get("rating"),
+        is_verified_only: search_params["is_verified_only"],
+        area_range: search_params["area_range"] ?? [MIN_AREA, MAX_AREA],
+        floors: search_params["floors"],
+        bedrooms: search_params["bedrooms"],
+        bathrooms: search_params["bathrooms"],
+        rating: search_params["rating"],
     })
 
     /** @type {StateControl<Region[]>} */
@@ -116,6 +118,7 @@ export function SearchProvider({ children }) {
             page, set_page,
 
             regions, set_regions,
+            search_params, set_search_params,
         }}>
             {children}
         </SearchContext.Provider>
