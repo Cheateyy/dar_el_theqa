@@ -33,6 +33,8 @@ const MAX_AREA = 1_000_000_000
  * @property {import('react').Dispatch<import('react').SetStateAction<SearchPayload>>} set_search_params
  
  * @property {import('react').Dispatch<import('react').SetStateAction<SearchPayload>>} set_search_params
+ 
+ * @property {Function(void) : void} clear_all
 */
 
 
@@ -82,7 +84,7 @@ export function SearchProvider({ children }) {
     // ==== Search state mng ======
     useEffect(() => {
         const params_obj = get_search_params_obj()
-        set_search_params(new URLSearchParams(params_obj))
+        set_search_params(params_obj)
     }, [filters, selected_offer_type, more_filters, page])
 
     useEffect(() => {
@@ -121,6 +123,10 @@ export function SearchProvider({ children }) {
         )
     }
 
+    function clear_all() {
+        set_search_params({})
+    }
+
     return (
         <SearchContext.Provider value={{
             filters, set_filters,
@@ -131,6 +137,7 @@ export function SearchProvider({ children }) {
             regions, set_regions,
             property_types,
             search_params, set_search_params,
+            clear_all,
         }}>
             {children}
         </SearchContext.Provider>

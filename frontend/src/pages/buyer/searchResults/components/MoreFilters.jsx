@@ -18,6 +18,7 @@ import { useSearch } from "../context/searchContext"
  * @param {StateControl<boolean>} props.dialog_control
  */
 export function MoreFilters({ className, dialog_control }) {
+    const { clear_all } = useSearch()
     const { more_filters, set_more_filters } = useSearch()
     const [_, set_is_dlg_open] = dialog_control
     return (
@@ -58,8 +59,11 @@ export function MoreFilters({ className, dialog_control }) {
             </div>
 
             <div role="actions" className="flex mt-9">
-                <Button variant={'ghost'} className={'text-red-500'}>Clear All</Button>
-                <Button variant={'default'} className={'ml-auto'} onClick={() => set_is_dlg_open(prev => !prev)}>
+                <Button variant={'ghost'} className={'text-red-500'}
+                    onClick={() => { clear_all(); set_is_dlg_open(false) }}
+                >Clear All
+                </Button>
+                <Button variant={'default'} className={'ml-auto'} onClick={() => set_is_dlg_open(false)}>
                     Apply filters
                     <ArrowRight />
                 </Button>

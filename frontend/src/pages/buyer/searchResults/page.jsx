@@ -14,7 +14,7 @@ export default function SearchResults() {
 
     useEffect(() => {
         async function fetchData() {
-            const search_params_obj = Object.fromEntries(search_params.entries())
+            const search_params_obj = Object.fromEntries(Object.entries(search_params))
             const search_result = await get_search_listings(search_params_obj)
             set_listings(search_result.results)
         }
