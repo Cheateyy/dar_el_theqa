@@ -1,6 +1,7 @@
 import { useState } from "react";
 import acceptImg from "../../assets/images/accept.png";
 import rejectImg from "../../assets/images/reject.png";
+import ReasonModal from "../../components/common/ReasonModal.jsx";
 
 const formatStatus = (status) => {
   if (!status) return "Pending";
@@ -10,6 +11,8 @@ const formatStatus = (status) => {
 
 export default function LegalDocumentsSection({ documents = [], onReject, onAccept }) {
   const [notes, setNotes] = useState({});
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState(null);
 
   const handleNoteChange = (docId, value) => {
     setNotes((prev) => ({ ...prev, [docId]: value }));
@@ -18,10 +21,20 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
   const handleReject = (docId) => {
     const reason = (notes[docId] || "").trim();
     if (!reason) {
-      alert("Please provide reviewer notes before rejecting the document.");
+      setSelectedDocId(docId);
+      setShowRejectModal(true);
       return;
     }
     onReject?.(docId, reason);
+  };
+
+  const handleRejectModalSubmit = (reason) => {
+    if (selectedDocId) {
+      setNotes((prev) => ({ ...prev, [selectedDocId]: reason }));
+      onReject?.(selectedDocId, reason);
+      setShowRejectModal(false);
+      setSelectedDocId(null);
+    }
   };
 
   const handleAccept = (docId, fallbackNote = "") => {
@@ -32,7 +45,23 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
   };
 
   return (
-    <div id="admin-legal-documents" className="admin-sell-legal-documents">
+    <>
+      <ReasonModal
+        open={showRejectModal}
+        title="Reject Document"
+        description="Please provide a reason for rejecting this document."
+        label="Reason"
+        placeholder="Enter rejection reason..."
+        confirmLabel="Reject"
+        cancelLabel="Cancel"
+        requireReason={true}
+        onSubmit={handleRejectModalSubmit}
+        onClose={() => {
+          setShowRejectModal(false);
+          setSelectedDocId(null);
+        }}
+      />
+      <div id="admin-legal-documents" className="admin-sell-legal-documents">
       <h3>Legal Documents</h3>
       <ul>
         {documents.map((doc) => (
@@ -75,5 +104,6 @@ export default function LegalDocumentsSection({ documents = [], onReject, onAcce
         ))}
       </ul>
     </div>
+    </>
   );
 }
