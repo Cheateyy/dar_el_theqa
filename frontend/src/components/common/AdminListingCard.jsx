@@ -36,7 +36,7 @@ export function AdminListingCard({ listing }) {
     function handle_preview(e) {
         const transaction_type = listing.transaction_type == OFFER_TYPE.BUY ? "Sell" : "Rent"
         exec_stop_propagation_proxy(e, () => {
-            const url = `/details/admingListing${transaction_type}/${listing.id}`
+            const url = `/details/adminReview${transaction_type}/${listing.id}`
             navigate(url)
         })
     }
