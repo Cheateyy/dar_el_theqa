@@ -1,7 +1,7 @@
 import { FilterCombobox } from "../../components/FilterCombobox"
 import { SearchFiltersWrapper } from "../../components/SearchFiltersWrapper"
 import { Button } from "@/components/ui/button"
-import { useRegionOptions, useWilayaOptions } from "../../lib/hooks"
+import { usePropertyTypesOptions, useRegionOptions, useWilayaOptions } from "../../lib/hooks"
 import filterIcon from '../assets/filter.svg'
 import { RangeInput } from "../../components/RangeInput"
 import { OFFER_TYPE } from "../../enum"
@@ -18,7 +18,8 @@ export function MainSearchFilters({ className, dialog_control }) {
     const [is_dlg_open, set_is_dlg_open] = dialog_control
 
     const wilaya_options = useWilayaOptions()
-    const regions = useRegionOptions()
+    const regions_options = useRegionOptions()
+    const property_types_options = usePropertyTypesOptions()
 
     return (
         <div>
@@ -38,7 +39,7 @@ export function MainSearchFilters({ className, dialog_control }) {
                             [filters.region_id,
                             (new_region_id) => set_filters(prev => ({ ...prev, region_id: new_region_id }))]}
                         className={'w-48 rounded-2xl'}
-                        options={regions}
+                        options={regions_options}
                     />
                     <FilterCombobox
                         filtername="Appartement"
@@ -46,7 +47,7 @@ export function MainSearchFilters({ className, dialog_control }) {
                             [filters.property_type,
                             (new_appartement) => set_filters(prev => ({ ...prev, property_type: new_appartement }))]}
                         className={'w-48 rounded-2xl'}
-                        options={[{ label: "APARTMENT", value: "APARTMENT" }]}
+                        options={property_types_options}
                     />
 
                     <PriceInput

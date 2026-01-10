@@ -1,9 +1,26 @@
 import logoSvg from "@/assets/images/logo.svg";
-import { LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "../../pages/buyer/components/Actions";
+import { AdminActions, LoggedInBuyerActions, LoggedInSellerActions, NotLoggedInActions } from "../../pages/buyer/components/Actions";
 import { useAuth } from "@/contexts/AuthContext";
+
+function get_actions(is_authenticated, user) {
+    if (!is_authenticated) {
+        return NotLoggedInActions
+    }
+    if (user.role == "ADMIN" || user.role == "Admin") {
+        return AdminActions
+    }
+    if (!user.is_staff) {
+        return LoggedInBuyerActions
+    }
+    if (user.is_staff) {
+        return LoggedInSellerActions
+    }
+
+}
 
 export function Header() {
     const { isAuthenticated, user, } = useAuth()
+    const Actions = get_actions(isAuthenticated, user)
 
     return <header>
         <div className="flex flex-row px-4 sm:px-8 md:px-16 justify-between items-center">
@@ -12,13 +29,7 @@ export function Header() {
                 <img src={logoSvg} alt="logo" className="w-full h-full object-contain" />
             </div>
 
-            {/* conditional rendering based on auth state */}
-
-            {!isAuthenticated && <NotLoggedInActions />}
-
-            {isAuthenticated && user.is_staff && < LoggedInSellerActions />}
-
-            {isAuthenticated && !user.is_staff && < LoggedInBuyerActions />}
+            <Actions />
         </div>
     </header>
 }

@@ -39,8 +39,8 @@ export function SellerListingCard({ listing }) {
     switch (listing.verification_status) {
         case "VERIFIED":
             verification_status_icon = isVerifiedSvg;
-            verification_status_str = "Pending"
-            verification_status_color = 'yellow'
+            verification_status_str = "Approved"
+            verification_status_color = 'green'
             break;
         case "PARTIAL":
             verification_status_icon = isPartiallyVerifiedSvg;
@@ -49,15 +49,14 @@ export function SellerListingCard({ listing }) {
             break;
         case "NONE":
             verification_status_icon = null;
-            verification_status_str = "Approved"
-            verification_status_color = 'green'
+            verification_status_str = null
+            verification_status_color = null
             break;
         default:
             console.error("ListingCard: unsupported verification status")
     }
 
-    function handle_click() {
-        console.log("button clicked")
+    function handle_click(e) {
         const url = `/details/sellerListing-${selected_offer_type == OFFER_TYPE.BUY ? "sell" : "rent"}/${listing.id}`
         navigate(url)
     }
@@ -66,7 +65,7 @@ export function SellerListingCard({ listing }) {
         <Card
             style={{ backgroundImage: `url(${listingCardImage})` }}
             className="relative bg-cover bg-center rounded-4xl max-w-80 h-56 sm:h-72 md:h-100 py-0 flex flex-col justify-end overflow-hidden"
-            onClick={handle_click}
+            onClick={(e) => handle_click(e)}
         >
             {/* top-right action */}
             <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex gap-2">
@@ -97,7 +96,7 @@ export function SellerListingCard({ listing }) {
                 <div className="flex items-start gap-3">
                     <div className="min-w-0">
                         <p className="text-sm sm:text-base font-medium truncate">{listing.title}</p>
-                        <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya}</p>
+                        <p className="text-xs sm:text-sm text-gray-200 truncate">{listing.wilaya_name}</p>
                     </div>
                     {verification_status_icon && <img src={verification_status_icon} alt="verified" className="ml-auto" />}
                 </div>

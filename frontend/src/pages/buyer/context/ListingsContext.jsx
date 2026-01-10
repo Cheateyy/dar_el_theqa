@@ -24,21 +24,19 @@ export function ListingProvider({ children }) {
     /** @type {[Listing[], import('react').Dispatch<import('react').SetStateAction<Listing[]>>]} */
     const [listings, set_listings] = useState([]);
 
-    /** @type {[Option[], import('react').Dispatch<import('react').SetStateAction<Option[]>>]} */
-    const [property_types, set_property_types] = useState([]);
+
 
     /** @type {[Wilaya[], import('react').Dispatch<import('react').SetStateAction<Wilaya[]>>]} */
     const [wilayas, set_wilayas] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            const [listingsData, wilayasData, propertyTypesData,] = await Promise.all([
+            const [listingsData, wilayasData,] = await Promise.all([
                 get_listings(),
                 get_wilayas(),
                 get_property_types(),
             ]);
             set_listings(listingsData);
-            set_property_types(propertyTypesData);
             set_wilayas(wilayasData);
         };
         fetchData();
@@ -47,7 +45,6 @@ export function ListingProvider({ children }) {
     return (
         <ListingsContext.Provider value={{
             listings, set_listings,
-            property_types,
             wilayas,
         }}>
             {children}

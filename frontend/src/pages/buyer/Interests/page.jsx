@@ -10,7 +10,7 @@ export function Interests() {
     useEffect(() => {
         async function fetchData() {
             const data = await get_contacted()
-            set_listings(data.results ?? [])
+            set_listings(data)
         }
         fetchData()
     }, [])

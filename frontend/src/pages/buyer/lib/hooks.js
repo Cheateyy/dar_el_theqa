@@ -12,3 +12,9 @@ export function useRegionOptions() {
     const region_options = regions.map((region) => ({ label: region.name, value: region.id }))
     return region_options;
 }
+
+export function usePropertyTypesOptions() {
+    const { property_types } = useSearch()
+    const options = property_types.map((property_type) => ({ label: property_type.label, value: property_type.value }))
+    return options;
+}

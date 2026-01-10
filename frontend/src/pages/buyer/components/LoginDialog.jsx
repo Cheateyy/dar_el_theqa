@@ -4,12 +4,14 @@ import { Label } from "@/components/ui/label"
 import { useAuth } from "@/contexts/AuthContext"
 import { useState } from "react"
 import ReactModal from "react-modal"
+import { useNavigate } from "react-router-dom"
 
 /**
  * @param {Object} props
  * @param {StateControl<boolean>} props.state_control
  */
 export function LoginDialog({ state_control }) {
+    const navigate = useNavigate()
     const { login } = useAuth()
     const [is_dlg_open, set_is_dlg_open] = state_control
     const [inputs, set_inputs] = useState({ email: "", password: "" })
@@ -84,7 +86,10 @@ export function LoginDialog({ state_control }) {
                 </div>
 
                 <div className="text-center mt-4 sm:mt-6 text-sm sm:text-base">
-                    Don't have an account?<strong className="ml-2 cursor-pointer text-blue-600 hover:underline">Sign up</strong>
+                    Don't have an account?
+                    <strong className="ml-2 cursor-pointer text-blue-600 hover:underline">
+                        <a onClick={() => navigate("/signup")}>Sign up</a>
+                    </strong>
                 </div>
 
                 <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-8 sm:mt-11">

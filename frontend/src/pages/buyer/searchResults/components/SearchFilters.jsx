@@ -19,7 +19,7 @@ export function SearchFilters({ className }) {
                 <MainSearchFilters
                     dialog_control={[is_dialog_open, set_is_dialog_open]}
                 />
-                <ApplyFiltersButton />
+                {/* <ApplyFiltersButton /> */}
             </div>
 
             <ReactModal
@@ -65,6 +65,7 @@ export function SearchFilters({ className }) {
                 />
 
                 <MoreFilters
+                    dialog_control={[is_dialog_open, set_is_dialog_open]}
                     className={"mt-8 p-10 rounded-2xl bg-white"}
                 />
             </ReactModal>
